@@ -3,15 +3,10 @@
  */
 import HistoricalData from '../models/historical';
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 const getHistoricalData = () => {
 	return HistoricalData.find({})
 };
 
-<<<<<<< HEAD
 const getHistoricalDataFilter = (findObject) => {
 	// grab start and end year provided by user
 	var startDate = findObject.startDate;
@@ -70,18 +65,12 @@ const getUniqueLocalForests = (stateAbbreviation) => {
 };
 
 // previous stuff is below
-=======
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 const uploadHistorical = async (historicalData) => {
 	let dataArray = [];
 	console.log(historicalData)
 	historicalData.forEach((historicalObj) => {
 		const historicalImport = {};
-<<<<<<< HEAD
 
-=======
-		
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 		historicalImport.yearNumber = historicalObj["YearNum"]
 		historicalImport.state = historicalObj["STATE"]
 		historicalImport.nf = historicalObj["NF"]
@@ -111,11 +100,5 @@ const uploadHistorical = async (historicalData) => {
 	});
 }
 
-<<<<<<< HEAD
 const historical = { getHistoricalData, getHistoricalDataFilter, getMinimumYear, getMaximumYear, getUniqueStates, getUniqueYears, getUniqueNationalForests, getUniqueLocalForests, uploadHistorical }
-=======
-
-
-const historical = { getHistoricalData, uploadHistorical }
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 export default historical;

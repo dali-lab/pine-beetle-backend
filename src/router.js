@@ -5,17 +5,13 @@ import { makePredictions } from './runRModel';
 
 const router = express();
 
-<<<<<<< HEAD
 // get all items in the database
-=======
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 router.get('/getHistoricals', (req, res) => {
 	historical.getHistoricalData().then((data) => {
 		res.send(data);
 	});
 });
 
-<<<<<<< HEAD
 // get all items with passed filter
 router.post('/getHistoricalsFilter', (req, res) => {
 	historical.getHistoricalDataFilter(req.body).then((data) => {
@@ -306,8 +302,6 @@ router.get('/getPredictions', (req, res) => {
 });
 
 // PREVIOUS IS ALL BELOW
-=======
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 router.get('/getSpots', (req, res) => {
 	controller.getSpotData().then((data) => {
 		res.send(data);
@@ -320,23 +314,6 @@ router.get('/getBeetles', (req, res) => {
 	});
 });
 
-<<<<<<< HEAD
-=======
-router.get('/getPredictions', (req, res) => {
-	// const { SPB, cleridst1, spotst1, spotst2, endobrev } = req.body; //es6 support not working?
-	const SPB = req.body["SPB"];
-	const cleridst1 = req.body["cleridst1"];
-	const spotst1 = req.body["spotst1"];
-	const spotst2 = req.body["spotst2"];
-	const endobrev = req.body["endobrev"];
-	makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev).then((predictions) => {
-		res.send(predictions);
-	}).catch((err) => {
-		re.send(err);
-	});
-});
-
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 router.post('/uploadSurvey123', (req, res) => {
 	const data = req.body;
 	controller.batchUpload(data).then((uploaded) => {
@@ -354,8 +331,4 @@ router.post('/uploadHistorical', (req, res) => {
 	})
 })
 
-<<<<<<< HEAD
 export default router;
-=======
-export default router;
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0

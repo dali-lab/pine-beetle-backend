@@ -5,32 +5,22 @@ import path from 'path';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import router from './router';
-<<<<<<< HEAD
 require('dotenv').config() // load environment variables
-=======
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 
 // DB Setup
 // NOTE this is where collection is named/which database we direct app to
 const localMongoConnection = 'mongodb://localhost/pb-dev';
 const mongoURI = process.env.MONGODB_URI || localMongoConnection;
-<<<<<<< HEAD
 mongoose.connect(mongoURI, {useNewUrlParser: true});
-=======
-mongoose.connect(mongoURI);
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 // set mongoose promises to es6 default
 mongoose.Promise = global.Promise;
 
 // initialize
 const app = express();
 
-<<<<<<< HEAD
 //enable cross origin resource sharing
 app.use(cors());
 
-=======
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
 // enable/disable http request logging
 app.use(morgan('dev'));
 

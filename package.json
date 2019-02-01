@@ -16,32 +16,17 @@
     "testSurvey123toMongo": "node src/importSurvey123toMongo.js"
   },
   "license": "ISC",
-<<<<<<< HEAD
-  "dependencies": {
-    "@babel/core": "^7.0.0",
-    "axios": "^0.18.0",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^10.0.1",
-=======
-  "engines": {
-    "node": ">=9 <=10",
-    "npm": "^5.6.0",
-    "yarn": "^1.6.0"
-  },
   "dependencies": {
     "axios": "^0.18.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
     "babel-loader": "^8.0.4",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "csvtojson": "^2.0.8",
-<<<<<<< HEAD
     "dotenv": "^6.2.0",
     "ejs": "^2.5.9",
     "event-stream": "^4.0.1",
@@ -55,20 +40,10 @@
   "devDependencies": {
     "eslint": "^5.12.1",
     "eslint-config-airbnb": "^17.1.0",
-=======
     "ejs": "^2.5.9",
     "express": "^4.16.3",
     "mongoose": "^5.0.17",
     "morgan": "^1.9.0",
     "r-script": "git+https://git@github.com/khamurdik/r-script.git"
-  },
-  "devDependencies": {
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb": "^16.1.0",
->>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
-    "eslint-plugin-import": "^2.11.0",
-    "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.7.0",
-    "nodemon": "^1.17.3"
   }
 }
