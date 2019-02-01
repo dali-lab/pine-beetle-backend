@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Project Pine Beetle
 Last Updated: 11.5.2018
 ## Table of Contents
@@ -108,3 +109,14 @@ Thomas Monfre, Isabelle Hurley, Madeline Hess.
 - This project was built in partnership with Professor Carissa Aoki of Bates College and Professor Matt Ayres of Dartmouth College, as well as with representatives from the US Forest Service.
 - Shout out to Paula Mendoza for guiding us during the first part of this project! The direction of the final product is in large part the result of your positive, guiding influence. Thanks!
 - Model for writing up this README drawn from https://github.com/dartmouth-cs98/18w-si32
+=======
+
+
+### Starter pack
+Includes express, node, and mongo dependencies (API, server, database)
+
+### dev notes
+brew install heroku/brew/heroku
+
+## todo include run and setup directions
+>>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0

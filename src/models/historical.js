@@ -65,8 +65,15 @@ const HistoricalSchema = new Schema({
 	toJSON: {
 		virtuals: true,
 	},
+<<<<<<< HEAD
 	strictQuery: true // turn on strict mode for query filters
 });
 
 const HistoricalModel = mongoose.model('Historical', HistoricalSchema);
 export default HistoricalModel;
+=======
+});
+
+const HistoricalModel = mongoose.model('Historical', HistoricalSchema);
+export default HistoricalModel;
+>>>>>>> 8f9dcbef5b2f9a7c19b41a714708c200836444c0
