@@ -269,7 +269,6 @@ router.post('/getPredictions', (req, res) => {
 			for (var entry in data) {
 				if (data[entry].year === parseInt(req.body.targetYear)) {
 					if (data[entry].spbPerTwoWeeks !== undefined) {
-						console.log("made it")
 						SPB += data[entry].spbPerTwoWeeks;
 					}
 				}
