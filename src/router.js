@@ -254,51 +254,84 @@ router.post('/getUniqueLocalForests', (req, res) => {
 });
 
 
-router.get('/getPredictions', (req, res) => {
-	historical.getHistoricalData().then((data) => {
-
-    //TODO: Implement express body-parser
-    //Plan:
-    // 1- Use body-parse to grab filters
-    // 2- Filter data
-    // 3- Retrieve (array of) SPB, cleridst1, spotst1, spotst2, endobrev
-    // 4- Run model and store inputs
-    // 4.5- Run model multiple times if need be (discuss implementation options), keep only average of results
-    // 5- Pass results to frontend
-
-    // Filters
-  	// const year = req.body["Year"];
-  	// const state = req.body["cleridst1"];
-  	// const BANKHEAD = req.body["spotst1"];
-  	// const classification = req.body["spotst2"];
-  	// const forest = req.body["endobrev"];
-    // others??
-
-    //Using windowed data, retrieve...
-    // obj.spbPerTwoWeeks
-    // cleridst1 = obj.cleridsPerTwoWeeks
-    // spotst1 = obj.spots (year before selected year)
-    // spotst2 = obj.spots (year selected)
-    // endobrev?
-
-    //Now pass results to model
-
-    //Running on hard coded data, temporary
-    const SPB = 2000;
-  	const cleridst1 = 582;
-  	const spotst1 = 1006;
-  	const spotst2 = 400;
-  	const endobrev = 1;
-
-    var predictions = new Promise(function(resolve, reject) {
-      resolve(makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev));
-    });
-
-    predictions.then(function(value){
-      // console.log(value);
-      res.send(value);
-    });
-  });
+router.post('/getPredictions', (req, res) => {
+	res.send("hello world")
+	// historical.getDataForPredictiveModel(req.body).then((data) => {
+	// 	//Vars Sum
+	// 	var sumSpots0 = 0;
+	// 	var sumSpots19 = 0;
+	// 	var sumSpots53 = 0;
+	// 	var sumSpots147 = 0;
+	// 	var sumSpots402 = 0;
+	// 	var sumSpots1095 = 0;
+	//
+	// 	//Vars aves
+	// 	var aveSpots0;
+	// 	var aveSpots19;
+	// 	var aveSpots53;
+	// 	var aveSpots147;
+	// 	var aveSpots402;
+	// 	var aveSpots1095;
+	//
+	// 	//Var t-1
+	// 	var cleridst1 = data[1].cleridsPerTwoWeeks;
+	// 	var spotst1 = data[1].spots;
+	//
+	// 	//Var t-2
+	// 	var spotst2 = data[0].spots;
+	//
+	// 	//Var others
+	// 	var endobrev = 1;
+	// 	var count = 0;
+	//
+	//
+	// 	for(i = 2; i < (data.length); i++) {
+	// 		console.log("slow and steady wins the race. count = " + count);
+	// 		//Vars t
+	// 		var SBP = data[i].spbPerTwoWeeks;
+	//
+	// 		//Run Model
+	// 		if ((isNaN(cleridst1) === true) (isNan(spotst1) === true) (isNan(spotst2) === true) (isNan(SBP) === true)) {
+	// 			var results = resolve(makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev));
+	//
+	// 			//Increment results
+	// 			sumSpots0 = sumSpots0 + results[3]._row;
+	// 			sumSpots19 = sumSpots19 + results[4]._row;
+	// 			sumSpots53 = sumSpots53 + results[5]._row;
+	// 			sumSpots147 = sumSpots147 + results[6]._row;
+	// 			sumSpots402 = sumSpots402 + results[7]._row;
+	// 			sumSpots1095 = sumSpots1095 + results[8]._row;
+	// 		}
+	//
+	// 		//Reset vars
+	// 		//Var t-1
+	// 		var cleridst1 = data[(i-1)].cleridsPerTwoWeeks;
+	// 		var spotst1 = data[(i-1)].spots;
+	//
+	// 		//Var t-2
+	// 		var spotst2 = data[(i-2)].spots;
+	// 		count++;
+	// 	}
+	//
+	// 	//calculate aves
+	// 	if (count > 0) {
+	// 		var aveSpots0 = sumSpots0 / count;
+	// 		var aveSpots19 = sumSpots19 / count;
+	// 		var aveSpots53 = sumSpots53 / count;
+	// 		var aveSpots147 = sumSpots147 / count;
+	// 		var aveSpots402 = sumSpots402 / count;
+	// 		var aveSpots1095 = sumSpots1095 / count;
+	// 	}
+	//
+	// 	//Create and send predictions as a promise
+	// 	var predictions = [];
+	// 	predictions.push(aveSpots0, aveSpots19, aveSpots53, aveSpots147, aveSpots402, aveSpots1095);
+	// 	var predPromise = Promise.resolve(predictions);
+	// 	predPromise.then(function(value){
+	// 	  console.log(value);
+	// 	  res.send(value);
+	// 	});
+  // });
 });
 
 // PREVIOUS IS ALL BELOW
