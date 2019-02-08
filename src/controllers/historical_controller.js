@@ -38,7 +38,7 @@ const getDataForPredictiveModel = (findObject) => {
     var data = HistoricalData.find(findObject);
 
     // query on year (allowing for range)
-		data = data.where('year').ne(undefined);
+	data = data.where('year').ne(undefined);
     data = data.where('year').gte(targetYear - 2);
     data = data.where('year').lte(targetYear);
 
