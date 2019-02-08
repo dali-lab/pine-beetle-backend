@@ -254,51 +254,57 @@ router.post('/getUniqueLocalForests', (req, res) => {
 });
 
 
-router.get('/getPredictions', (req, res) => {
-	historical.getHistoricalData().then((data) => {
+router.post('/getPredictions', (req, res) => {
+	historical.getDataForPredictiveModel(req.body).then((data) => {
+		// initialize input counts
+		var SPB = 0;
+		var cleridst1 = 0;
+		var spotst1 = 0;
+		var spotst2 = 0;
+		var endobrev = 1;
 
-    //TODO: Implement express body-parser
-    //Plan:
-    // 1- Use body-parse to grab filters
-    // 2- Filter data
-    // 3- Retrieve (array of) SPB, cleridst1, spotst1, spotst2, endobrev
-    // 4- Run model and store inputs
-    // 4.5- Run model multiple times if need be (discuss implementation options), keep only average of results
-    // 5- Pass results to frontend
+		// sum up inputs across these filters
+		for (var entry in data) {
+			if (data[entry].year === parseInt(req.body.targetYear)) {
+				if (data[entry].spbPerTwoWeeks !== undefined) {
+					console.log("made it")
+					SPB += data[entry].spbPerTwoWeeks;
+				}
+			}
+			if (data[entry].year === parseInt(req.body.targetYear - 1)) {
+				if (data[entry].spots !== undefined) {
+					spotst1 += data[entry].spots;
+				}
+				if (data[entry].cleridsPerTwoWeeks !== undefined) {
+					cleridst1 += data[entry].cleridsPerTwoWeeks;
+				}
+			}
+			else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
+				if (data[entry].spots !== undefined) {
+					spotst2 += data[entry].spots;
+				}
+			}
+		}
 
-    // Filters
-  	// const year = req.body["Year"];
-  	// const state = req.body["cleridst1"];
-  	// const BANKHEAD = req.body["spotst1"];
-  	// const classification = req.body["spotst2"];
-  	// const forest = req.body["endobrev"];
-    // others??
+		// make prediction
+		var results = makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev);
 
-    //Using windowed data, retrieve...
-    // obj.spbPerTwoWeeks
-    // cleridst1 = obj.cleridsPerTwoWeeks
-    // spotst1 = obj.spots (year before selected year)
-    // spotst2 = obj.spots (year selected)
-    // endobrev?
+		// get results
+		var expSpotsIfOutbreak = results[2].Predictions;
+		var spots0 = results[3].Predictions;
+		var spots19 = results[4].Predictions;
+		var spots53 = results[5].Predictions;
+		var spots147 = results[6].Predictions;
+		var spots402 = results[7].Predictions;
+		var spots1095 = results[8].Predictions;
 
-    //Now pass results to model
+		var predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak]
+		var predPromise = Promise.resolve(predictions);
 
-    //Running on hard coded data, temporary
-    const SPB = 2000;
-  	const cleridst1 = 582;
-  	const spotst1 = 1006;
-  	const spotst2 = 400;
-  	const endobrev = 1;
-
-    var predictions = new Promise(function(resolve, reject) {
-      resolve(makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev));
-    });
-
-    predictions.then(function(value){
-      // console.log(value);
-      res.send(value);
-    });
-  });
+		predPromise.then(function(value){
+		  res.send(value);
+		});
+  	});
 });
 
 // PREVIOUS IS ALL BELOW

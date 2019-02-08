@@ -11,7 +11,7 @@ attach(input[[1]])  # take parameters (SPB, clerids, spots, endobrev) as input (
 
 # Coefficients below were estimated for a zero-inflated Poisson model fit to historical data using pscl package in R.
 # These coefficients, and means and SDs that follow, remain the same for all predictions.
-# ______ Later insert code here that will ... 
+# ______ Later insert code here that will ...
 # ............ Refit the model with updated data. Assign new coefficient estimates to the variable names below.
 # ............ Calculate means and SDs of the transformed input data. Assign these values to the variable names below.
 # ______ End of subroutine for updating model
