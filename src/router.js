@@ -391,7 +391,7 @@ router.post('/getPredictions', (req, res) => {
   	});
 });
 
-router.post('/getPredictionsOnlySum', (req, res) => {
+router.post('/getPredictionsOld', (req, res) => {
 	historical.getDataForPredictiveModel(req.body).then((data) => {
 		// initialize input counts
 		var SPB = 0;
