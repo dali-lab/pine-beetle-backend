@@ -143,7 +143,7 @@ router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
 			var long = data[entry].longitude;
 
 			if (lat !== null && long !== null && lat !== undefined && long !== undefined) {
-				var index = findLocationObject(summarizedDataByLatLong, lat, long);
+				var index = findLatLongObject(summarizedDataByLatLong, lat, long);
 				var object = summarizedDataByLatLong[index];
 				if (object !== null && object !== undefined) {
 					object.spots += dataObject.spots;
@@ -202,9 +202,91 @@ router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
 	});
 });
 
-const findLocationObject = (collection, lat, long) => {
+const findLatLongObject = (collection, lat, long) => {
 	for (var i in collection) {
 		if (collection[i].latitude === lat && collection[i].longitude === long) {
+			return i
+		}
+	}
+	return null;
+}
+
+// get all items with passed filter, then summarize based on year
+router.post('/getSummarizedDataByState', (req, res) => {
+	historical.getHistoricalData().then((data) => {
+
+		// grab start and end year provided by user
+		var startDate = req.body.startDate;
+		var endDate = req.body.endDate;
+
+		var summarizedDataByState = [];
+
+		for (var entry in data) {
+			var dataObject = JSON.parse(JSON.stringify(data[entry]))
+			var state = data[entry].state;
+
+			if (state !== null && state !== undefined) {
+				var index = findStateObject(summarizedDataByState, state);
+				var object = summarizedDataByState[index];
+				if (object !== null && object !== undefined) {
+					object.spots += dataObject.spots;
+					object.spotsPerHundredKm += dataObject.spotsPerHundredKm;
+					object.spbPerTwoWeeks += dataObject.spbPerTwoWeeks;
+					object.cleridsPerTwoWeeks += dataObject.cleridsPerTwoWeeks;
+
+					// update start date
+					if (dataObject.year < object.startDate) {
+						object.startDate = dataObject.year
+					}
+
+					// update end date
+					if (dataObject.year > object.startDate) {
+						object.endDate = dataObject.year
+					}
+
+					// add to year array
+					if  (dataObject.year !== null && dataObject.year !== undefined && dataObject.year !== "" && !object.yearArray.includes(dataObject.year)) {
+						object.yearArray.push(dataObject.year)
+					}
+				}
+				else {
+					var newObject = dataObject;
+
+					// set start date and end date
+					newObject.startDate = dataObject.year;
+					newObject.endDate = dataObject.year
+
+					// set years array
+					var yearArray = []
+					if  (newObject.year !== null && newObject.year !== undefined && newObject.year !== "") {
+						yearArray.push(newObject.year)
+					}
+					newObject.yearArray = yearArray
+
+					summarizedDataByState.push(newObject)
+				}
+			}
+		}
+
+		// if all observations for a lat, long are 0, remove from dataset
+		var i = 0;
+		while (i < summarizedDataByState.length) {
+			if (summarizedDataByState[i].spots === 0 && summarizedDataByState[i].spotsPerHundredKm === 0 && summarizedDataByState[i].spbPerTwoWeeks === 0 && summarizedDataByState[i].cleridsPerTwoWeeks === 0) {
+				// remove observation from dataset and year
+				summarizedDataByState.splice(i,1);
+			}
+			else {
+				i += 1;
+			}
+		}
+
+		res.send(summarizedDataByState);
+	});
+});
+
+const findStateObject = (collection, state) => {
+	for (var i in collection) {
+		if (collection[i].state === state) {
 			return i
 		}
 	}
