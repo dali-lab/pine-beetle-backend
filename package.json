@@ -1,5 +1,5 @@
 {
-  "name": "example_express_with_es6",
+  "name": "pine-beetle-prediction-backend",
   "version": "2.0.0",
   "description": "",
   "author": "",
@@ -13,7 +13,8 @@
     "samplePopulate": "babel-node src/samplePopulate.js",
     "importHistoricalLocal": "curl -XPOST -H 'Content-type: application/json' -d @./src/data/SPB2016_toDALI.json 'http://localhost:9090/v1/uploadHistorical'",
     "rerunModel": "babel-node src/runRModel.js",
-    "testSurvey123toMongo": "node src/importSurvey123toMongo.js"
+    "testSurvey123toMongo": "node src/importSurvey123toMongo.js",
+    "heroku-postbuild": "echo Skip build on Heroku"
   },
   "license": "ISC",
   "dependencies": {
@@ -45,5 +46,6 @@
     "mongoose": "^5.0.17",
     "morgan": "^1.9.0",
     "r-script": "git+https://git@github.com/khamurdik/r-script.git"
-  }
+  },
+  "heroku-run-build-script": true
 }

@@ -143,7 +143,7 @@ router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
 			var long = data[entry].longitude;
 
 			if (lat !== null && long !== null && lat !== undefined && long !== undefined) {
-				var index = findLocationObject(summarizedDataByLatLong, lat, long);
+				var index = findLatLongObject(summarizedDataByLatLong, lat, long);
 				var object = summarizedDataByLatLong[index];
 				if (object !== null && object !== undefined) {
 					object.spots += dataObject.spots;
@@ -202,9 +202,91 @@ router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
 	});
 });
 
-const findLocationObject = (collection, lat, long) => {
+const findLatLongObject = (collection, lat, long) => {
 	for (var i in collection) {
 		if (collection[i].latitude === lat && collection[i].longitude === long) {
+			return i
+		}
+	}
+	return null;
+}
+
+// get all items with passed filter, then summarize based on year
+router.post('/getSummarizedDataByState', (req, res) => {
+	historical.getHistoricalData().then((data) => {
+
+		// grab start and end year provided by user
+		var startDate = req.body.startDate;
+		var endDate = req.body.endDate;
+
+		var summarizedDataByState = [];
+
+		for (var entry in data) {
+			var dataObject = JSON.parse(JSON.stringify(data[entry]))
+			var state = data[entry].state;
+
+			if (state !== null && state !== undefined) {
+				var index = findStateObject(summarizedDataByState, state);
+				var object = summarizedDataByState[index];
+				if (object !== null && object !== undefined) {
+					object.spots += dataObject.spots;
+					object.spotsPerHundredKm += dataObject.spotsPerHundredKm;
+					object.spbPerTwoWeeks += dataObject.spbPerTwoWeeks;
+					object.cleridsPerTwoWeeks += dataObject.cleridsPerTwoWeeks;
+
+					// update start date
+					if (dataObject.year < object.startDate) {
+						object.startDate = dataObject.year
+					}
+
+					// update end date
+					if (dataObject.year > object.startDate) {
+						object.endDate = dataObject.year
+					}
+
+					// add to year array
+					if  (dataObject.year !== null && dataObject.year !== undefined && dataObject.year !== "" && !object.yearArray.includes(dataObject.year)) {
+						object.yearArray.push(dataObject.year)
+					}
+				}
+				else {
+					var newObject = dataObject;
+
+					// set start date and end date
+					newObject.startDate = dataObject.year;
+					newObject.endDate = dataObject.year
+
+					// set years array
+					var yearArray = []
+					if  (newObject.year !== null && newObject.year !== undefined && newObject.year !== "") {
+						yearArray.push(newObject.year)
+					}
+					newObject.yearArray = yearArray
+
+					summarizedDataByState.push(newObject)
+				}
+			}
+		}
+
+		// if all observations for a lat, long are 0, remove from dataset
+		var i = 0;
+		while (i < summarizedDataByState.length) {
+			if (summarizedDataByState[i].spots === 0 && summarizedDataByState[i].spotsPerHundredKm === 0 && summarizedDataByState[i].spbPerTwoWeeks === 0 && summarizedDataByState[i].cleridsPerTwoWeeks === 0) {
+				// remove observation from dataset and year
+				summarizedDataByState.splice(i,1);
+			}
+			else {
+				i += 1;
+			}
+		}
+
+		res.send(summarizedDataByState);
+	});
+});
+
+const findStateObject = (collection, state) => {
+	for (var i in collection) {
+		if (collection[i].state === state) {
 			return i
 		}
 	}
@@ -256,6 +338,143 @@ router.post('/getUniqueLocalForests', (req, res) => {
 
 router.post('/getPredictions', (req, res) => {
 	historical.getDataForPredictiveModel(req.body).then((data) => {
+		// if the user selected a specific national forest or forest, simply run the model
+		if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== "") || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== "")) {
+			// initialize input counts
+			var SPB = 0;
+			var cleridst1 = 0;
+			var spotst1 = 0;
+			var spotst2 = 0;
+			var endobrev = 1;
+
+			// sum up inputs across these filters
+			for (var entry in data) {
+				if (data[entry].year === parseInt(req.body.targetYear)) {
+					if (data[entry].spbPerTwoWeeks !== undefined) {
+						SPB += data[entry].spbPerTwoWeeks;
+					}
+				}
+				if (data[entry].year === parseInt(req.body.targetYear - 1)) {
+					if (data[entry].spots !== undefined) {
+						spotst1 += data[entry].spots;
+					}
+					if (data[entry].cleridsPerTwoWeeks !== undefined) {
+						cleridst1 += data[entry].cleridsPerTwoWeeks;
+					}
+				}
+				else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
+					if (data[entry].spots !== undefined) {
+						spotst2 += data[entry].spots;
+					}
+				}
+			}
+
+			// make prediction
+			var results = makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev);
+
+			// get results
+			var expSpotsIfOutbreak = results[2].Predictions;
+			var spots0 = results[3].Predictions;
+			var spots19 = results[4].Predictions;
+			var spots53 = results[5].Predictions;
+			var spots147 = results[6].Predictions;
+			var spots402 = results[7].Predictions;
+			var spots1095 = results[8].Predictions;
+
+			var predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak]
+			var predPromise = Promise.resolve(predictions);
+
+			predPromise.then(function(value){
+			  res.send(value);
+			});
+		}
+
+		// split the data up by forests, run the model each time, average the results
+		else {
+			// separate all data by forest
+			var forestsData = {}
+
+			// sum up inputs across these filters
+			for (var entry in data) {
+				var forest = data[entry].forest;
+				let obj;
+
+				if (forest !== null && forest !== "") {
+					if (forestsData[forest] !== undefined) {
+						obj = forestsData[forest]
+					}
+					else {
+						obj = {
+							SPB: 0,
+							cleridst1: 0,
+							spotst1: 0,
+							spotst2: 0,
+							endobrev: 1
+						}
+					}
+				}
+
+				if (data[entry].year === parseInt(req.body.targetYear)) {
+					if (data[entry].spbPerTwoWeeks !== undefined) {
+						obj.SPB += data[entry].spbPerTwoWeeks;
+					}
+				}
+				if (data[entry].year === parseInt(req.body.targetYear - 1)) {
+					if (data[entry].spots !== undefined) {
+						obj.spotst1 += data[entry].spots;
+					}
+					if (data[entry].cleridsPerTwoWeeks !== undefined) {
+						obj.cleridst1 += data[entry].cleridsPerTwoWeeks;
+					}
+				}
+				else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
+					if (data[entry].spots !== undefined) {
+						obj.spotst2 += data[entry].spots;
+					}
+				}
+
+				forestsData[forest] = obj;
+			}
+
+			// initialize a collection of sums
+			var sums = {
+				expSpotsIfOutbreak: 0,
+				spots0: 0,
+				spots19: 0,
+				spots53: 0,
+				spots147: 0,
+				spots402: 0,
+				spots1095: 0
+			}
+
+			// run model on each forest
+			for (var forest in forestsData) {
+				// make prediction
+				var results = makePredictions(forestsData[forest].SPB, forestsData[forest].cleridst1, forestsData[forest].spotst1, forestsData[forest].spotst2, forestsData[forest].endobrev);
+
+				// get results
+				sums.expSpotsIfOutbreak += results[2].Predictions;
+				sums.spots0 += results[3].Predictions;
+				sums.spots19 += results[4].Predictions;
+				sums.spots53 += results[5].Predictions;
+				sums.spots147 += results[6].Predictions;
+				sums.spots402 += results[7].Predictions;
+				sums.spots1095 += results[8].Predictions;
+			}
+
+			var numForests = Object.keys(forestsData).length;
+			var predictions = [sums.spots0 / numForests, sums.spots19 / numForests, sums.spots53 / numForests, sums.spots147 / numForests, sums.spots402 / numForests, sums.spots1095 / numForests, sums.expSpotsIfOutbreak / numForests]
+			var predPromise = Promise.resolve(predictions);
+
+			predPromise.then(function(value){
+			  res.send(value);
+			});
+		}
+  	});
+});
+
+router.post('/getPredictionsOld', (req, res) => {
+	historical.getDataForPredictiveModel(req.body).then((data) => {
 		// initialize input counts
 		var SPB = 0;
 		var cleridst1 = 0;
@@ -267,7 +486,6 @@ router.post('/getPredictions', (req, res) => {
 		for (var entry in data) {
 			if (data[entry].year === parseInt(req.body.targetYear)) {
 				if (data[entry].spbPerTwoWeeks !== undefined) {
-					console.log("made it")
 					SPB += data[entry].spbPerTwoWeeks;
 				}
 			}
