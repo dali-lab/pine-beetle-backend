@@ -306,7 +306,7 @@ router.post('/getUniqueLocalForests', (req, res) => {
 router.post('/getPredictions', (req, res) => {
 	historical.getDataForPredictiveModel(req.body).then((data) => {
 		// if the user selected a specific national forest or forest, simply run the model
-		if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== "") || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== "")) {
+		breakpoint: if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== "") || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== "")) {
 			// initialize input counts
 			var SPB = 0;
 			var cleridst1 = 0;
@@ -358,6 +358,13 @@ router.post('/getPredictions', (req, res) => {
 
 		// split the data up by forests, run the model each time, average the results
 		else {
+			// TEMPORARILY DO NOT ALLOW THE USER TO RUN THE MODEL MULTIPLE TIMES -- AVOID CRASHING THE SERVER
+			return res.status(400).send({
+				message: 'We are not currently multiple concurrent model runs. Please use the getPredictionsOld route.'
+			 });
+
+			break breakpoint;
+
 			// separate all data by forest
 			var forestsData = {}
 
