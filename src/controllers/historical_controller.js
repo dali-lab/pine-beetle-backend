@@ -48,6 +48,20 @@ const getDataForPredictiveModel = (findObject) => {
     return data;
 };
 
+const getDataForSingleYear = (findObject) => {
+    // grab start and end year provided by user	
+	var targetYear = findObject.targetYear
+
+    // find all values with matching fields in the parameters
+    var data = HistoricalData.find(findObject);
+
+    // query on year (allowing for range) then sort based on year
+	data = data.where('year').ne(undefined);
+	data = data.where('year').equals(targetYear);
+
+    return data;
+};
+
 // returns the first year found in the database
 const getMinimumYear = () => {
 	return HistoricalData.find({}).sort("year").limit(1)
@@ -118,5 +132,5 @@ const uploadHistorical = async (historicalData) => {
 	});
 }
 
-const historical = { getHistoricalData, getHistoricalDataFilter, getDataForPredictiveModel, getMinimumYear, getMaximumYear, getUniqueStates, getUniqueYears, getUniqueNationalForests, getUniqueLocalForests, uploadHistorical }
+const historical = { getHistoricalData, getHistoricalDataFilter, getDataForPredictiveModel, getDataForSingleYear, getMinimumYear, getMaximumYear, getUniqueStates, getUniqueYears, getUniqueNationalForests, getUniqueLocalForests, uploadHistorical }
 export default historical;
