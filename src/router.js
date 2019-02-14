@@ -2,6 +2,8 @@ import express, {Router} from 'express';
 import historical from './controllers/historical_controller';
 import controller from './controllers/survey123_controller';
 import { makePredictions } from './runRModel';
+import math from 'mathjs'; 
+import { ObjectUnsubscribedError } from 'rxjs';
 
 const router = express();
 
@@ -302,11 +304,11 @@ router.post('/getUniqueLocalForests', (req, res) => {
 	});
 });
 
-
+// run the R model on forest if specified, otherwise on entire state
 router.post('/getPredictions', (req, res) => {
 	historical.getDataForPredictiveModel(req.body).then((data) => {
 		// if the user selected a specific national forest or forest, simply run the model
-		breakpoint: if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== "") || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== "")) {
+		if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== "") || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== "")) {
 			// initialize input counts
 			var SPB = 0;
 			var cleridst1 = 0;
@@ -360,89 +362,94 @@ router.post('/getPredictions', (req, res) => {
 		else {
 			// TEMPORARILY DO NOT ALLOW THE USER TO RUN THE MODEL MULTIPLE TIMES -- AVOID CRASHING THE SERVER
 			return res.status(400).send({
-				message: 'We are not currently multiple concurrent model runs. Please use the getPredictionsOld route.'
+				message: 'We are not currently allowing multiple concurrent model runs. Please use the getPredictionsOld route.'
 			 });
 
-			break breakpoint;
+			// // separate all data by forest
+			// var forestsData = {}
 
-			// separate all data by forest
-			var forestsData = {}
+			// // sum up inputs across these filters
+			// for (var entry in data) {
+			// 	var forestNames = [data[entry].forest, data[entry].nf]
+			// 	var obj = [null,null];
 
-			// sum up inputs across these filters
-			for (var entry in data) {
-				var forest = data[entry].forest;
-				let obj;
+			// 	// repeat for forest and national forest
+			// 	for (var i=0; i < obj.length; i++) {
+			// 		// if there is a forest to grab, find object, otherwise create one
+			// 		if (forestNames[i] !== null && forestNames[i] !== "") {
+			// 			if (forestsData[forestNames[i]] !== undefined) {
+			// 				obj[i] = forestsData[forestNames[i]]
+			// 			}
+			// 			else {
+			// 				obj[i] = {
+			// 					SPB: 0,
+			// 					cleridst1: 0,
+			// 					spotst1: 0,
+			// 					spotst2: 0,
+			// 					endobrev: 1
+			// 				}
+			// 			}
+			// 		}
 
-				if (forest !== null && forest !== "") {
-					if (forestsData[forest] !== undefined) {
-						obj = forestsData[forest]
-					}
-					else {
-						obj = {
-							SPB: 0,
-							cleridst1: 0,
-							spotst1: 0,
-							spotst2: 0,
-							endobrev: 1
-						}
-					}
-				}
+			// 		// if we have an object to grab, get statistics for spb, spots, etc.
+			// 		if (obj[i] !== null) {
+			// 			if (data[entry].year === parseInt(req.body.targetYear)) {
+			// 				if (data[entry].spbPerTwoWeeks !== undefined) {
+			// 					obj[i].SPB += data[entry].spbPerTwoWeeks;
+			// 				}
+			// 			}
+			// 			if (data[entry].year === parseInt(req.body.targetYear - 1)) {
+			// 				if (data[entry].spots !== undefined) {
+			// 					obj[i].spotst1 += data[entry].spots;
+			// 				}
+			// 				if (data[entry].cleridsPerTwoWeeks !== undefined) {
+			// 					obj[i].cleridst1 += data[entry].cleridsPerTwoWeeks;
+			// 				}
+			// 			}
+			// 			else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
+			// 				if (data[entry].spots !== undefined) {
+			// 					obj[i].spotst2 += data[entry].spots;
+			// 				}
+			// 			}
+			
+			// 			forestsData[forestNames[i]] = obj[i];
+			// 		}
+			// 	}
+			// }
 
-				if (data[entry].year === parseInt(req.body.targetYear)) {
-					if (data[entry].spbPerTwoWeeks !== undefined) {
-						obj.SPB += data[entry].spbPerTwoWeeks;
-					}
-				}
-				if (data[entry].year === parseInt(req.body.targetYear - 1)) {
-					if (data[entry].spots !== undefined) {
-						obj.spotst1 += data[entry].spots;
-					}
-					if (data[entry].cleridsPerTwoWeeks !== undefined) {
-						obj.cleridst1 += data[entry].cleridsPerTwoWeeks;
-					}
-				}
-				else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
-					if (data[entry].spots !== undefined) {
-						obj.spotst2 += data[entry].spots;
-					}
-				}
+			// // initialize a collection of sums
+			// var sums = {
+			// 	expSpotsIfOutbreak: 0,
+			// 	spots0: 0,
+			// 	spots19: 0,
+			// 	spots53: 0,
+			// 	spots147: 0,
+			// 	spots402: 0,
+			// 	spots1095: 0
+			// }
 
-				forestsData[forest] = obj;
-			}
+			// // run model on each forest
+			// for (var forest in forestsData) {
+			// 	// make prediction
+			// 	var results = makePredictions(forestsData[forest].SPB, forestsData[forest].cleridst1, forestsData[forest].spotst1, forestsData[forest].spotst2, forestsData[forest].endobrev);
 
-			// initialize a collection of sums
-			var sums = {
-				expSpotsIfOutbreak: 0,
-				spots0: 0,
-				spots19: 0,
-				spots53: 0,
-				spots147: 0,
-				spots402: 0,
-				spots1095: 0
-			}
+			// 	// get results
+			// 	sums.expSpotsIfOutbreak += results[2].Predictions;
+			// 	sums.spots0 += results[3].Predictions;
+			// 	sums.spots19 += results[4].Predictions;
+			// 	sums.spots53 += results[5].Predictions;
+			// 	sums.spots147 += results[6].Predictions;
+			// 	sums.spots402 += results[7].Predictions;
+			// 	sums.spots1095 += results[8].Predictions;
+			// }
 
-			// run model on each forest
-			for (var forest in forestsData) {
-				// make prediction
-				var results = makePredictions(forestsData[forest].SPB, forestsData[forest].cleridst1, forestsData[forest].spotst1, forestsData[forest].spotst2, forestsData[forest].endobrev);
+			// var numForests = Object.keys(forestsData).length;
+			// var predictions = [sums.spots0 / numForests, sums.spots19 / numForests, sums.spots53 / numForests, sums.spots147 / numForests, sums.spots402 / numForests, sums.spots1095 / numForests, sums.expSpotsIfOutbreak / numForests]
+			// var predPromise = Promise.resolve(predictions);
 
-				// get results
-				sums.expSpotsIfOutbreak += results[2].Predictions;
-				sums.spots0 += results[3].Predictions;
-				sums.spots19 += results[4].Predictions;
-				sums.spots53 += results[5].Predictions;
-				sums.spots147 += results[6].Predictions;
-				sums.spots402 += results[7].Predictions;
-				sums.spots1095 += results[8].Predictions;
-			}
-
-			var numForests = Object.keys(forestsData).length;
-			var predictions = [sums.spots0 / numForests, sums.spots19 / numForests, sums.spots53 / numForests, sums.spots147 / numForests, sums.spots402 / numForests, sums.spots1095 / numForests, sums.expSpotsIfOutbreak / numForests]
-			var predPromise = Promise.resolve(predictions);
-
-			predPromise.then(function(value){
-			  res.send(value);
-			});
+			// predPromise.then(function(value){
+			//   res.send(value);
+			// });
 		}
   	});
 });
@@ -491,6 +498,126 @@ router.post('/getPredictionsOld', (req, res) => {
 		var spots1095 = results[8].Predictions;
 
 		var predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak]
+		var predPromise = Promise.resolve(predictions);
+
+		predPromise.then(function(value){
+		  res.send(value);
+		});
+  	});
+});
+
+// testing to see where heroku crashes in for-loop
+router.post('/getPredictionsState', (req, res) => {
+	historical.getDataForPredictiveModel(req.body).then((data) => {
+		// separate all data by forest
+		var forestsData = {}
+
+		// sum up inputs across these filters
+		for (var entry in data) {
+			var forestNames = [data[entry].forest, data[entry].nf]
+			var obj = [null,null];
+
+			// repeat for forest and national forest
+			for (var i=0; i < obj.length; i++) {
+				// if there is a forest to grab, find object, otherwise create one
+				if (forestNames[i] !== null && forestNames[i] !== "") {
+					if (forestsData[forestNames[i]] !== undefined) {
+						obj[i] = forestsData[forestNames[i]]
+					}
+					else {
+						obj[i] = {
+							SPB: 0,
+							cleridst1: 0,
+							spotst1: 0,
+							spotst2: 0,
+							endobrev: 1
+						}
+					}
+				}
+
+				// if we have an object to grab, get statistics for spb, spots, etc.
+				if (obj[i] !== null) {
+					if (data[entry].year === parseInt(req.body.targetYear)) {
+						if (data[entry].spbPerTwoWeeks !== undefined) {
+							obj[i].SPB += data[entry].spbPerTwoWeeks;
+						}
+					}
+					if (data[entry].year === parseInt(req.body.targetYear - 1)) {
+						if (data[entry].spots !== undefined) {
+							obj[i].spotst1 += data[entry].spots;
+						}
+						if (data[entry].cleridsPerTwoWeeks !== undefined) {
+							obj[i].cleridst1 += data[entry].cleridsPerTwoWeeks;
+						}
+					}
+					else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
+						if (data[entry].spots !== undefined) {
+							obj[i].spotst2 += data[entry].spots;
+						}
+					}
+		
+					forestsData[forestNames[i]] = obj[i];
+				}
+			}
+		}
+
+		// grab array of spots values
+		var spots = []
+		for (var forest in forestsData) {
+			spots.push(forestsData[forest].spotst1)
+		}
+
+		// compute mean and standard deviation of observed spots
+		var meanSpots = math.mean(spots);
+		var sdSpots = math.std(spots);
+
+		// get count of number of forests chosen then determine number of forests to run the model on
+		var numForests = Object.keys(forestsData).length;
+		var numForestsForModel = parseInt(numForests / 4);
+
+		// construct object for forests to run the model on
+		var forestsDataForModel = {}
+		var forestsAdded = 0;
+
+		// get representative forests to run the model on
+		for (var forest in forestsData) {
+			if (forestsAdded < numForestsForModel) {
+				// determine if this spots value is within one standard deviation of the mean
+				if (forestsData[forest].spotst1 >= meanSpots - sdSpots && forestsData[forest].spotst1 <= meanSpots + sdSpots) {
+					forestsDataForModel[forest] = forestsData[forest]
+					delete forestsData[forest];
+					forestsAdded += 1;
+				}
+			}
+		}
+
+		// initialize a collection of sums
+		var sums = {
+			expSpotsIfOutbreak: 0,
+			spots0: 0,
+			spots19: 0,
+			spots53: 0,
+			spots147: 0,
+			spots402: 0,
+			spots1095: 0
+		}
+
+		// run model on each representative forest
+		for (var forest in forestsDataForModel) {
+			// make prediction
+			var results = makePredictions(forestsDataForModel[forest].SPB, forestsDataForModel[forest].cleridst1, forestsDataForModel[forest].spotst1, forestsDataForModel[forest].spotst2, forestsDataForModel[forest].endobrev);
+
+			// get results
+			sums.expSpotsIfOutbreak += results[2].Predictions;
+			sums.spots0 += results[3].Predictions;
+			sums.spots19 += results[4].Predictions;
+			sums.spots53 += results[5].Predictions;
+			sums.spots147 += results[6].Predictions;
+			sums.spots402 += results[7].Predictions;
+			sums.spots1095 += results[8].Predictions;
+		}
+
+		var predictions = [sums.spots0 / numForestsForModel, sums.spots19 / numForestsForModel, sums.spots53 / numForestsForModel, sums.spots147 / numForestsForModel, sums.spots402 / numForestsForModel, sums.spots1095 / numForestsForModel, sums.expSpotsIfOutbreak / numForestsForModel]
 		var predPromise = Promise.resolve(predictions);
 
 		predPromise.then(function(value){
