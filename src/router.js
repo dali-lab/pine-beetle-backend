@@ -361,11 +361,21 @@ router.post('/getPredictions', (req, res) => {
 				var predPromise = Promise.resolve(predictions);
 	
 				predPromise.then(function(value){
+					// put model outputs into JSON object
+					var outputs = {
+						prob0spots: value[0],
+						prob19spots: value[1],
+						prob53spots: value[2],
+						prob147spots: value[3],
+						prob402spots: value[4],
+						prob1095spots: value[5],
+						expSpotsIfOutbreak: value[6]
+					}
+
 					res.send({
 						inputs: modelInputs,
-						outputs: value
+						outputs: outputs
 					});
-					// res.send(value);
 				});
 			}
 	
@@ -504,9 +514,20 @@ router.post('/getPredictions', (req, res) => {
 				var predPromise = Promise.resolve(predictions);
 	
 				predPromise.then(function(value){
+					// put model outputs into JSON object
+					var outputs = {
+						prob0spots: value[0],
+						prob19spots: value[1],
+						prob53spots: value[2],
+						prob147spots: value[3],
+						prob402spots: value[4],
+						prob1095spots: value[5],
+						expSpotsIfOutbreak: value[6]
+					}
+
 					res.send({
 						inputs: averageModelInputs,
-						outputs: value
+						outputs: outputs
 					});
 					// res.send(value);
 				});
@@ -540,60 +561,19 @@ router.post('/getCustomPredictions', (req, res) => {
 	var predPromise = Promise.resolve(predictions);
 
 	predPromise.then(function(value){
-	  res.send(value);
-	});
-});
-
-router.post('/getPredictionsOld', (req, res) => {
-	historical.getDataForPredictiveModel(req.body).then((data) => {
-		// initialize input counts
-		var SPB = 0;
-		var cleridst1 = 0;
-		var spotst1 = 0;
-		var spotst2 = 0;
-		var endobrev = 1;
-
-		// sum up inputs across these filters
-		for (var entry in data) {
-			if (data[entry].year === parseInt(req.body.targetYear)) {
-				if (data[entry].spbPerTwoWeeks !== undefined) {
-					SPB += data[entry].spbPerTwoWeeks;
-				}
-			}
-			if (data[entry].year === parseInt(req.body.targetYear - 1)) {
-				if (data[entry].spots !== undefined) {
-					spotst1 += data[entry].spots;
-				}
-				if (data[entry].cleridsPerTwoWeeks !== undefined) {
-					cleridst1 += data[entry].cleridsPerTwoWeeks;
-				}
-			}
-			else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
-				if (data[entry].spots !== undefined) {
-					spotst2 += data[entry].spots;
-				}
-			}
+		// put model outputs into JSON object
+		var outputs = {
+			prob0spots: value[0],
+			prob19spots: value[1],
+			prob53spots: value[2],
+			prob147spots: value[3],
+			prob402spots: value[4],
+			prob1095spots: value[5],
+			expSpotsIfOutbreak: value[6]
 		}
 
-		// make prediction
-		var results = makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev);
-
-		// get results
-		var expSpotsIfOutbreak = results[2].Predictions;
-		var spots0 = results[3].Predictions;
-		var spots19 = results[4].Predictions;
-		var spots53 = results[5].Predictions;
-		var spots147 = results[6].Predictions;
-		var spots402 = results[7].Predictions;
-		var spots1095 = results[8].Predictions;
-
-		var predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak]
-		var predPromise = Promise.resolve(predictions);
-
-		predPromise.then(function(value){
-		  res.send(value);
-		});
-  	});
+	  res.send(outputs);
+	});
 });
 
 // PREVIOUS IS ALL BELOW
