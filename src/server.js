@@ -35,6 +35,13 @@ app.use(bodyParser.json({ limit: '50mb', extended: true }));
 // prefix API endpoints
 app.use('/v1', router);
 
+// allow cors
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 // START THE SERVER
 // =============================================================================
 const port = process.env.PORT || 9090;
