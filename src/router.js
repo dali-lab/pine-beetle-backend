@@ -316,36 +316,37 @@ router.post('/getPredictions', (req, res) => {
 			// if the user selected a specific national forest or forest, simply run the model
 			if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== "") || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== "")) {
 				// initialize input counts
-				var SPB = 0;
-				var cleridst1 = 0;
-				var spotst1 = 0;
-				var spotst2 = 0;
-				var endobrev = 1;
-	
+				var modelInputs = {
+					SPB: 0,
+					cleridst1: 0,
+					spotst1: 0,
+					spotst2: 0
+				}
+
 				// sum up inputs across these filters
 				for (var entry in data) {
 					if (data[entry].year === parseInt(req.body.targetYear)) {
 						if (data[entry].spbPerTwoWeeks !== undefined) {
-							SPB += data[entry].spbPerTwoWeeks;
+							modelInputs.SPB += data[entry].spbPerTwoWeeks;
 						}
 					}
 					if (data[entry].year === parseInt(req.body.targetYear - 1)) {
 						if (data[entry].spots !== undefined) {
-							spotst1 += data[entry].spots;
+							modelInputs.spotst1 += data[entry].spots;
 						}
 						if (data[entry].cleridsPerTwoWeeks !== undefined) {
-							cleridst1 += data[entry].cleridsPerTwoWeeks;
+							modelInputs.cleridst1 += data[entry].cleridsPerTwoWeeks;
 						}
 					}
 					else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
 						if (data[entry].spots !== undefined) {
-							spotst2 += data[entry].spots;
+							modelInputs.spotst2 += data[entry].spots;
 						}
 					}
 				}
-	
+
 				// make prediction
-				var results = makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev);
+				var results = makePredictions(modelInputs.SPB, modelInputs.cleridst1, modelInputs.spotst1, modelInputs.spotst2, 1);
 	
 				// get results
 				var expSpotsIfOutbreak = results[2].Predictions;
@@ -360,7 +361,11 @@ router.post('/getPredictions', (req, res) => {
 				var predPromise = Promise.resolve(predictions);
 	
 				predPromise.then(function(value){
-				  res.send(value);
+					res.send({
+						inputs: modelInputs,
+						outputs: value
+					});
+					// res.send(value);
 				});
 			}
 	
@@ -458,9 +463,22 @@ router.post('/getPredictions', (req, res) => {
 					spots402: 0,
 					spots1095: 0
 				}
+
+				var outputSums = {
+					SPB: 0,
+					cleridst1: 0,
+					spotst1: 0,
+					spotst2: 0
+				}
 	
 				// run model on each representative forest
 				for (var forest in forestsDataForModel) {
+					// add to outputSums
+					outputSums.SPB += forestsDataForModel[forest].SPB;
+					outputSums.cleridst1 += forestsDataForModel[forest].cleridst1;
+					outputSums.spotst1 += forestsDataForModel[forest].spotst1;
+					outputSums.spotst2 += forestsDataForModel[forest].spotst2;
+
 					// make prediction
 					var results = makePredictions(forestsDataForModel[forest].SPB, forestsDataForModel[forest].cleridst1, forestsDataForModel[forest].spotst1, forestsDataForModel[forest].spotst2, forestsDataForModel[forest].endobrev);
 	
@@ -473,20 +491,60 @@ router.post('/getPredictions', (req, res) => {
 					sums.spots402 += results[7].Predictions;
 					sums.spots1095 += results[8].Predictions;
 				}
+				
+				// get average model inputs
+				var averageModelInputs = {
+					SPB: outputSums.SPB / numForestsForModel,
+					cleridst1: outputSums.cleridst1 / numForestsForModel,
+					spotst1: outputSums.spotst1 / numForestsForModel,
+					spotst2: outputSums.spotst2 / numForestsForModel
+				}
 	
 				var predictions = [sums.spots0 / numForestsForModel, sums.spots19 / numForestsForModel, sums.spots53 / numForestsForModel, sums.spots147 / numForestsForModel, sums.spots402 / numForestsForModel, sums.spots1095 / numForestsForModel, sums.expSpotsIfOutbreak / numForestsForModel]
 				var predPromise = Promise.resolve(predictions);
 	
 				predPromise.then(function(value){
-				res.send(value);
+					res.send({
+						inputs: averageModelInputs,
+						outputs: value
+					});
+					// res.send(value);
 				});
 			}
 		});
 	}
 });
 
+router.post('/getCustomPredictions', (req, res) => {
+	// get model inputs
+	var SPB = parseInt(req.body.SPB);
+	var cleridst1 = parseInt(req.body.cleridst1);
+	var spotst1 = parseInt(req.body.spotst1);
+	var spotst2 = parseInt(req.body.spotst2);
+	var endobrev = 1;
+
+	// make prediction
+	var results = makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev);
+
+	// grab results
+	var expSpotsIfOutbreak = results[2].Predictions;
+	var spots0 = results[3].Predictions;
+	var spots19 = results[4].Predictions;
+	var spots53 = results[5].Predictions;
+	var spots147 = results[6].Predictions;
+	var spots402 = results[7].Predictions;
+	var spots1095 = results[8].Predictions;
+
+	// resolve promise
+	var predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak]
+	var predPromise = Promise.resolve(predictions);
+
+	predPromise.then(function(value){
+	  res.send(value);
+	});
+});
+
 router.post('/getPredictionsOld', (req, res) => {
-	console.log(req)
 	historical.getDataForPredictiveModel(req.body).then((data) => {
 		// initialize input counts
 		var SPB = 0;
