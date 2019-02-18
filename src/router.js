@@ -596,6 +596,67 @@ router.post('/uploadSurvey123', (req, res) => {
 	})
 })
 
+router.post('/uploadSurvey123Fake', (req, res) => {
+	res.send([{
+			hello: "world",
+			test: 1
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		{
+			hello: "world",
+			test: 2
+		},
+		
+	]);
+})
+
 router.post('/uploadHistorical', (req, res) => {
 	const data = req.body;
 	console.log(data)
