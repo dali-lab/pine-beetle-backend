@@ -1,9 +1,9 @@
 import express, {Router} from 'express';
 import math from 'mathjs';
 import historical from './controllers/historical_controller';
-import controller from './controllers/survey123_controller';
+import controller from './controllers/survey123_controller_v2';
 import { makePredictions } from './runRModel';
-// import upload from './importing-scripts/uploadSurvey123toMongo';
+import upload from './importing-scripts/uploadSurvey123toMongo';
 
 const router = express();
 
@@ -595,21 +595,47 @@ router.get('/getBeetles', (req, res) => {
 	});
 });
 
-router.post('/uploadSurvey123', (req, res) => {
-	const data = req.body;
-	controller.batchUpload(data).then((uploaded) => {
-		res.send(uploaded);
-	})
+router.get('/uploadSurvey123', (req, res) => {
 
+	//Debug
 	console.log('uploadSurvey123 running');
+	res.send('uploadSurvey123 running');
+
 	// const data = upload.getData();
 	// console.log("data " + data);
-	// contoller.uploadSpotData(data);
-	// contoller.uploadSpotData(data).then((uploaded) => {
+	// controller.uploadSpotData(data);
+
+
+	//get the data from S123 using axios, then with that...
+	upload.getData().then((data) => {
+		//what IS the data???
+		console.log("data " + data);
+
+		//check and filter if we already have the data
+
+		//run uploadSpotData to upload data to db, then report to user
+		// controller.uploadSpotData(data);
+		controller.uploadSpotData(data).then((uploaded) => {
+			console.log("uploaded " + uploaded);
+			res.send(uploaded);
+		}).catch((err) => {
+			console.log("err: " + err)
+		})
+
+	}).catch((err) => {
+		console.log("err: " + err);
+	})
+
+	// controller.uploadSpotData(data).then((uploaded) => {
 	// 	console.log("uploaded " + uploaded);
 	// 	res.send(uploaded);
 	// }).catch((err) => {
 	// 	console.log("err" + err)
+	// })
+
+	// const data = req.body;
+	// controller.batchUpload(data).then((uploaded) => {
+	// 	res.send(uploaded);
 	// })
 
 })

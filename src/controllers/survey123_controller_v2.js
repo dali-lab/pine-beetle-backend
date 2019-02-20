@@ -13,8 +13,17 @@ export const getBeetleData = () => {
  };
 
 //might need to make async
-export const uploadSpotData = (object) => {
-  console.log("uploadSpotData running")
+export const uploadSpotData = () => {
+  console.log("uploadSpotData running");
+
+  //return for testing only
+  var promise1 = Promise.resolve(123);
+  promise1.then(function(value) {
+    console.log(value);
+    // expected output: 123
+  });
+  return promise1;
+
 	// console.log(object);
 
   // //Multi Obj Version
@@ -204,3 +213,7 @@ export const editField = (sampleId, field, newValue) => {
 		return example.save();
 	});
 };
+
+
+const controller = { uploadSpotData };
+export default controller;
