@@ -3,6 +3,7 @@ import math from 'mathjs';
 import historical from './controllers/historical_controller';
 import controller from './controllers/survey123_controller';
 import { makePredictions } from './runRModel';
+// import upload from './importing-scripts/uploadSurvey123toMongo';
 
 const router = express();
 
@@ -352,7 +353,7 @@ router.post('/getPredictions', (req, res) => {
 
 				// make prediction
 				var results = makePredictions(modelInputs.SPB, modelInputs.cleridst1, modelInputs.spotst1, modelInputs.spotst2, 1);
-	
+
 				// get results
 				var expSpotsIfOutbreak = results[2].Predictions;
 				var spots0 = results[3].Predictions;
@@ -361,10 +362,10 @@ router.post('/getPredictions', (req, res) => {
 				var spots147 = results[6].Predictions;
 				var spots402 = results[7].Predictions;
 				var spots1095 = results[8].Predictions;
-	
+
 				var predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak]
 				var predPromise = Promise.resolve(predictions);
-	
+
 				predPromise.then(function(value){
 					// put model outputs into JSON object
 					var outputs = {
@@ -383,17 +384,17 @@ router.post('/getPredictions', (req, res) => {
 					});
 				});
 			}
-	
+
 			// split the data up by forests, determine representative forests of the sample, run the model on only representative forests
 			else {
 				// separate all data by forest
 				var forestsData = {}
-	
+
 				// sum up inputs across these filters
 				for (var entry in data) {
 					var forestNames = [data[entry].forest, data[entry].nf]
 					var obj = [null,null];
-	
+
 					// repeat for forest and national forest
 					for (var i=0; i < obj.length; i++) {
 						// if there is a forest to grab, find object, otherwise create one
@@ -411,7 +412,7 @@ router.post('/getPredictions', (req, res) => {
 								}
 							}
 						}
-	
+
 						// if we have an object to grab, get statistics for spb, spots, etc.
 						if (obj[i] !== null) {
 							if (data[entry].year === parseInt(req.body.targetYear)) {
@@ -432,30 +433,30 @@ router.post('/getPredictions', (req, res) => {
 									obj[i].spotst2 += data[entry].spots;
 								}
 							}
-				
+
 							forestsData[forestNames[i]] = obj[i];
 						}
 					}
 				}
-	
+
 				// grab array of spots values
 				var spots = []
 				for (var forest in forestsData) {
 					spots.push(forestsData[forest].spotst1)
 				}
-	
+
 				// compute mean and standard deviation of observed spots
 				var meanSpots = math.mean(spots);
 				var sdSpots = math.std(spots);
-	
+
 				// get count of number of forests chosen then determine number of forests to run the model on
 				var numForests = Object.keys(forestsData).length;
 				var numForestsForModel = parseInt(numForests / 4);
-	
+
 				// construct object for forests to run the model on
 				var forestsDataForModel = {}
 				var forestsAdded = 0;
-	
+
 				// get representative forests to run the model on
 				for (var forest in forestsData) {
 					if (forestsAdded < numForestsForModel) {
@@ -467,7 +468,7 @@ router.post('/getPredictions', (req, res) => {
 						}
 					}
 				}
-	
+
 				// initialize a collection of sums
 				var sums = {
 					expSpotsIfOutbreak: 0,
@@ -485,7 +486,7 @@ router.post('/getPredictions', (req, res) => {
 					spotst1: 0,
 					spotst2: 0
 				}
-	
+
 				// run model on each representative forest
 				for (var forest in forestsDataForModel) {
 					// add to outputSums
@@ -496,7 +497,7 @@ router.post('/getPredictions', (req, res) => {
 
 					// make prediction
 					var results = makePredictions(forestsDataForModel[forest].SPB, forestsDataForModel[forest].cleridst1, forestsDataForModel[forest].spotst1, forestsDataForModel[forest].spotst2, forestsDataForModel[forest].endobrev);
-	
+
 					// get results
 					sums.expSpotsIfOutbreak += results[2].Predictions;
 					sums.spots0 += results[3].Predictions;
@@ -506,7 +507,7 @@ router.post('/getPredictions', (req, res) => {
 					sums.spots402 += results[7].Predictions;
 					sums.spots1095 += results[8].Predictions;
 				}
-				
+
 				// get average model inputs
 				var averageModelInputs = {
 					SPB: outputSums.SPB / numForestsForModel,
@@ -514,10 +515,10 @@ router.post('/getPredictions', (req, res) => {
 					spotst1: outputSums.spotst1 / numForestsForModel,
 					spotst2: outputSums.spotst2 / numForestsForModel
 				}
-	
+
 				var predictions = [sums.spots0 / numForestsForModel, sums.spots19 / numForestsForModel, sums.spots53 / numForestsForModel, sums.spots147 / numForestsForModel, sums.spots402 / numForestsForModel, sums.spots1095 / numForestsForModel, sums.expSpotsIfOutbreak / numForestsForModel]
 				var predPromise = Promise.resolve(predictions);
-	
+
 				predPromise.then(function(value){
 					// put model outputs into JSON object
 					var outputs = {
@@ -599,6 +600,18 @@ router.post('/uploadSurvey123', (req, res) => {
 	controller.batchUpload(data).then((uploaded) => {
 		res.send(uploaded);
 	})
+
+	console.log('uploadSurvey123 running');
+	// const data = upload.getData();
+	// console.log("data " + data);
+	// contoller.uploadSpotData(data);
+	// contoller.uploadSpotData(data).then((uploaded) => {
+	// 	console.log("uploaded " + uploaded);
+	// 	res.send(uploaded);
+	// }).catch((err) => {
+	// 	console.log("err" + err)
+	// })
+
 })
 
 router.post('/uploadSurvey123Fake', (req, res) => {
@@ -658,7 +671,7 @@ router.post('/uploadSurvey123Fake', (req, res) => {
 			hello: "world",
 			test: 2
 		},
-		
+
 	]);
 })
 
