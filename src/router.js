@@ -322,13 +322,15 @@ router.post('/getPredictions', (req, res) => {
 					spotst1: 0,
 					spotst2: 0,
 					stateCode: 0,
-					forestCode: 0
+					forestCode: 0,
+					forest: ""
 				}
 
 				// sum up inputs across these filters
 				for (var entry in data) {
-					modelInputs.stateCode = data[entry].stateCode
-					modelInputs.forestCode = data[entry].forestCode
+					modelInputs.stateCode = data[entry].stateCode;
+					modelInputs.forestCode = data[entry].forestCode;
+					modelInputs.forest = data[entry].forest;
 
 					if (data[entry].year === parseInt(req.body.targetYear)) {
 						if (data[entry].spbPerTwoWeeks !== undefined) {
