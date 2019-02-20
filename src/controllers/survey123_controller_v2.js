@@ -16,7 +16,7 @@ export const getBeetleData = () => {
 export const uploadSpotData = (object) => {
   console.log("uploadSpotData running")
 	// console.log(object);
-  
+
   // //Multi Obj Version
   // let dataArray = [];
   // object.forEach((rawObject) => {
