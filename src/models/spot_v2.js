@@ -7,6 +7,8 @@ import mongoose, { Schema } from 'mongoose';
 const Spot_V2_Schema = new Schema({
 	objectid: String,
 	globalid: String,
+	latitude: Number,
+	longitude: Number,
 	SPB: Number,
 	USA_State: Number,
 	County: Number,

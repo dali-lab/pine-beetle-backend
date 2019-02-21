@@ -608,30 +608,20 @@ router.get('/uploadSurvey123', (req, res) => {
 
 	//get the data from S123 using axios, then with that...
 	upload.getData().then((data) => {
-		//what IS the data???
+		//what IS the (raw) data???
 		console.log("data " + data);
 
-		//check and filter if we already have the data
-
-		//run uploadSpotData to upload data to db, then report to user
-		// controller.uploadSpotData(data);
+		//run uploadSpotData to filter and upload data to db, then report to user
 		controller.uploadSpotData(data).then((uploaded) => {
 			console.log("uploaded " + uploaded);
 			res.send(uploaded);
 		}).catch((err) => {
-			console.log("err: " + err)
+			console.log("err1: " + err)
 		})
 
 	}).catch((err) => {
-		console.log("err: " + err);
+		console.log("err2: " + err);
 	})
-
-	// controller.uploadSpotData(data).then((uploaded) => {
-	// 	console.log("uploaded " + uploaded);
-	// 	res.send(uploaded);
-	// }).catch((err) => {
-	// 	console.log("err" + err)
-	// })
 
 	// const data = req.body;
 	// controller.batchUpload(data).then((uploaded) => {
