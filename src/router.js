@@ -321,6 +321,7 @@ router.post('/getPredictions', (req, res) => {
 					cleridst1: 0,
 					spotst1: 0,
 					spotst2: 0,
+					endobrev: req.body.endobrev,
 					stateCode: 0,
 					forestCode: 0,
 					forest: ""
@@ -353,7 +354,7 @@ router.post('/getPredictions', (req, res) => {
 				}
 
 				// make prediction
-				var results = makePredictions(modelInputs.SPB, modelInputs.cleridst1, modelInputs.spotst1, modelInputs.spotst2, 1);
+				var results = makePredictions(modelInputs.SPB, modelInputs.cleridst1, modelInputs.spotst1, modelInputs.spotst2, modelInputs.endobrev);
 	
 				// get results
 				var expSpotsIfOutbreak = results[2].Predictions;
@@ -409,7 +410,7 @@ router.post('/getPredictions', (req, res) => {
 									cleridst1: 0,
 									spotst1: 0,
 									spotst2: 0,
-									endobrev: 1
+									endobrev: req.body.endobrev
 								}
 							}
 						}
@@ -549,7 +550,7 @@ router.post('/getCustomPredictions', (req, res) => {
 	var cleridst1 = parseInt(req.body.cleridst1);
 	var spotst1 = parseInt(req.body.spotst1);
 	var spotst2 = parseInt(req.body.spotst2);
-	var endobrev = 1;
+	var endobrev = parseInt(req.body.endobrev);
 
 	// make prediction
 	var results = makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev);
