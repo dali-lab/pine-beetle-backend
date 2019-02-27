@@ -5,6 +5,7 @@ import mongoose, { Schema } from 'mongoose';
 // it may be easiest to choose to use only historical data up to some year, say 2018 (where it ends)
 // and then use Survey123 data from that point on (2019+)
 const HistoricalSchema = new Schema({
+	objectIDs: [Number], //store array of objectIDs from ArcGIS to track which observations compose each row
 	yearNumber: {
 		type: Number,
 		min: 0

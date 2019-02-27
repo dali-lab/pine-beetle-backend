@@ -3,6 +3,7 @@
  */
  import Spot_V2 from '../models/spot_v2';
  import Trapping from '../models/trapping';
+ import processRawData from '../importing-scripts';
 
 const getSpotData = () => {
  	return Spot.find({})

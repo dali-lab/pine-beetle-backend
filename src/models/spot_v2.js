@@ -6,7 +6,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const Spot_V2_Schema = new Schema({
 	objectid: String,
-	globalid: String,
+	// globalid: String,
 	latitude: Number,
 	longitude: Number,
 	SPB: Number,
@@ -17,10 +17,10 @@ const Spot_V2_Schema = new Schema({
 	Trap_name: Number,
 	Cooperator: Number,
 	Trap_Lure: Number,
-	Initial_Bloom: Number,
-	Species_Bloom: Number,
-	Comments: String,
-	DeleteSurvey: Number,
+	// Initial_Bloom: Number,
+	// Species_Bloom: Number,
+	// Comments: String,
+	// DeleteSurvey: Number,
 	CollectionDate1: Number,
   TrappingInterval1: Number,
   Number_SPB1: Number,
