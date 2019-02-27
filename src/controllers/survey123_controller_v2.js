@@ -34,7 +34,7 @@ const uploadSpotData = (object) => {
     const newSpot = {};
 
     newSpot.objectid = object.data.features[i].attributes.objectid;
-    newSpot.globalid = object.data.features[i].attributes.globalid;
+    // newSpot.globalid = object.data.features[i].attributes.globalid;
     newSpot.latitude = object.data.features[i].geometry.y;
     newSpot.longitude = object.data.features[i].geometry.x;
     newSpot.SPB = object.data.features[i].attributes.SPB;
@@ -45,10 +45,10 @@ const uploadSpotData = (object) => {
     newSpot.Trap_name = object.data.features[i].attributes.Trap_name;
     newSpot.Cooperator = object.data.features[i].attributes.Cooperator;
     newSpot.Trap_Lure = object.data.features[i].attributes.Trap_Lure;
-    newSpot.Initial_Bloom = object.data.features[i].attributes.Initial_Bloom;
-    newSpot.Species_Bloom = object.data.features[i].attributes.Species_Bloom;
-    newSpot.Comments = object.data.features[i].attributes.Comments;
-    newSpot.DeleteSurvey = object.data.features[i].attributes.DeleteSurvey;
+    // newSpot.Initial_Bloom = object.data.features[i].attributes.Initial_Bloom;
+    // newSpot.Species_Bloom = object.data.features[i].attributes.Species_Bloom;
+    // newSpot.Comments = object.data.features[i].attributes.Comments;
+    // newSpot.DeleteSurvey = object.data.features[i].attributes.DeleteSurvey;
     newSpot.CollectionDate1 = object.data.features[i].attributes.CollectionDate1;
     newSpot.TrappingInterval1 = object.data.features[i].attributes.TrappingInterval1;
     newSpot.Number_SPB1 = object.data.features[i].attributes.Number_SPB1;
