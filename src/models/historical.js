@@ -7,8 +7,8 @@ import mongoose, { Schema } from 'mongoose';
 const HistoricalSchema = new Schema({
 	objectIDs: [Number], //store array of objectIDs from ArcGIS to track which observations compose each row
 	county: String,
-	numTraps: Number, //for data processing only
-	trapsSeen: Number, //for data processing only
+	// numTraps: Number, //for data processing only
+	// trapsSeen: Number, //for data processing only
 	yearNumber: {
 		type: Number,
 		min: 0

@@ -58,10 +58,31 @@ const formatToSpot = (data) => {
           if ((countyTrapSeen[k][0] === spot.county) && (countyTrapSeen[k][1] === spot.state) {
             found2 = true;
 
-            //if we are in the last round of traps for the county-state, then divde by max denominator
-            //maybe put a console log here
-            //if we are not in the last round of traps for the county-state, do nothing
+            //calculate values for this trap...
+            tempspbPerTwoWeeks = ((object.Number_SPB1 + object.Number_SPB2) + (object.Number_SPB3 + object.Number_SPB4) + (object.Number_SPB5 + object.Number_SPB6))/(object.Num_Weeks_Trapping / 2);;
+            tempcleridsPerTwoWeeks = ((object.Number_Clerids1 + object.Number_Clerids2) + (object.Number_Clerids3 + object.Number_Clerids4) + (object.Number_Clerids5 + object.Number_Clerids6))/(object.Num_Weeks_Trapping / 2);
+            // tempspots = ;
+            // tempspotsPerHundredKm = ;
+            // temppercentSpb = ;
 
+            //add in this trap...
+            newSpot.spbPerTwoWeeks = newSpot.spbPerTwoWeeks + tempspbPerTwoWeeks;
+            newSpot.cleridsPerTwoWeeks = newSpot.cleridsPerTwoWeeks + tempcleridsPerTwoWeeks;
+            newSpot.spots = newSpot.spots + tempspots;
+            newSpot.spotsPerHundredKm = newSpot.spotsPerHundredKm + tempspotsPerHundredKm;
+            newSpot.percentSpb = newSpot.percentSpb + temppercentSpb;
+
+            //if we are in the last round of traps for the county-state, then divde by max denominator
+            if((countyTrapSeen[k][2] = countyTrapTotals[k][2])) {
+              console.log("completed " + countyTrapSeen[k][0] + " " + countyTrapSeen[k][1]);
+              //Scale based on number of traps
+              newSpot.spbPerTwoWeeks = newSpot.spbPerTwoWeeks / countyTrapTotals[k][0];
+              newSpot.cleridsPerTwoWeeks = newSpot.cleridsPerTwoWeeks / countyTrapTotals[k][0];
+              newSpot.spots = newSpot.spots / countyTrapTotals[k][0];
+              newSpot.spotsPerHundredKm = newSpot.spotsPerHundredKm / countyTrapTotals[k][0];
+              newSpot.percentSpb = newSpot.percentSpb / countyTrapTotals[k][0];
+
+            }
             countyTrapTotals[j][2]++;
             break;
           }
@@ -69,14 +90,21 @@ const formatToSpot = (data) => {
           else {
             if (found2 === false) {
               //do stuff...
-              //add to array
+              //add to countyTrapSeen array
               //do prelim calculations
 
+              spot.latitude = object.latitude; //add error checking to see if changed from last
+              spot.longitude = object.longitude; //add error checking to see if changed from last
+              spot.year = object.Year;
             }
           }
         }
       }
       //else spot doesn't match so do nothing
+
+      //Now update spot in formattedSpotArray
+      var formattedSpotArray[j] = spot;
+
     }
   }
 
