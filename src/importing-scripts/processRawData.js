@@ -104,7 +104,7 @@ const formatToSpot = (data) => {
     if (parseInt(data[i].Year) === currentYear) {
 
       var observation = data[i];
-      console.log("num trapping weeks = " + observation.Num_Weeks_Trapping);
+      console.log("num trapping weeks = " + observation.Num_Trapping_Periods);
 
       //Find spot that matches county-state
       for (var j = 0; j < formattedSpotArray.length; j++) {
@@ -122,15 +122,15 @@ const formatToSpot = (data) => {
               found2 = true; //set found2 to true to show that we found it (for error checking)
 
               //calculate values for this trap...
-              let tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6))/(observation.Num_Weeks_Trapping / 2);;
-              // let tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Weeks_Trapping / 2);
+              let tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6))/(observation.Num_Trapping_Periods / 2);;
+              let tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Trapping_Periods / 2);
               // tempspots = ;
               // tempspotsPerHundredKm = ;
               // temppercentSpb = ;
 
               //add in this trap...
               spot.spbPerTwoWeeks = spot.spbPerTwoWeeks + tempspbPerTwoWeeks;
-              // spot.cleridsPerTwoWeeks = spot.cleridsPerTwoWeeks + tempcleridsPerTwoWeeks;
+              spot.cleridsPerTwoWeeks = spot.cleridsPerTwoWeeks + tempcleridsPerTwoWeeks;
               spot.spots = spot.spots + tempspots;
               spot.spotsPerHundredKm = spot.spotsPerHundredKm + tempspotsPerHundredKm;
               spot.percentSpb = spot.percentSpb + temppercentSpb;
@@ -140,11 +140,11 @@ const formatToSpot = (data) => {
               if((countyTrapSeen[k][2] === countyTrapTotals[k][2])) {
                 console.log("completed " + countyTrapSeen[k][0] + " " + countyTrapSeen[k][1]);
                 //Scale based on number of traps
-                newSpot.spbPerTwoWeeks = newSpot.spbPerTwoWeeks / countyTrapTotals[k][2];
-                // newSpot.cleridsPerTwoWeeks = newSpot.cleridsPerTwoWeeks / countyTrapTotals[k][2];
-                newSpot.spots = newSpot.spots / countyTrapTotals[k][2];
-                newSpot.spotsPerHundredKm = newSpot.spotsPerHundredKm / countyTrapTotals[k][2];
-                newSpot.percentSpb = newSpot.percentSpb / countyTrapTotals[k][2];
+                spot.spbPerTwoWeeks = spot.spbPerTwoWeeks / countyTrapTotals[k][2];
+                spot.cleridsPerTwoWeeks = spot.cleridsPerTwoWeeks / countyTrapTotals[k][2];
+                spot.spots = spot.spots / countyTrapTotals[k][2];
+                spot.spotsPerHundredKm = spot.spotsPerHundredKm / countyTrapTotals[k][2];
+                spot.percentSpb = spot.percentSpb / countyTrapTotals[k][2];
               }
               //if we are NOT in the last round of traps for the county-state
               else {
@@ -183,13 +183,13 @@ const formatToSpot = (data) => {
             /*do prelim calculations*/
             //calculate values for this trap...
             let tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6))/(observation.Num_Trapping_Periods / 2);;
-            // let tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Trapping_Periods / 2);
+            let tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Trapping_Periods / 2);
             // tempspots = ;
             // tempspotsPerHundredKm = ;
             // temppercentSpb = ;
 
             spot.spbPerTwoWeeks = tempspbPerTwoWeeks;
-            // spot.cleridsPerTwoWeeks = tempcleridsPerTwoWeeks;
+            spot.cleridsPerTwoWeeks = tempcleridsPerTwoWeeks;
             // spot.spots = tempspots;
             // spot.spotsPerHundredKm = tempspotsPerHundredKm;
             // spot.percentSpb = temppercentSpb;
