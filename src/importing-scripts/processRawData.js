@@ -11,7 +11,7 @@ const formatToSpot = (data) => {
   var countyTrapTotals = []; //{county, state, countTraps}
   var countyTrapSeen = []; //{county, state, countTrapsSeen}
 
-  var formattedSpotArray = [2, 3];
+  var formattedSpotArray = [];
 
   /*Generate tracking array countryTrapTotals*/
   //for each data point from Survey123...
@@ -94,15 +94,15 @@ const formatToSpot = (data) => {
   var diff = data.length - sum;
   console.log(diff + " points had critical fields that were null. We were unable to add them to the database as a result");
 
-  // /* Generate empty spots with county and state indicators */
-  // //For each county-state combo in countyTrapTotals
-  // for (var i = 0; i<countyTrapTotals.length; i++) {
-  //   const newProcessedSpot = {};
-  //   newProcessedSpot.county = countyTrapTotals[i][0]; //need to map these to forests
-  //   newProcessedSpot.state = countyTrapTotals[i][2];
-  //   formattedSpotArray.push(newProcessedSpot);
-  // }
-  //
+  /* Generate empty spots with county and state indicators */
+  //For each county-state combo in countyTrapTotals
+  for (var i = 0; i<countyTrapTotals.length; i++) {
+    const newProcessedSpot = {};
+    newProcessedSpot.county = countyTrapTotals[i].county; //need to map these to forests
+    newProcessedSpot.state = countyTrapTotals[i].state;
+    formattedSpotArray.push(newProcessedSpot);
+  }
+
   // /* Fill spots */
   // //For each data point...
   // for (var i = 0; i < data.length; i++) {
