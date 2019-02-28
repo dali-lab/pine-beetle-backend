@@ -3,7 +3,7 @@
  */
  import Spot_V2 from '../models/spot_v2';
  import Trapping from '../models/trapping';
- import processRawData from '../importing-scripts';
+ import Process from '../importing-scripts/processRawData';
 
 const getSpotData = () => {
  	return Spot.find({})
@@ -115,12 +115,25 @@ const uploadSpotData = (object) => {
 
   }
 
-  //formatToSpot
+  //Process to Historical Form
+  var dataArrayFormatted = [];
+  dataArrayFormatted = Process.formatToSpot(dataArray);
 
+  // console.log("dataArrayFormatted = " + dataArrayFormatted);
+
+  // Spot.insertMany(
+  //   dataArrayFormatted,
+  //   {ordered: false},
+  //   (err, docs) => {
+  //     if (err) {
+  //       console.log(err)
+  //     }
+  //   }
+  // );
 
 
   //return for testing only
-  var promise1 = Promise.resolve(dataArray);
+  var promise1 = Promise.resolve(dataArrayFormatted);
   promise1.then(function(value) {
     console.log(value);
     // expected output: 123
