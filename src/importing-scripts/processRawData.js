@@ -9,11 +9,15 @@ const formatToSpot = (data) => {
   // var traps = []; //error checking
   var countyTrapTotals = []; //{county, state, countTraps}
   var countyTrapSeen = []; //{county, countTrapsSeen}
-  var found = false;
+
+  var formattedSpotArray = [];
 
   //Generate countryTrapTotals
   for (var i = 0; i<data.length; i++) {
+    //Set up
+    var found = false;
     observation = data[i];
+
     //County
     for (var j = 0; j<countyTrapTotals.length; j++) {
       //if {county, state} DOES exist in array...
@@ -22,7 +26,7 @@ const formatToSpot = (data) => {
           countyTrapTotals[j][2]++;
           break;
       } else {
-        if (found === true) { //if we haven't already found {county, state}
+        if (found === false) { //if we haven't already found {county, state}
           var addMe = {observation.County, observation.USA_State, 1};
           countyTrapTotals.push(addMe);
         }
@@ -30,15 +34,18 @@ const formatToSpot = (data) => {
     }
   }
 
-  //Generate empty spots
+  //Generate empty spots with county and state indicators
   for (var i = 0; i<countyTrapTotals.length; i++) {
     const newProcessedSpot = {};
-    newProcessedSpot.county = observation.County; //need to map these to forests
-    newProcessedSpot.state = observation.USA_State;
-
+    newProcessedSpot.county = countyTrapTotals[i][0]; //need to map these to forests
+    newProcessedSpot.state = countyTrapTotals[i][2];
+    formattedSpotArray.push(newProcessedSpot);
   }
 
   //Fill spots
+  for (var i = 0; i < data.length; i++) {
+    var observation = data[i];
+  }
 
 }
 
