@@ -6,6 +6,9 @@ import mongoose, { Schema } from 'mongoose';
 // and then use Survey123 data from that point on (2019+)
 const HistoricalSchema = new Schema({
 	objectIDs: [Number], //store array of objectIDs from ArcGIS to track which observations compose each row
+	county: String,
+	numTraps: Number, //for data processing only
+	trapsSeen: Number, //for data processing only
 	yearNumber: {
 		type: Number,
 		min: 0
