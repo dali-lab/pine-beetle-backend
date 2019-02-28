@@ -64,7 +64,8 @@ const HistoricalSchema = new Schema({
 		type: Number,
 		min: 0,
 		max: 100
-	}
+	},
+	lure: String,
 }, {
 	toJSON: {
 		virtuals: true,
