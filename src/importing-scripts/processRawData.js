@@ -76,6 +76,7 @@ const formatToSpot = (data) => {
   // console.log("traps found = " + sum);
   var diff = data.length - sum;
   console.log(diff + " points had critical fields that were null. We were unable to add them to the database as a result");
+  //add year differencer
 
   /* Generate empty spots with county and state indicators */
   //For each county-state combo in countyTrapTotals
@@ -96,12 +97,14 @@ const formatToSpot = (data) => {
   /* Fill spots */
   //For each data point...
   for (var i = 0; i < data.length; i++) {
+    console.log("beep boop!");
     //add objectID checking
 
     //if from this year...
     if (parseInt(data[i].Year) === currentYear) {
 
       var observation = data[i];
+      console.log("num trapping weeks = " + observation.Num_Weeks_Trapping);
 
       //Find spot that matches county-state
       for (var j = 0; j < formattedSpotArray.length; j++) {
@@ -115,19 +118,19 @@ const formatToSpot = (data) => {
           for (var k = 0; k < countyTrapSeen.length; k++) {
 
             //if we have seen a trap from this county-state before...
-            if ((countyTrapSeen[k][0] === spot.county) && (countyTrapSeen[k][1] === spot.state) {
+            if ((countyTrapSeen[k][0] === spot.county) && (countyTrapSeen[k][1] === spot.state)) {
               found2 = true; //set found2 to true to show that we found it (for error checking)
 
               //calculate values for this trap...
-              tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6))/(observation.Num_Weeks_Trapping / 2);;
-              tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Weeks_Trapping / 2);
+              let tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6))/(observation.Num_Weeks_Trapping / 2);;
+              // let tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Weeks_Trapping / 2);
               // tempspots = ;
               // tempspotsPerHundredKm = ;
               // temppercentSpb = ;
 
               //add in this trap...
               spot.spbPerTwoWeeks = spot.spbPerTwoWeeks + tempspbPerTwoWeeks;
-              spot.cleridsPerTwoWeeks = spot.cleridsPerTwoWeeks + tempcleridsPerTwoWeeks;
+              // spot.cleridsPerTwoWeeks = spot.cleridsPerTwoWeeks + tempcleridsPerTwoWeeks;
               spot.spots = spot.spots + tempspots;
               spot.spotsPerHundredKm = spot.spotsPerHundredKm + tempspotsPerHundredKm;
               spot.percentSpb = spot.percentSpb + temppercentSpb;
@@ -138,7 +141,7 @@ const formatToSpot = (data) => {
                 console.log("completed " + countyTrapSeen[k][0] + " " + countyTrapSeen[k][1]);
                 //Scale based on number of traps
                 newSpot.spbPerTwoWeeks = newSpot.spbPerTwoWeeks / countyTrapTotals[k][2];
-                newSpot.cleridsPerTwoWeeks = newSpot.cleridsPerTwoWeeks / countyTrapTotals[k][2];
+                // newSpot.cleridsPerTwoWeeks = newSpot.cleridsPerTwoWeeks / countyTrapTotals[k][2];
                 newSpot.spots = newSpot.spots / countyTrapTotals[k][2];
                 newSpot.spotsPerHundredKm = newSpot.spotsPerHundredKm / countyTrapTotals[k][2];
                 newSpot.percentSpb = newSpot.percentSpb / countyTrapTotals[k][2];
@@ -171,20 +174,22 @@ const formatToSpot = (data) => {
           if (found2 === false) { //then found2 will be false
             //add to countyTrapSeen array
             //create a temp JS object
-            var addMeSeen = {observation.County, observation.USA_State, 1}; //1 indicates that we've seen this county once
+            var countyTemp = observation.County;
+            var stateTemp = observation.USA_State;
+            var addMeSeen = {county: countyTemp, state: stateTemp, traps: 1}; //1 indicates that we've seen this county once
             //add it to the tracking array
             countyTrapSeen.push(addMeSeen);
 
             /*do prelim calculations*/
             //calculate values for this trap...
-            tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6))/(observation.Num_Weeks_Trapping / 2);;
-            tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Weeks_Trapping / 2);
+            let tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6))/(observation.Num_Trapping_Periods / 2);;
+            // let tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Trapping_Periods / 2);
             // tempspots = ;
             // tempspotsPerHundredKm = ;
             // temppercentSpb = ;
 
             spot.spbPerTwoWeeks = tempspbPerTwoWeeks;
-            spot.cleridsPerTwoWeeks = tempcleridsPerTwoWeeks;
+            // spot.cleridsPerTwoWeeks = tempcleridsPerTwoWeeks;
             // spot.spots = tempspots;
             // spot.spotsPerHundredKm = tempspotsPerHundredKm;
             // spot.percentSpb = temppercentSpb;
@@ -192,13 +197,14 @@ const formatToSpot = (data) => {
             //add categorical vars only once
             spot.latitude = observation.latitude; //add error checking to see if changed from last
             spot.longitude = observation.longitude; //add error checking to see if changed from last
-            spot.year = object.Year;
+            spot.year = observation.Year;
           }
         }
         //else spot doesn't match so do nothing
 
         //Now update spot in formattedSpotArray
-        var formattedSpotArray[j] = spot;
+        formattedSpotArray[j] = spot;
+        // formattedSpotArray.splice(j, 1, spot);
 
       }
     }

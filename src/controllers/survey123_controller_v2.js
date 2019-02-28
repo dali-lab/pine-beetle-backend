@@ -109,7 +109,30 @@ const uploadSpotData = (object) => {
     newSpot.EditDate = object.data.features[i].attributes.EditDate;
     newSpot.Editor = object.data.features[i].attributes.Editor;
     newSpot.Trapping_End_Date = object.data.features[i].attributes.Trapping_End_Date;
-    newSpot.Num_Weeks_Trapping = object.data.features[i].attributes.Num_Weeks_Trapping;
+
+
+    var periods = 0;
+    if ((object.data.features[i].attributes.CollectionDate1 != null)) {
+      periods++;
+    };
+    if ((object.data.features[i].attributes.CollectionDate2 != null)) {
+       periods++;
+    };
+    if ((object.data.features[i].attributes.CollectionDate3 != null)) {
+      periods++;
+    };
+    if ((object.data.features[i].attributes.CollectionDate4 != null)) {
+      periods++;
+    };
+    if ((object.data.features[i].attributes.CollectionDate5 != null)) {
+      periods++;
+    };
+    if ((object.data.features[i].attributes.CollectionDate6 != null)) {
+      periods++;
+    };
+
+    // console.log("num periods = " + periods);
+    newSpot.Num_Trapping_Periods = periods;
 
     dataArray.push(newSpot);
 

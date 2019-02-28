@@ -81,7 +81,7 @@ const Spot_V2_Schema = new Schema({
   EditDate: Date,
   Editor: String,
   Trapping_End_Date: Date,
-  Num_Weeks_Trapping: Number,
+  Num_Trapping_Periods: Number,
 }, {
 	toJSON: {
 		virtuals: true,
