@@ -1,6 +1,8 @@
 import HistoricalData from '../models/historical';
 import Spot_V2 from '../models/spot_v2';
 import Trapping from '../models/trapping';
+import * as fs from 'fs';
+import axios from "axios";
 
 /*
 * Method: formatToSpot()
@@ -13,20 +15,27 @@ import Trapping from '../models/trapping';
 const formatToSpot = (data) => {
   // Set up
   var currentYear = new Date().getFullYear();
-  var countyTrapTotals = []; // for tracking, {county, state, countTraps}
+  var countyTrapTotals = []; // for tracking, {county, state, countTrapsSeen}
   var countyTrapSeen = []; // for tracking, {county, state, countTrapsSeen}
   var formattedSpotArray = []; //to be returned as processed data array
+  var avoidMe = []; //objectids to skip to avoid duplicates
+  var usedIDs = [];
+  /*
+  * Generate object list to aviod
+  */
+  var avoidMe = [7, 20];
 
   /*
   * Generate tracking array countryTrapTotals
   */
   //for each data point from Survey123...
   for (var i = 0; i<data.length; i++) {
+    usedIDs.push(data[i].objectid); //add me to db in comments
 
     //add objectID checking
 
     //if current year
-    if (parseInt(data[i].Year) === currentYear) {
+    if ((parseInt(data[i].Year) === currentYear) && (!avoidMe.includes(data[i].objectid))) {
       //Set up
       var found = false; //have u found a match in the tracking array?
       var observation = data[i];
@@ -47,8 +56,6 @@ const formatToSpot = (data) => {
         var countyTemp = observation.County;
         var stateTemp = observation.USA_State;
         var addMe = {county: countyTemp, state: stateTemp, traps: 1};
-        console.log(found);
-        console.log(addMe);
         //add it to the tracking array
         countyTrapTotals.push(addMe);
       }
@@ -78,7 +85,7 @@ const formatToSpot = (data) => {
     //add objectID checking
 
     //if from this year...
-    if (parseInt(data[i].Year) === currentYear) {
+    if ((parseInt(data[i].Year) === currentYear) && (!avoidMe.includes(data[i].objectid))) {
 
       var observation = data[i]; //for readability
 
@@ -101,7 +108,6 @@ const formatToSpot = (data) => {
 
             //if we have seen a trap from this county-state before...
             if ((countyTrapSeen[k].county === spot.county) && (countyTrapSeen[k].state === spot.state)) {
-              console.log("in if statement! 125");
               found2 = true; //set found2 to true to show that we found it (for error checking)
 
               //calculate values for this trap...
@@ -117,8 +123,6 @@ const formatToSpot = (data) => {
               //if we are in the last round of traps for the county-state, then divde by number of trap
               //may need another for loop for countyTrapTotals, but it should be the same
               if((countyTrapSeen[k].traps === countyTrapTotals[k].traps)) {
-                console.log("in if statement! 145");
-                console.log("completed " + countyTrapSeen[k].county + " " + countyTrapSeen[k].state);
                 //Scale based on number of traps
                 spot.spbPerTwoWeeks = (spot.spbPerTwoWeeks / countyTrapTotals[k].traps);
                 spot.cleridsPerTwoWeeks = (spot.cleridsPerTwoWeeks / countyTrapTotals[k].traps);
@@ -135,7 +139,6 @@ const formatToSpot = (data) => {
           }
           //if we haven't seen a trap from this county-state before...
           if (found2 === false) { //then found2 will be false
-            console.log("in if statement! 165");
             //add to countyTrapSeen array
             //create a temp JS object
             var countyTemp = observation.County;
@@ -208,6 +211,19 @@ const formatToSpot = (data) => {
   // // console.log("traps found = " + sum);
   // var diff = data.length - sum;
   // console.log(diff + " points had critical fields that were null or they were from the wrong time frame. We were unable to add them to the database as a result.");
+
+  /*
+  * Aspect data points from consideration by objectid
+  */
+  // var obj = JSON.parse(json);
+  // console.log("hello world!!!!")
+  // console.log("obj = " + obj);
+  // fs.writeFile('./viewed.json', JSON.stringify(obj), function (err) {
+  //   console.log("file writing obj = " + obj);
+  //   console.log("file writing error = " + err);
+  // });
+
+
 
   return formattedSpotArray;
 }
