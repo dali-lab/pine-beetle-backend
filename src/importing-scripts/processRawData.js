@@ -30,7 +30,7 @@ const formatToSpot = (data) => {
   */
   //for each data point from Survey123...
   for (var i = 0; i<data.length; i++) {
-    usedIDs.push(data[i].objectid); //add me to db in comments
+    // usedIDs.push(data[i].objectid); //add me to db in comments
 
     //add objectID checking
 
@@ -93,6 +93,7 @@ const formatToSpot = (data) => {
       let tempspbPerTwoWeeks = 0;
       let tempcleridsPerTwoWeeks = 0;
       let temppercentSpb = 0;
+      let tempobjectid = 0;
       /*NOTE: spots information is collected in the fall, so spots and spotsPerHundredKm should be processed separately*/
 
       //Find spot that matches county-state
@@ -119,6 +120,9 @@ const formatToSpot = (data) => {
               spot.spbPerTwoWeeks = spot.spbPerTwoWeeks + tempspbPerTwoWeeks;
               spot.cleridsPerTwoWeeks = spot.cleridsPerTwoWeeks + tempcleridsPerTwoWeeks;
               spot.percentSpb = spot.percentSpb + temppercentSpb;
+              tempobjectid = observation.objectid;
+              // spot.objectIDs = spot.objectIDs.push(tempobjectid);
+              // console.log("objectID: " + observation.objectid);
 
               //if we are in the last round of traps for the county-state, then divde by number of trap
               //may need another for loop for countyTrapTotals, but it should be the same
@@ -152,11 +156,16 @@ const formatToSpot = (data) => {
             tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6))/(observation.Num_Trapping_Periods / 2);;
             tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6))/(observation.Num_Trapping_Periods / 2);
             temppercentSpb = ((observation.Percent_SPB1 + observation.Percent_SPB2) + (observation.Percent_SPB3 + observation.Percent_SPB4) + (observation.Percent_SPB5 + observation.Percent_SPB6))/(observation.Num_Trapping_Periods / 2);
+            tempobjectid = observation.objectid;
+            // spot.objectIDs = spot.objectIDs.push(tempobjectid);
+            // console.log("objectID: " + observation.objectid);
 
             //create attribute and fill values for this trap...
             spot.spbPerTwoWeeks = tempspbPerTwoWeeks;
             spot.cleridsPerTwoWeeks = tempcleridsPerTwoWeeks;
             spot.percentSpb = temppercentSpb;
+            // console.log("objectID: " + observation.objectid);
+            // spot.objectIDs = spot.objectIDs.push(observation.objectid);
 
             //add categorical vars only once
             spot.latitude = observation.latitude; //add error checking to see if changed from last
