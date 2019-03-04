@@ -595,11 +595,11 @@ router.get('/getBeetles', (req, res) => {
 	});
 });
 
-router.get('/uploadSurvey123', (req, res) => {
+router.post('/uploadSurvey123', (req, res) => {
 
-	//Debug
-	console.log('uploadSurvey123 running');
-	res.send('uploadSurvey123 running');
+	// //Debug
+	// console.log('uploadSurvey123 running');
+	// res.send('uploadSurvey123 running');
 
 	// const data = upload.getData();
 	// console.log("data " + data);
