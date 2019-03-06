@@ -29,7 +29,7 @@ Trapping data is entered in the spring. Spot data is entered in the fall. For in
 Between Spring 2017 and Spring 2018, the USFS shifted over from manual data collection (Microsoft Excel) to data collection through Survey123, an online platform built on top of ArcGIS. A representation of the manually collected data can be seen in `src/data/` on the back-end, as well as within the database (currently closed to the public). Survey123 data is visible both through the database and through the Survey123 platform. Information on querying data from Survey123 and ArcGIS can be found [here](https://developers.arcgis.com/rest/services-reference/query-feature-service-layer-.html).
 
 ### Front-end
-You can the back-end repository [here](https://github.com/dali-lab/pine-beetle-frontend).
+You can the front-end repository [here](https://github.com/dali-lab/pine-beetle-frontend).
 
 ## Developer Information
 ### Installation:
