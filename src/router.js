@@ -4,6 +4,7 @@ import historical from './controllers/historical_controller';
 import controller from './controllers/survey123_controller_v2';
 import { makePredictions } from './runRModel';
 import upload from './importing-scripts/uploadSurvey123toMongo';
+import queryURL from './importing-scripts/buildQuery';
 
 const router = express();
 
@@ -601,6 +602,10 @@ router.get('/getBeetles', (req, res) => {
 router.get('/uploadSurvey123', (req, res) => {
 	console.log("req.body");
 	console.log(req.body);
+
+	console.log("URL");
+	console.log(queryURL.getURL());
+
 	// //Debug
 	// console.log('uploadSurvey123 running');
 	// res.send('uploadSurvey123 running');
@@ -612,11 +617,11 @@ router.get('/uploadSurvey123', (req, res) => {
 	//get the data from S123 using axios, then with that...
 	upload.getData().then((data) => {
 		//what IS the (raw) data???
-		console.log("data " + data);
+		// console.log("data " + data);
 
 		//run uploadSpotData to filter and upload data to db, then report to user
 		controller.uploadSpotData(data).then((uploaded) => {
-			console.log("uploaded " + uploaded);
+			// console.log("uploaded " + uploaded);
 			res.send(uploaded);
 		}).catch((err) => {
 			console.log("err1: " + err)

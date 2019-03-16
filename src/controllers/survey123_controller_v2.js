@@ -158,7 +158,7 @@ const uploadSpotData = (object) => {
   //return for testing only
   var promise1 = Promise.resolve(dataArrayFormatted);
   promise1.then(function(value) {
-    console.log(value);
+    // console.log(value);
     // expected output: 123
   });
   return promise1;
