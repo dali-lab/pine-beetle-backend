@@ -599,42 +599,22 @@ router.get('/getBeetles', (req, res) => {
 	});
 });
 
-router.get('/uploadSurvey123', (req, res) => {
-	console.log("req.body");
-	console.log(req.body);
-
-	console.log("URL");
-	console.log(queryURL.getURL());
-
-	// //Debug
-	// console.log('uploadSurvey123 running');
-	// res.send('uploadSurvey123 running');
-
-	// const data = upload.getData();
-	// console.log("data " + data);
-	// controller.uploadSpotData(data);
-
+router.post('/uploadSurvey123', (req, res) => {
 	//get the data from S123 using axios, then with that...
 	upload.getData().then((data) => {
-		//what IS the (raw) data???
+		//view raw data
 		// console.log("data " + data);
 
 		//run uploadSpotData to filter and upload data to db, then report to user
-		controller.uploadSpotData(data).then((uploaded) => {
-			// console.log("uploaded " + uploaded);
+		controller.uploadSpotData(data, req.body).then((uploaded) => {
 			res.send(uploaded);
 		}).catch((err) => {
-			console.log("err1: " + err)
+			console.log("Error: " + err)
 		})
 
 	}).catch((err) => {
-		console.log("err2: " + err);
+		console.log("Error: " + err);
 	})
-
-	// const data = req.body;
-	// controller.batchUpload(data).then((uploaded) => {
-	// 	res.send(uploaded);
-	// })
 
 })
 

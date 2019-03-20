@@ -172,6 +172,15 @@ const formatToSpot = (data) => {
             spot.longitude = observation.longitude; //add error checking to see if changed from last
             spot.lure = observation.Trap_Lure; //add error checking to see if changed from last
             spot.year = observation.Year;
+
+            //need to be included in survey by USFS
+            if(observation.isNF) {
+              spot.nf: observation.forest,
+            } else {
+              spot.classification: observation.rangerDistrictName,
+              spot.forest: observation.forest,
+            }
+
           }
         }
         //else spot doesn't match so do nothing

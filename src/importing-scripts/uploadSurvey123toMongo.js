@@ -2,7 +2,7 @@ import axios from 'axios'
 import queryURL from './buildQuery';
 
 const getData = async () => {
-  console.log('getData running');
+  // console.log('getData running');
 
   // queryURL.getURL().then((url) => {
     //var token = url.access_token;

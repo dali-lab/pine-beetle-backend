@@ -10,8 +10,11 @@ const Spot_V2_Schema = new Schema({
 	latitude: Number,
 	longitude: Number,
 	SPB: Number,
-	USA_State: Number,
-	County: Number,
+	USA_State: String,
+	County: String,
+	forest: String, //not yet in system
+	rangerDistrictName: String, //not yet in system
+	isNF: Boolean, //not yet in system
 	Year: Number,
 	TrapSetDate: Number,
 	Trap_name: Number,
