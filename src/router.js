@@ -640,59 +640,59 @@ router.get('/uploadSurvey123', (req, res) => {
 
 router.post('/uploadSurvey123Fake', (req, res) => {
 	res.send([{
-			hello: "world",
+			hello: "WORLD",
 			test: 1
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 		{
-			hello: "world",
+			hello: "WORLD",
 			test: 2
 		},
 

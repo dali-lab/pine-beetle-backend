@@ -6,7 +6,7 @@ const getData = async () => {
 
   // queryURL.getURL().then((url) => {
     //var token = url.access_token;
-    var token ="EoT4KmWseJ80eVGbqpFD4OtNr1XLRuRnyqtq1zIGyMC32zpUo3kmaCRMcfFFtlR3YRVS5u1mKaevkVeGSC5a27N9VwF767SloWqJ6P-hTWFDPFKOszQa7xYUtftkuW9Xq2wN_d8-h5-msToXfD48VBGO6JemL4qI6PO6qL1vpKiN8ZNymHUv1ZPS2ybL31LUlxIHhbqXVXHPqlupUyxqYXHmki-FSd8xJkLbWyVjlDc.";
+    var token = 'asCk1oGTJowciW9GaWdQgZCv-C-pF6T0Ds4pNQiIYEa2rsplKbPoDgzSFp0eLB372No1GPDsBoc7cAUNaoHrOZXFscDJsM0SE9wBPIMez8lfe1b6kFj3TzRoPo6YnbjM5ncdHY66zTwcSSA4d7ihi0-SRNfutkUhUtnkBJbLEnFkqtIig_YaITok1i4HKeABf95C4H0_y674CvAzxjkMaxeLKZRIWgmkudkS2TyXMR4.';
     // console.log("token");
     // console.log(token)
 

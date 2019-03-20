@@ -14,7 +14,14 @@ const getBeetleData = () => {
  };
 
 //might need to make async
-const uploadSpotData = (object) => {
+const uploadSpotData = (object, info) => {
+
+  // grab start and end year provided by user
+  var startDate = info.startDate;
+  var endDate = info.endDate;
+
+
+
   console.log("uploadSpotData running");
   // console.log(object);
   // console.log(object.status);
