@@ -15,31 +15,43 @@ const getBeetleData = () => {
 
 //might need to make async
 const uploadSpotData = (object, bodyFilters) => {
+  // console.log(object.data.features);
+
   //Get filters
   var applicableState = bodyFilters.state;
   var applicableForest = bodyFilters.forest;
 
   // get current year for filtering too
-  var currentYear = new Date().getFullYear();
-  currentYear = parseInt(currentYear)
+  var currentYear = 2019;//new Date().getFullYear();
+  // currentYear = parseInt(currentYear)
 
   //Multi Obj Version
   let dataArray = [];
 
+  console.log("data length = " + object.data.features.length);
+
+  // console.log("currentYear = " + currentYear + ", Year = " + object.data.features[0].attributes.Year)
+
   for (var i = 0; i < object.data.features.length; i++) {
+    // console.log(object.data.features[i]);
     //Filter which data to consider
-    if ((object.data.features[i].attributes.Year === currentYear) && (object.data.features[i].attributes.USA_State === applicableState) && (object.data.features[i].attributes.forestName === applicableForest) && (object.data.features[i].attributes.Trapping_End_Date != null)) {
+    if ((parseInt(object.data.features[i].attributes.Year) === currentYear) && (object.data.features[i].attributes.USA_State === applicableState)) {
+      // && (object.data.features[i].attributes.Trapping_End_Date != null)
+
+      console.log("made it inside if statement!!!!!");
+
       //DEBUGGING STATEMENTS
       //log each observation/data point from survey123
       // console.log(object.data.features[i]);
       //log the observation id of each data point from survey123URL
       // console.log(object.data.features[i].attributes.objectid);
+      console.log("test1 " + object.data.features[i].attributes.forestName)
 
       const newSpot = {};
 
       //expected to be implemented by USFS, will not work if not
       newSpot.forest = object.data.features[i].attributes.forestName;
-      newSpot.rangerDistrictName = object.data.features[i].attributes.rangerDistrictName;
+      newSpot.rangerDistrictName = object.data.features[i].attributes.Nat_Forest_Ranger_Dist;
       newSpot.isNF = object.data.features[i].attributes.isNF;
 
       newSpot.objectid = object.data.features[i].attributes.objectid;
@@ -142,6 +154,8 @@ const uploadSpotData = (object, bodyFilters) => {
         periods++;
       };
       newSpot.Num_Trapping_Periods = periods;
+
+      console.log(newSpot.USA_State);
 
       dataArray.push(newSpot);
     }

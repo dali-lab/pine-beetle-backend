@@ -174,11 +174,11 @@ const formatToSpot = (data) => {
             spot.year = observation.Year;
 
             //need to be included in survey by USFS
-            if(observation.isNF) {
-              spot.nf: observation.forest,
+            if(observation.is_Nat_Forest) {
+              spot.nf = observation.forest
             } else {
-              spot.classification: observation.rangerDistrictName,
-              spot.forest: observation.forest,
+              spot.rangerDistrictName = observation.Nat_Forest_Ranger_Dist,
+              spot.forest = observation.forest
             }
 
           }

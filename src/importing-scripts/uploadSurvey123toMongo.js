@@ -1,12 +1,12 @@
 import axios from 'axios'
 import queryURL from './buildQuery';
 
-const getData = async () => {
+const getData = async (token) => {
   // console.log('getData running');
 
   // queryURL.getURL().then((url) => {
     //var token = url.access_token;
-    var token = 'asCk1oGTJowciW9GaWdQgZCv-C-pF6T0Ds4pNQiIYEa2rsplKbPoDgzSFp0eLB372No1GPDsBoc7cAUNaoHrOZXFscDJsM0SE9wBPIMez8lfe1b6kFj3TzRoPo6YnbjM5ncdHY66zTwcSSA4d7ihi0-SRNfutkUhUtnkBJbLEnFkqtIig_YaITok1i4HKeABf95C4H0_y674CvAzxjkMaxeLKZRIWgmkudkS2TyXMR4.';
+    // var token = 'vSKJelvkGRTJmZJQI4Tto8C6FusVP0R0BAqO-oaut7-WO98KANdFSGfxTO7JghnCwOVK1ArfkJK8-XUmwNdOcIn_Ja9r-0117_Bd40tL41uCpzjMMHPePOwI3up-x2XeSt2tTcQfAj4Ts7JOMUqpaMZCqsMSv-duT1EzibmoM038FoYwrN8KwYmcDBDgsxj7x7dO6sfzsct8hVKX0sqvsnLi1AzTPmNh4GtqhqU6i4M.';
     // console.log("token");
     // console.log(token)
 

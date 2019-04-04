@@ -600,9 +600,10 @@ router.get('/getBeetles', (req, res) => {
 });
 
 router.post('/uploadSurvey123', (req, res) => {
+	// console.log(req.body);
 	//get the data from S123 using axios, then with that...
-	upload.getData().then((data) => {
-		//view raw data
+	upload.getData(req.body.token).then((data) => {
+		// view raw data
 		// console.log("data " + data);
 
 		//run uploadSpotData to filter and upload data to db, then report to user
