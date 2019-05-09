@@ -1,90 +1,84 @@
 /* for testing/development purposes
  * input, edit, and get sample data (src/data/sample_import_data.csv)
  */
+// eslint-disable-next-line camelcase
 import Spot_V2 from '../models/spot_v2';
 import Trapping from '../models/trapping';
 import Process from '../importing-scripts/processRawData';
+import SampleData from '../models/sample';
+
+// db.artists.insert({ artistname: "The Tea Party" })
+
 
 const getSpotData = () => {
- 	return Spot_V2.find({})
- };
+  return Spot_V2.find({});
+};
 
 const getBeetleData = () => {
- 	return Trapping.find({})
- };
+  return Trapping.find({});
+};
 
-//might need to make async
+// might need to make async
 const uploadSpotData = (object, bodyFilters) => {
   // console.log(object.data.features);
 
-  //Create forest map
-  var stateAbbrevToStateName = {
-    AL:"Alabama",
-    AR:"Arkansas",
-    DE:"Delaware",
-    FL:"Florida",
-    GA:"Georgia",
-    KY:"Kentucky",
-    LA:"Louisiana",
-    MD:"Maryland",
-    MS:"Mississippi",
-    NC:"North Carolina",
-    NJ:"New Jersey",
-    OK:"Oklahoma",
-    SC:"South Carolina",
-    TN:"Tennesse",
-    TX:"Texas",
-    VA:"Virginia"
-}
+  // Create forest map
+  const stateAbbrevToStateName = {
+    AL: 'Alabama',
+    AR: 'Arkansas',
+    DE: 'Delaware',
+    FL: 'Florida',
+    GA: 'Georgia',
+    KY: 'Kentucky',
+    LA: 'Louisiana',
+    MD: 'Maryland',
+    MS: 'Mississippi',
+    NC: 'North Carolina',
+    NJ: 'New Jersey',
+    OK: 'Oklahoma',
+    SC: 'South Carolina',
+    TN: 'Tennesse',
+    TX: 'Texas',
+    VA: 'Virginia',
+  };
 
-  // console.log("bodyFilters = " + bodyFilters.forest);
+  // Get filters
+  const applicableState = bodyFilters.state;
+  let applicableForest = bodyFilters.forest;
 
-  //Get filters
-  var applicableState = bodyFilters.state;
-  var applicableForest = bodyFilters.forest;
-  // console.log("applicableForest (no mod) = " + applicableForest);
-
-  //Convert to Title Case
-  //Source: https://medium.freecodecamp.org/three-ways-to-title-case-a-sentence-in-javascript-676a9175eb27
+  // Convert to Title Case
+  // Source: https://medium.freecodecamp.org/three-ways-to-title-case-a-sentence-in-javascript-676a9175eb27
   applicableForest = applicableForest.toLowerCase();
-  // console.log("applicableForest (toLowerCase) = " + applicableForest);
 
-  //https://stackoverflow.com/questions/952924/javascript-chop-slice-trim-off-last-character-in-string
+  // https://stackoverflow.com/questions/952924/javascript-chop-slice-trim-off-last-character-in-string
   applicableForest = applicableForest.substring(0, applicableForest.length - 3);
-  // console.log("applicableForest (substring) = " + applicableForest);
 
   applicableForest = applicableForest.charAt(0).toUpperCase() + applicableForest.slice(1);
-  // console.log("applicableForest (charAt(0).toUpperCase) = " + applicableForest);
 
 
   // get current year for filtering too
-  var currentYear = 2019;//new Date().getFullYear();
-  // currentYear = parseInt(currentYear)
+  let currentYear = new Date().getFullYear(); // 2019
+  currentYear = parseInt(currentYear, 10);
 
-  //Multi Obj Version
-  let dataArray = [];
+  // Multi Obj Version
+  const dataArray = [];
 
-  console.log("data length = " + object.data.features.length);
-
-  // console.log("currentYear = " + currentYear + ", Year = " + object.data.features[0].attributes.Year)
-
-  for (var i = 0; i < object.data.features.length; i++) {
-    // console.log(object.data.features[i]);
-    //Filter which data to consider
-    if ((parseInt(object.data.features[i].attributes.Year) === currentYear) && (object.data.features[i].attributes.USA_State === applicableState) && (object.data.features[i].attributes.County === applicableForest)) {
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < object.data.features.length; i++) {
+    // Filter which data to consider
+    if ((parseInt(object.data.features[i].attributes.Year, 10) === currentYear) && (object.data.features[i].attributes.USA_State === applicableState) && (object.data.features[i].attributes.County === applicableForest)) {
       // && (object.data.features[i].attributes.Trapping_End_Date != null)
 
       // console.log("made it inside if statement!!!!!");
 
-      //DEBUGGING STATEMENTS
-      //log each observation/data point from survey123
+      // DEBUGGING STATEMENTS
+      // log each observation/data point from survey123
       // console.log(object.data.features[i]);
-      //log the observation id of each data point from survey123URL
+      // log the observation id of each data point from survey123URL
       // console.log(object.data.features[i].attributes.objectid);
 
       const newSpot = {};
-
-      //expected to be implemented by USFS, will not work if not
+      // expected to be implemented by USFS, will not work if not
       newSpot.forest = object.data.features[i].attributes.forestName;
       newSpot.rangerDistrictName = object.data.features[i].attributes.Nat_Forest_Ranger_Dist;
       newSpot.isNF = object.data.features[i].attributes.isNF;
@@ -168,43 +162,57 @@ const uploadSpotData = (object, bodyFilters) => {
       // newSpot.Editor = object.data.features[i].attributes.Editor;
       // newSpot.CreationDate = object.data.features[i].attributes.CreationDate;
 
-      //Calculate num of trapping periods
-      var periods = 0;
+      // Calculate num of trapping periods
+      let periods = 0;
       if ((object.data.features[i].attributes.CollectionDate1 != null)) {
-        periods++;
-      };
+        periods += 1;
+      }
       if ((object.data.features[i].attributes.CollectionDate2 != null)) {
-         periods++;
-      };
+        periods += 1;
+      }
       if ((object.data.features[i].attributes.CollectionDate3 != null)) {
-        periods++;
-      };
+        periods += 1;
+      }
       if ((object.data.features[i].attributes.CollectionDate4 != null)) {
-        periods++;
-      };
+        periods += 1;
+      }
       if ((object.data.features[i].attributes.CollectionDate5 != null)) {
-        periods++;
-      };
+        periods += 1;
+      }
       if ((object.data.features[i].attributes.CollectionDate6 != null)) {
-        periods++;
-      };
+        periods += 1;
+      }
       newSpot.Num_Trapping_Periods = periods;
 
-      // console.log(newSpot.USA_State);
+      // console.log(newSpot);
 
       dataArray.push(newSpot);
     }
   }
 
-  //Process to Historical Form
-  var dataArrayFormatted = [];
+  // Process to Historical Form
+  let dataArrayFormatted = [];
   dataArrayFormatted = Process.formatToSpot(dataArray);
 
-  //View Processed Data
-  // console.log("dataArrayFormatted = " + dataArrayFormatted);
+  // View Raw Data
+  console.log(`dataArray raw = ${dataArray}`);
+  // TODO
+  // Insert Raw Data
+  // db.raw.insertMany(
+  //   dataArray,
+  //   {ordered: false},
+  //   (err, docs) => {
+  //     if (err) {
+  //       console.log(err)
+  //     }
+  //   }
+  // );
 
-  //Insert to DB
-  // Spot_V2.insertMany(
+  // View Processed Data
+  console.log(`dataArrayFormatted = ${dataArrayFormatted}`);
+  // TODO
+  // Insert Processed Data
+  // db.historicals.insertMany(
   //   dataArrayFormatted,
   //   {ordered: false},
   //   (err, docs) => {
@@ -215,24 +223,24 @@ const uploadSpotData = (object, bodyFilters) => {
   // );
 
 
-  //Return to frontend
-  var promiseFR = Promise.resolve(dataArrayFormatted);
-  promiseFR.then(function(value) {
+  // Return to frontend
+  const promiseFR = Promise.resolve(dataArrayFormatted);
+  promiseFR.then((value) => {
     // console.log(value);
-    // expected output: 123
   });
   return promiseFR;
-
 };
 
 
 const editField = (sampleId, field, newValue) => {
-	SampleData.findOne({ _id: sampleId }).then((example) => {
-		example.field = newValue;
-		return example.save();
-	});
+  SampleData.findOne({ _id: sampleId }).then((example) => {
+    example.field = newValue;
+    return example.save();
+  });
 };
 
 
-const controller = { uploadSpotData };
+const controller = {
+  getSpotData, getBeetleData, uploadSpotData, editField,
+};
 export default controller;
