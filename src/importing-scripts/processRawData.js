@@ -72,7 +72,6 @@ const formatToSpot = (data) => {
     let tempspbPerTwoWeeks = 0;
     let tempcleridsPerTwoWeeks = 0;
     let temppercentSpb = 0;
-    // let tempobjectid = 0;
     /* NOTE: spots information is collected in the fall, so spots and spotsPerHundredKm should be processed separately */
 
     // First, find spot that matches county-state of observation
@@ -81,38 +80,42 @@ const formatToSpot = (data) => {
 
       // if spot matches county and state of data point, then begin calculations...
       if ((spot.county === observation.County) && (spot.state === observation.USA_State)) {
-        // try to find matching object in SEEN tracking array
+        // keep spacing
+
         let found2 = false; // found2 indicates whether or not you've found a match in countyTrapSeen
+        // try to find matching object in SEEN tracking array
         for (let k = 0; k < countyTrapSeen.length; k++) {
           // if we HAVE seen a trap from this county-state before...
           if ((countyTrapSeen[k].county === spot.county) && (countyTrapSeen[k].state === spot.state)) {
             found2 = true; // set found2 to true to show that we found it (for error checking)
+
+            // update tracking array
+            countyTrapSeen[k].traps = countyTrapSeen[k].traps + 1;
 
             // calculate values for this trap...
             tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6)) / (observation.Num_Trapping_Periods / 2);
             tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6)) / (observation.Num_Trapping_Periods / 2);
             temppercentSpb = ((observation.Percent_SPB1 + observation.Percent_SPB2) + (observation.Percent_SPB3 + observation.Percent_SPB4) + (observation.Percent_SPB5 + observation.Percent_SPB6)) / (observation.Num_Trapping_Periods / 2);
 
-            // add in this trap...
+            // add in this trap to spot values...
             spot.spbPerTwoWeeks += tempspbPerTwoWeeks;
             spot.cleridsPerTwoWeeks += tempcleridsPerTwoWeeks;
             spot.percentSpb += temppercentSpb;
-            tempobjectid = observation.objectid;
-            // spot.objectIDs = spot.objectIDs.push(tempobjectid);
-            // console.log("objectID: " + observation.objectid);
 
             // if we are in the last round of traps for the county-state, then divde by number of trap
             // may need another for loop for countyTrapTotals, but it should be the same
-            if ((countyTrapSeen[k].traps === countyTrapTotals[k].traps)) {
-              // Scale based on number of traps
-              spot.spbPerTwoWeeks /= countyTrapTotals[k].traps;
-              spot.cleridsPerTwoWeeks /= countyTrapTotals[k].traps;
-              spot.percentSpb /= countyTrapTotals[k].traps;
-            }
-            // if we are NOT in the last round of traps for the county-state
-            else {
-              // increment SEEN
-              countyTrapSeen[k].traps = countyTrapSeen[k].traps + 1;
+            for (let q = 0; q < countyTrapTotals.length; q++) {
+              if ((countyTrapSeen[k].county === countyTrapTotals[q].county) && (countyTrapSeen[k].state === countyTrapTotals[q].state)) {
+                if (countyTrapSeen[k].traps === countyTrapTotals[q].traps) {
+                // Scale based on number of traps
+                  spot.spbPerTwoWeeks /= countyTrapTotals[q].traps;
+                  spot.cleridsPerTwoWeeks /= countyTrapTotals[q].traps;
+                  spot.percentSpb /= countyTrapTotals[q].traps;
+                }
+              }
+              // else {
+              //   // then we didn't count all the traps yet so keep going
+              // }
             }
             break;
           }
@@ -127,21 +130,16 @@ const formatToSpot = (data) => {
           // add it to the tracking array
           countyTrapSeen.push(addMeSeen);
 
-          /* add baseline */
+          /* add baseline vals to spot */
           // calculate values for this trap...
           tempspbPerTwoWeeks = ((observation.Number_SPB1 + observation.Number_SPB2) + (observation.Number_SPB3 + observation.Number_SPB4) + (observation.Number_SPB5 + observation.Number_SPB6)) / (observation.Num_Trapping_Periods / 2);
           tempcleridsPerTwoWeeks = ((observation.Number_Clerids1 + observation.Number_Clerids2) + (observation.Number_Clerids3 + observation.Number_Clerids4) + (observation.Number_Clerids5 + observation.Number_Clerids6)) / (observation.Num_Trapping_Periods / 2);
           temppercentSpb = ((observation.Percent_SPB1 + observation.Percent_SPB2) + (observation.Percent_SPB3 + observation.Percent_SPB4) + (observation.Percent_SPB5 + observation.Percent_SPB6)) / (observation.Num_Trapping_Periods / 2);
-          tempobjectid = observation.objectid;
-          // spot.objectIDs = spot.objectIDs.push(tempobjectid);
-          // console.log("objectID: " + observation.objectid);
 
           // create attribute and fill values for this trap...
           spot.spbPerTwoWeeks = tempspbPerTwoWeeks;
           spot.cleridsPerTwoWeeks = tempcleridsPerTwoWeeks;
           spot.percentSpb = temppercentSpb;
-          // console.log("objectID: " + observation.objectid);
-          // spot.objectIDs = spot.objectIDs.push(observation.objectid);
 
           // add categorical vars only once
           spot.latitude = observation.latitude; // add error checking to see if changed from last
@@ -153,8 +151,24 @@ const formatToSpot = (data) => {
           if (observation.is_Nat_Forest) {
             spot.nf = observation.forest;
           } else {
-            spot.rangerDistrictName = observation.Nat_Forest_Ranger_Dist,
+            spot.rangerDistrictName = observation.Nat_Forest_Ranger_Dist;
             spot.forest = observation.forest;
+          }
+
+          // if we are in the last round of traps for the county-state, then divde by number of trap
+          // may need another for loop for countyTrapTotals, but it should be the same
+          for (let q = 0; q < countyTrapTotals.length; q++) {
+            if ((addMeSeen.county === countyTrapTotals[q].county) && (addMeSeen.state === countyTrapTotals[q].state)) {
+              if (addMeSeen.traps === countyTrapTotals[q].traps) {
+                // Scale based on number of traps
+                spot.spbPerTwoWeeks /= countyTrapTotals[q].traps;
+                spot.cleridsPerTwoWeeks /= countyTrapTotals[q].traps;
+                spot.percentSpb /= countyTrapTotals[q].traps;
+              }
+            }
+            // else {
+            //   // then we didn't count all the traps yet so keep going
+            // }
           }
         }
       }

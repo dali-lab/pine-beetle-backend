@@ -17,6 +17,7 @@ const HistoricalSchema = new Schema({
   nf: String,
   classification: String,
   forest: String,
+  rangerDistrictName: String,
   stateCode: {
     type: Number,
     min: 0,
