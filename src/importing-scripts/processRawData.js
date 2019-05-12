@@ -15,7 +15,9 @@ import Trapping from '../models/trapping';
 * Use formatToSpot(dataArray) to process array of data in schema spots_v2 format.
 */
 
-const formatToSpot = (data) => {
+const formatToHist = (data) => {
+  console.log('formatToHist data');
+  console.log(data);
   /* Set Up: Generate tracking arrays for traps */
   const countyTrapTotals = []; // for tracking, {county, state, traps} where traps is the total count of traps found for the county-state in data
   const countyTrapSeen = []; // for tracking, {county, state, traps} where traps is the total count of traps seen so far for the county-state in calculation
@@ -68,6 +70,8 @@ const formatToSpot = (data) => {
   for (let i = 0; i < data.length; i++) {
     const observation = data[i]; // for readability
 
+    console.log('observation');
+    console.log(observation);
     // Set up temporary vars for calculation
     let tempspbPerTwoWeeks = 0;
     let tempcleridsPerTwoWeeks = 0;
@@ -217,8 +221,17 @@ const formatToSpot = (data) => {
   // var diff = data.length - sum;
   // console.log(diff + " points had critical fields that were null or they were from the wrong time frame. We were unable to add them to the database as a result.");
 
-  return formattedSpotArray;
+  console.log('processRawData.js');
+  console.log(formattedSpotArray);
+
+  // Return to promise
+  const promiseFR = Promise.resolve(formattedSpotArray);
+  promiseFR.then((value) => {
+    // console.log(value);
+  });
+
+  return promiseFR; // formattedSpotArray
 };
 
-const Process = { formatToSpot };
+const Process = { formatToHist };
 export default Process;

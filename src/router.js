@@ -9,6 +9,7 @@ import controller from './controllers/survey123_controller_v2';
 import { makePredictions } from './runRModel';
 import upload from './importing-scripts/uploadSurvey123toMongo';
 import queryURL from './importing-scripts/buildQuery';
+import Process from './importing-scripts/processRawData';
 
 const router = express();
 
@@ -603,21 +604,72 @@ router.post('/uploadSurvey123', (req, res) => {
 
   // get the data from S123 using axios, then with that...
   upload.getData(req.body.token).then((data) => {
+    console.log('inside getData');
     // view raw data
-    // console.log("data " + data);
+    console.log(`data ${data}`);
 
-    // run uploadSpotData to filter and upload data to db, then report to user
-    controller.uploadSpotData(data, req.body).then((uploaded) => {
-      // view transformed/uploaded historical data
-      // console.log("uploaded " + uploaded);
-      res.send(uploaded);
-    }).catch((err) => {
-      console.log(`Error: ${err}`);
+    // format to spot array
+    controller.formatToSpot(data, req.body)
+      .then((spotData) => {
+        console.log('inside formatToSpot');
+        console.log(spotData);
+
+        // //   //   // upload spots to db
+        // //   //   // controller.uploadSpotData(spotData);
+      })
+      .catch((error) => {
+        console.log('spotData still undefined :/');
+        console.log(error);
+      });
+  })
+    .catch((error) => {
+      console.log('something going wrong w getData');
+      console.log(error);
     });
-  }).catch((err) => {
-    console.log(`Error: ${err}`);
-  });
+  res.send('hi!');
 });
+// process spots to historicals
+// Process.formatToHist(spotData).then((histData) => {
+//   console.log(histData);
+//   console.log('inside formatToHist');
+//     // console.log('histData');
+//     // console.log(histData);
+//     // upload historicals to db
+// controller.uploadHistData(histData).then((uploaded) => { // move to hist controller
+//       console.log('inside uploadHistData');
+//       // pass forward historicals uploaded to db
+//       res.send(uploaded);
+//     })
+//       .catch((err) => {
+//         console.log(`Error: ${err}`);
+//       });
+//   })
+//     .catch((err) => {
+//       console.log(`Error: ${err}`);
+//     });
+// });
+//   .catch((err) => {
+//     console.log(`Error: ${err}`);
+// });
+
+//   // run uploadSpotData to filter and upload data to db, then report to user
+//   controller.uploadSpotData(data, req.body).then((uploaded) => {
+//     // view transformed/uploaded historical data
+//     // console.log("uploaded " + uploaded);
+//     res.send(uploaded);
+//   }).catch((err) => {
+//     console.log(`Error: ${err}`);
+//   });
+// });
+// .catch((err) => {
+//   console.log(`Error: ${err}`);
+// });
+// });
+// .catch((err) => {
+//   console.log(`Error: ${err}`);
+// });
+//   res.send('hi!');
+// });
 
 router.post('/uploadSurvey123Fake', (req, res) => {
   res.send([{
