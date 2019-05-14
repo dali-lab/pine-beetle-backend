@@ -4,27 +4,28 @@
  */
 import mongoose, { Schema } from 'mongoose';
 
+// eslint-disable-next-line camelcase
 const Spot_V2_Schema = new Schema({
-	objectid: String,
-	// globalid: String,
-	latitude: Number,
-	longitude: Number,
-	SPB: Number,
-	USA_State: String,
-	County: String,
-	forest: String, //not yet in system
-	rangerDistrictName: String, //not yet in system
-	isNF: Boolean, //not yet in system
-	Year: Number,
-	TrapSetDate: Number,
-	Trap_name: Number,
-	Cooperator: Number,
-	Trap_Lure: Number,
-	// Initial_Bloom: Number,
-	// Species_Bloom: Number,
-	// Comments: String,
-	// DeleteSurvey: Number,
-	CollectionDate1: Number,
+  objectid: String,
+  // globalid: String,
+  latitude: Number,
+  longitude: Number,
+  SPB: Number,
+  USA_State: String,
+  County: String,
+  forest: String, // not yet in system
+  Nat_Forest_Ranger_Dist: String, // not yet in system
+  is_Nat_Forest: Boolean, // not yet in system
+  Year: Number,
+  TrapSetDate: Number,
+  Trap_name: Number,
+  Cooperator: Number,
+  Trap_Lure: Number,
+  // Initial_Bloom: Number,
+  // Species_Bloom: Number,
+  // Comments: String,
+  // DeleteSurvey: Number,
+  CollectionDate1: Number,
   TrappingInterval1: Number,
   Number_SPB1: Number,
   Number_Clerids1: Number,
@@ -86,12 +87,14 @@ const Spot_V2_Schema = new Schema({
   Trapping_End_Date: Date,
   Num_Trapping_Periods: Number,
 }, {
-	toJSON: {
-		virtuals: true,
-	},
+  toJSON: {
+    virtuals: true,
+  },
 
 });
 
 
-const Spot_V2 = mongoose.model('Spot', Spot_V2_Schema);
+// eslint-disable-next-line camelcase
+const Spot_V2 = mongoose.model('Spot', Spot_V2_Schema, 'spots');
+// eslint-disable-next-line camelcase
 export default Spot_V2;
