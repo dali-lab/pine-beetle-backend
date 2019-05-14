@@ -14,8 +14,8 @@ const Spot_V2_Schema = new Schema({
   USA_State: String,
   County: String,
   forest: String, // not yet in system
-  rangerDistrictName: String, // not yet in system
-  isNF: Boolean, // not yet in system
+  Nat_Forest_Ranger_Dist: String, // not yet in system
+  is_Nat_Forest: Boolean, // not yet in system
   Year: Number,
   TrapSetDate: Number,
   Trap_name: Number,
@@ -95,6 +95,6 @@ const Spot_V2_Schema = new Schema({
 
 
 // eslint-disable-next-line camelcase
-const Spot_V2 = mongoose.model('Spot', Spot_V2_Schema);
+const Spot_V2 = mongoose.model('Spot', Spot_V2_Schema, 'spots');
 // eslint-disable-next-line camelcase
 export default Spot_V2;

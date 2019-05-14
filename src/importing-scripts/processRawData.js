@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable operator-assignment */
 /* eslint-disable no-plusplus */
 import * as fs from 'fs';
 import axios from 'axios';
 import HistoricalData from '../models/historical';
-import Spot_V2 from '../models/spot_v2';
+// import Spot_V2 from '../models/spot_v2';
 import Trapping from '../models/trapping';
 
 /*
@@ -15,9 +16,50 @@ import Trapping from '../models/trapping';
 * Use formatToSpot(dataArray) to process array of data in schema spots_v2 format.
 */
 
+
+// Create forest map
+const stateAbbrevToStateName = {
+  AL: 'Alabama',
+  AR: 'Arkansas',
+  DE: 'Delaware',
+  FL: 'Florida',
+  GA: 'Georgia',
+  KY: 'Kentucky',
+  LA: 'Louisiana',
+  MD: 'Maryland',
+  MS: 'Mississippi',
+  NC: 'North Carolina',
+  NJ: 'New Jersey',
+  OK: 'Oklahoma',
+  SC: 'South Carolina',
+  TN: 'Tennesse',
+  TX: 'Texas',
+  VA: 'Virginia',
+};
+
+// create inverse forest map
+const stateNameToStateAbbrev = {
+  Alabama: 'AL',
+  Arkansas: 'AR',
+  Delaware: 'DE',
+  Florida: 'FL',
+  Georgia: 'GA',
+  Kentucky: 'KY',
+  Louisiana: 'LA',
+  Maryland: 'MD',
+  Mississippi: 'MS',
+  'North Carolina': 'NC',
+  'New Jersey': 'NJ',
+  Oklahoma: 'OK',
+  'South Carolina': 'SC',
+  Tennesse: 'TN',
+  Texas: 'TX',
+  Virginia: 'VA',
+};
+
 const formatToHist = (data) => {
-  console.log('formatToHist data');
-  console.log(data);
+  // console.log('formatToHist data');
+  // console.log(data);
   /* Set Up: Generate tracking arrays for traps */
   const countyTrapTotals = []; // for tracking, {county, state, traps} where traps is the total count of traps found for the county-state in data
   const countyTrapSeen = []; // for tracking, {county, state, traps} where traps is the total count of traps seen so far for the county-state in calculation
@@ -153,10 +195,19 @@ const formatToHist = (data) => {
 
           // need to be included in survey by USFS
           if (observation.is_Nat_Forest) {
-            spot.nf = observation.forest;
+            const tempState = observation.USA_State;
+            spot.state = stateNameToStateAbbrev[tempState];
+            // spot.state = tempState;
+            spot.forest = `${observation.County.toUpperCase()} ${spot.state}`;
+            spot.classification = 'CO';
           } else {
+            const tempState = observation.USA_State;
+            // spot.state = tempState;
+            spot.state = stateNameToStateAbbrev[tempState];
+            spot.nf = observation.County.toUpperCase();
             spot.rangerDistrictName = observation.Nat_Forest_Ranger_Dist;
-            spot.forest = observation.forest;
+            spot.forest = `${observation.County.toUpperCase()} RD`;
+            spot.classification = 'RD';
           }
 
           // if we are in the last round of traps for the county-state, then divde by number of trap

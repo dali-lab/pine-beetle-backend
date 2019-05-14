@@ -74,5 +74,5 @@ const HistoricalSchema = new Schema({
   strictQuery: true, // turn on strict mode for query filters
 });
 
-const HistoricalModel = mongoose.model('Historical', HistoricalSchema);
+const HistoricalModel = mongoose.model('Historical', HistoricalSchema, 'historicals');
 export default HistoricalModel;

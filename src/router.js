@@ -9,7 +9,7 @@ import controller from './controllers/survey123_controller_v2';
 import { makePredictions } from './runRModel';
 import upload from './importing-scripts/uploadSurvey123toMongo';
 import queryURL from './importing-scripts/buildQuery';
-import Process from './importing-scripts/processRawData';
+import process from './importing-scripts/processRawData';
 
 const router = express();
 
@@ -600,7 +600,7 @@ router.get('/getBeetles', (req, res) => {
 
 router.post('/uploadSurvey123', (req, res) => {
   // view request
-  // console.log(req.body);
+  console.log(req.body);
 
   // get the data from S123 using axios, then with that...
   upload.getData(req.body.token).then((data) => {
@@ -613,21 +613,39 @@ router.post('/uploadSurvey123', (req, res) => {
       .then((spotData) => {
         console.log('inside formatToSpot');
         console.log(spotData);
+        controller.uploadRawData(spotData);
+
+        process.formatToHist(spotData)
+          .then((histData) => {
+            console.log(histData);
+            controller.uploadHistData(histData);
+            res.send(histData);
+          })
+          .catch((error) => {
+            console.log(error);
+            res.send(error);
+          });
 
         // //   //   // upload spots to db
-        // //   //   // controller.uploadSpotData(spotData);
+        // controller.uploadSpotData(spotData);
       })
       .catch((error) => {
         console.log('spotData still undefined :/');
         console.log(error);
+        res.send(error);
       });
   })
     .catch((error) => {
       console.log('something going wrong w getData');
       console.log(error);
+      res.send(error);
     });
-  res.send('hi!');
+  // res.send([{
+  //   hello: 'WORLD',
+  //   test: 1,
+  // }]);
 });
+
 // process spots to historicals
 // Process.formatToHist(spotData).then((histData) => {
 //   console.log(histData);
