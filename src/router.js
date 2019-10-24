@@ -626,8 +626,7 @@ router.post('/uploadSurvey123', (req, res) => {
             res.send(error);
           });
 
-        // //   //   // upload spots to db
-        // controller.uploadSpotData(spotData);
+        // upload spots to db
       })
       .catch((error) => {
         console.log('spotData still undefined :/');
@@ -640,54 +639,8 @@ router.post('/uploadSurvey123', (req, res) => {
       console.log(error);
       res.send(error);
     });
-  // res.send([{
-  //   hello: 'WORLD',
-  //   test: 1,
-  // }]);
 });
 
-// process spots to historicals
-// Process.formatToHist(spotData).then((histData) => {
-//   console.log(histData);
-//   console.log('inside formatToHist');
-//     // console.log('histData');
-//     // console.log(histData);
-//     // upload historicals to db
-// controller.uploadHistData(histData).then((uploaded) => { // move to hist controller
-//       console.log('inside uploadHistData');
-//       // pass forward historicals uploaded to db
-//       res.send(uploaded);
-//     })
-//       .catch((err) => {
-//         console.log(`Error: ${err}`);
-//       });
-//   })
-//     .catch((err) => {
-//       console.log(`Error: ${err}`);
-//     });
-// });
-//   .catch((err) => {
-//     console.log(`Error: ${err}`);
-// });
-
-//   // run uploadSpotData to filter and upload data to db, then report to user
-//   controller.uploadSpotData(data, req.body).then((uploaded) => {
-//     // view transformed/uploaded historical data
-//     // console.log("uploaded " + uploaded);
-//     res.send(uploaded);
-//   }).catch((err) => {
-//     console.log(`Error: ${err}`);
-//   });
-// });
-// .catch((err) => {
-//   console.log(`Error: ${err}`);
-// });
-// });
-// .catch((err) => {
-//   console.log(`Error: ${err}`);
-// });
-//   res.send('hi!');
-// });
 
 router.post('/uploadSurvey123Fake', (req, res) => {
   res.send([{
