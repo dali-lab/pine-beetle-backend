@@ -8,8 +8,7 @@ import historical from './controllers/historical_controller';
 import controller from './controllers/survey123_controller_v2';
 import { makePredictions } from './runRModel';
 import upload from './importing-scripts/uploadSurvey123toMongo';
-import queryURL from './importing-scripts/buildQuery';
-import process from './importing-scripts/processRawData';
+import summarizeTrappingData from './importing-scripts/summarizeTrappingData';
 
 const router = express();
 
@@ -615,7 +614,7 @@ router.post('/uploadSurvey123', (req, res) => {
         console.log(spotData);
         controller.uploadRawData(spotData);
 
-        process.formatToHist(spotData)
+        summarizeTrappingData.formatToHist(spotData)
           .then((histData) => {
             console.log(histData);
             controller.uploadHistData(histData);
