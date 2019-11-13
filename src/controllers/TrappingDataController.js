@@ -4,17 +4,11 @@
 import util from 'util';
 import mongoose from 'mongoose';
 import trappingData from '../models/trappingData';
-import SampleData from '../models/sample';
-import HistoricalModel from '../models/historical';
 
 mongoose.Promise = global.Promise;
 
 const getSpotData = () => {
   return trappingData.find({});
-};
-
-const getBeetleData = () => {
-  return SampleData.find({});
 };
 
 const getExistingSpots = (sampleid) => {
@@ -180,23 +174,6 @@ const formatToSpot = async (object, bodyFilters) => {
   });
 };
 
-const uploadHistData = (histData) => {
-  HistoricalModel.collection.insert(histData, onInsert);
-  function onInsert(err, docs) {
-    if (err) {
-    } else {
-      console.info('%d historical data was successfully stored.', docs.length);
-    }
-  }
-
-  // // Return to promise
-  const promiseFR = Promise.resolve(histData); // dataArrayFormatted;
-  promiseFR.then((value) => {
-  });
-  return promiseFR;
-};
-
-
 const uploadTrappingData = (trappingData) => {
   trappingData.collection.insert(trappingData, onInsert);
   function onInsert(err, docs) {
@@ -212,15 +189,7 @@ const uploadTrappingData = (trappingData) => {
   return promiseFR;
 };
 
-const editField = (sampleId, field, newValue) => {
-  SampleData.findOne({ _id: sampleId }).then((example) => {
-    example.field = newValue;
-    return example.save();
-  });
-};
-
-
 const controller = {
-  getSpotData, getBeetleData, editField, formatToSpot, formatToSpotCalc, uploadRawData, uploadHistData,
+  getSpotData, formatToSpot, formatToSpotCalc, uploadRawData, uploadHistData,
 };
 export default controller;

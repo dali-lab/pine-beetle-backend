@@ -130,6 +130,22 @@ const uploadHistorical = async (historicalData) => {
   });
 };
 
+const uploadHistData = (histData) => {
+  HistoricalModel.collection.insert(histData, onInsert);
+  function onInsert(err, docs) {
+    if (err) {
+    } else {
+      console.info('%d historical data was successfully stored.', docs.length);
+    }
+  }
+
+  // // Return to promise
+  const promiseFR = Promise.resolve(histData); // dataArrayFormatted;
+  promiseFR.then((value) => {
+  });
+  return promiseFR;
+};
+
 const historical = {
   getHistoricalData, getHistoricalDataFilter, getDataForPredictiveModel, getDataForSingleYear, getMinimumYear, getMaximumYear, getUniqueStates, getUniqueYears, getUniqueNationalForests, getUniqueLocalForests, uploadHistorical,
 };
