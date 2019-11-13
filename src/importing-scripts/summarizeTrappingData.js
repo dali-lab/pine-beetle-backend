@@ -1,10 +1,6 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable operator-assignment */
-/* eslint-disable no-plusplus */
 import * as fs from 'fs';
 import axios from 'axios';
 import HistoricalData from '../models/historical';
-import Trapping from '../models/trapping';
 
 /*
 * Method: formatToSpot()

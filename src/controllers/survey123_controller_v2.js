@@ -1,15 +1,9 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-loop-func */
-/* eslint-disable no-plusplus */
 /* for testing/development purposes
  * input, edit, and get sample data (src/data/sample_import_data.csv)
  */
-// eslint-disable-next-line camelcase
 import util from 'util';
 import mongoose from 'mongoose';
 import trappingData from '../models/trappingData';
-import Trapping from '../models/trapping';
 import SampleData from '../models/sample';
 import HistoricalModel from '../models/historical';
 
@@ -20,7 +14,7 @@ const getSpotData = () => {
 };
 
 const getBeetleData = () => {
-  return Trapping.find({});
+  return SampleData.find({});
 };
 
 const getExistingSpots = (sampleid) => {
@@ -63,15 +57,7 @@ const formatToSpotCalc = (object, bodyFilters, objectid) => {
     ) {
       console.log(objectid);
       const newSpot = {};
-      // console.log('got 1 spot');
       console.log(object.data.features[i].attributes.objectid);
-      // console.log(object.data.features[i]);
-      // console.log('made it through if statement');
-      // DEBUGGING STATEMENTS
-      // log each observation/data point from survey123
-      // console.log(object.data.features[i]);
-      // log the observation id of each data point from survey123URL
-      // console.log(object.data.features[i].attributes.objectid);
 
       // Create Raw Spot
       newSpot.forest = object.data.features[i].attributes.forestName;
@@ -144,8 +130,6 @@ const formatToSpotCalc = (object, bodyFilters, objectid) => {
       newSpot.Overall_SPB_PerDay = object.data.features[i].attributes.Overall_SPB_PerDay;
       newSpot.Overall_Clerids_PerDay = object.data.features[i].attributes.Overall_Clerids_PerDay;
       newSpot.Trapping_End_Date = object.data.features[i].attributes.Trapping_End_Date;
-
-      // If DB running out of space, stop tracking these
       newSpot.Initial_Bloom = object.data.features[i].attributes.Initial_Bloom;
       newSpot.Species_Bloom = object.data.features[i].attributes.Species_Bloom;
       newSpot.Comments = object.data.features[i].attributes.Comments;
@@ -181,18 +165,13 @@ const formatToSpotCalc = (object, bodyFilters, objectid) => {
 
       promises.push(newSpot);
     }
-    // console.log(object.data.features[i].attributes.objectid);
   }
   const promiseFR = Promise.resolve(promises);
   return promiseFR;
 };
 
 const formatToSpot = async (object, bodyFilters) => {
-  // console.log(grabAvoid());
   return grabAvoid().then((avoidIds) => {
-    console.log('entered .then() of grabAvoid() in formatToSpot()');
-    // console.log('avoidIds');
-    // console.log(avoidIds);
     return formatToSpotCalc(object, bodyFilters, avoidIds);
   }).catch((error) => {
     console.log('couldn\'t grab ids');
@@ -206,27 +185,24 @@ const uploadHistData = (histData) => {
   function onInsert(err, docs) {
     if (err) {
     } else {
-      console.info('%d potatoes were successfully stored.', docs.length);
+      console.info('%d historical data was successfully stored.', docs.length);
     }
   }
 
   // // Return to promise
   const promiseFR = Promise.resolve(histData); // dataArrayFormatted;
   promiseFR.then((value) => {
-    // console.log(value);
   });
   return promiseFR;
 };
 
 
-const uploadRawData = (spotData) => {
-  // View Raw Data
-  console.log(`spotData= ${spotData}`);
-  trappingData.collection.insert(spotData, onInsert);
+const uploadTrappingData = (trappingData) => {
+  trappingData.collection.insert(trappingData, onInsert);
   function onInsert(err, docs) {
     if (err) {
     } else {
-      console.info('%d potatoes were successfully stored.', docs.length);
+      console.info('%d trapping Data successfully stored.', docs.length);
     }
   }
 

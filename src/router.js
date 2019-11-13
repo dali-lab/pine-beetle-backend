@@ -1,7 +1,3 @@
-/* eslint-disable radix */
-/* eslint-disable no-unused-vars */
-/* eslint-disable guard-for-in */
-/* eslint-disable no-restricted-syntax */
 import express, { Router } from 'express';
 import math from 'mathjs';
 import historical from './controllers/historical_controller';
@@ -584,7 +580,6 @@ router.post('/getCustomPredictions', (req, res) => {
   });
 });
 
-// PREVIOUS IS ALL BELOW
 router.get('/getSpots', (req, res) => {
   controller.getSpotData().then((data) => {
     res.send(data);
@@ -598,43 +593,29 @@ router.get('/getBeetles', (req, res) => {
 });
 
 router.post('/uploadSurvey123', (req, res) => {
-  // view request
-  console.log(req.body);
 
   // get the data from S123 using axios, then with that...
   upload.getData(req.body.token).then((data) => {
-    console.log('inside getData');
-    // view raw data
-    console.log(`data ${data}`);
-
     // format to spot array
     controller.formatToSpot(data, req.body)
-      .then((spotData) => {
-        console.log('inside formatToSpot');
-        console.log(spotData);
-        controller.uploadRawData(spotData);
+      .then((trappingData) => {
+        controller.uploadTrappingData(trappingData);
 
-        summarizeTrappingData.formatToHist(spotData)
+        summarizeTrappingData.formatToHist(trappingData)
           .then((histData) => {
-            console.log(histData);
             controller.uploadHistData(histData);
             res.send(histData);
           })
           .catch((error) => {
-            console.log(error);
             res.send(error);
           });
-
-        // upload spots to db
       })
       .catch((error) => {
-        console.log('spotData still undefined :/');
         console.log(error);
         res.send(error);
       });
   })
     .catch((error) => {
-      console.log('something going wrong w getData');
       console.log(error);
       res.send(error);
     });
