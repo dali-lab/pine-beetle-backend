@@ -1,14 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 
-// TODO historical data is NOT the same format as Survey123 data (which is already either Trapping or Spot)
-// when fetching data to display, it could be returned in up to 3 different models
-// it may be easiest to choose to use only historical data up to some year, say 2018 (where it ends)
-// and then use Survey123 data from that point on (2019+)
+// Historical Data = Combination of Summarized trapping Data + Spot Data
 const HistoricalSchema = new Schema({
   objectIDs: [Number], // store array of objectIDs from ArcGIS to track which observations compose each row
   county: String,
-  // numTraps: Number, //for data processing only
-  // trapsSeen: Number, //for data processing only
   yearNumber: {
     type: Number,
     min: 0,
