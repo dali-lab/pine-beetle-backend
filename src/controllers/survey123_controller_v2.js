@@ -10,11 +10,9 @@ import util from 'util';
 import mongoose from 'mongoose';
 import trappingData from '../models/trappingData';
 import Trapping from '../models/trapping';
-import Process from '../importing-scripts/processRawData';
 import SampleData from '../models/sample';
-// import HistoricalSchema from '../models/historical';
 import HistoricalModel from '../models/historical';
-// import historical from './historical_controller';
+
 mongoose.Promise = global.Promise;
 
 const getSpotData = () => {
