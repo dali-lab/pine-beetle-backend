@@ -4,12 +4,11 @@
 import * as fs from 'fs';
 import axios from 'axios';
 import HistoricalData from '../models/historical';
-// import Spot_V2 from '../models/spot_v2';
 import Trapping from '../models/trapping';
 
 /*
 * Method: formatToSpot()
-* Inputs: dataArray in schema spot_v2.js
+* Inputs: dataArray in schema trappingData.js
 * Outputs: dataArray in schema historical.js
 * Note: Only calculates spbPerTwoWeeks, cleridsPerTwoWeeks, and percentSpb,
 * because other fields are calculated in the fall

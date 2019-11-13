@@ -4,8 +4,7 @@
  */
 import mongoose, { Schema } from 'mongoose';
 
-// eslint-disable-next-line camelcase
-const Spot_V2_Schema = new Schema({
+const trappingDataSchema = new Schema({
   objectid: String,
   // globalid: String,
   latitude: Number,
@@ -93,8 +92,5 @@ const Spot_V2_Schema = new Schema({
 
 });
 
-
-// eslint-disable-next-line camelcase
-const Spot_V2 = mongoose.model('Spot', Spot_V2_Schema, 'spots');
-// eslint-disable-next-line camelcase
-export default Spot_V2;
+const trappingData = mongoose.model('Spot', trappingDataSchema, 'spots');
+export default trappingData;
