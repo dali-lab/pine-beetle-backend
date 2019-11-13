@@ -1,7 +1,8 @@
 import express, { Router } from 'express';
 import math from 'mathjs';
-import historical from './controllers/historical_controller';
-import controller from './controllers/survey123_controller_v2';
+import historicalController from './controllers/HistoricalController';
+import sampleController from './controllers/SampleController';
+import trappingDataController from './controllers/TrappingDataController';
 import { makePredictions } from './runRModel';
 import upload from './importing-scripts/uploadSurvey123toMongo';
 import summarizeTrappingData from './importing-scripts/summarizeTrappingData';
@@ -10,14 +11,14 @@ const router = express();
 
 // get all items in the database
 router.get('/getHistoricals', (req, res) => {
-  historical.getHistoricalData().then((data) => {
+  historicalController.getHistoricalData().then((data) => {
     res.send(data);
   });
 });
 
 // get all items with passed filter
 router.post('/getHistoricalsFilter', (req, res) => {
-  historical.getHistoricalDataFilter(req.body).then((data) => {
+  historicalController.getHistoricalDataFilter(req.body).then((data) => {
     res.send(data);
   });
 });
@@ -33,7 +34,7 @@ const findYearObject = (collection, year) => {
 
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByYearFilter', (req, res) => {
-  historical.getHistoricalDataFilter(req.body).then((data) => {
+  historicalController.getHistoricalDataFilter(req.body).then((data) => {
     // grab start and end year provided by user
     // eslint-disable-next-line prefer-destructuring
     const startDate = req.body.startDate;
@@ -141,7 +142,7 @@ const findLatLongObject = (collection, lat, long) => {
 
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
-  historical.getHistoricalDataFilter(req.body).then((data) => {
+  historicalController.getHistoricalDataFilter(req.body).then((data) => {
     // grab start and end year provided by user
     // eslint-disable-next-line prefer-destructuring
     const startDate = req.body.startDate;
@@ -223,7 +224,7 @@ const findStateObject = (collection, state) => {
 
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByState', (req, res) => {
-  historical.getDataForSingleYear(req.body).then((data) => {
+  historicalController.getDataForSingleYear(req.body).then((data) => {
     const summarizedDataByState = [];
 
     for (const entry in data) {
@@ -262,42 +263,42 @@ router.post('/getSummarizedDataByState', (req, res) => {
 
 // get the first year present in the database
 router.get('/getMinimumYear', (req, res) => {
-  historical.getMinimumYear().then((data) => {
+  historicalController.getMinimumYear().then((data) => {
     res.send(data[0].year.toString());
   });
 });
 
 // get the most recent year present in the database
 router.get('/getMaximumYear', (req, res) => {
-  historical.getMaximumYear().then((data) => {
+  historicalController.getMaximumYear().then((data) => {
     res.send(data[0].year.toString());
   });
 });
 
 // get all unique states in the database
 router.get('/getUniqueStates', (req, res) => {
-  historical.getUniqueStates().then((data) => {
+  historicalController.getUniqueStates().then((data) => {
     res.send(data.filter((state) => { return state !== ''; }));
   });
 });
 
 // get all unique years in the database
 router.get('/getUniqueYears', (req, res) => {
-  historical.getUniqueYears().then((data) => {
+  historicalController.getUniqueYears().then((data) => {
     res.send(data.filter((year) => { return year !== ''; }));
   });
 });
 
 // get all unique years in the database
 router.post('/getUniqueNationalForests', (req, res) => {
-  historical.getUniqueNationalForests(req.body.stateAbbreviation).then((data) => {
+  historicalController.getUniqueNationalForests(req.body.stateAbbreviation).then((data) => {
     res.send(data.filter((nf) => { return nf !== ''; }));
   });
 });
 
 // get all unique years in the database
 router.post('/getUniqueLocalForests', (req, res) => {
-  historical.getUniqueLocalForests(req.body.stateAbbreviation).then((data) => {
+  historicalController.getUniqueLocalForests(req.body.stateAbbreviation).then((data) => {
     res.send(data.filter((forest) => { return forest !== ''; }));
   });
 });
@@ -310,7 +311,7 @@ router.post('/getPredictions', (req, res) => {
       message: 'Cannot run the model on the entire nation. Please specify a state and/or forest.',
     });
   } else {
-    historical.getDataForPredictiveModel(req.body).then((data) => {
+    historicalController.getDataForPredictiveModel(req.body).then((data) => {
       // if the user selected a specific national forest or forest, simply run the model
       if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== '') || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== '')) {
         // initialize input counts
@@ -581,13 +582,13 @@ router.post('/getCustomPredictions', (req, res) => {
 });
 
 router.get('/getSpots', (req, res) => {
-  controller.getSpotData().then((data) => {
+  trappingDataController.getSpotData().then((data) => {
     res.send(data);
   });
 });
 
 router.get('/getBeetles', (req, res) => {
-  controller.getBeetleData().then((data) => {
+  sampleController.getSampleData().then((data) => {
     res.send(data);
   });
 });
@@ -597,13 +598,13 @@ router.post('/uploadSurvey123', (req, res) => {
   // get the data from S123 using axios, then with that...
   upload.getData(req.body.token).then((data) => {
     // format to spot array
-    controller.formatToSpot(data, req.body)
+    trappingDataController.formatToSpot(data, req.body)
       .then((trappingData) => {
-        controller.uploadTrappingData(trappingData);
+        trappingDataController.uploadTrappingData(trappingData);
 
         summarizeTrappingData.formatToHist(trappingData)
           .then((histData) => {
-            controller.uploadHistData(histData);
+            historicalController.uploadHistData(histData);
             res.send(histData);
           })
           .catch((error) => {
@@ -686,7 +687,7 @@ router.post('/uploadSurvey123Fake', (req, res) => {
 router.post('/uploadHistorical', (req, res) => {
   const data = req.body;
   console.log(data);
-  historical.uploadHistorical(data).then((uploaded) => {
+  historicalController.uploadHistorical(data).then((uploaded) => {
     res.send(uploaded);
   }).catch((err) => {
     console.log(err);
