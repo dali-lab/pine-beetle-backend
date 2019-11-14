@@ -190,6 +190,6 @@ const uploadTrappingData = (trappingData) => {
 };
 
 const controller = {
-  getSpotData, formatToSpot, formatToSpotCalc, uploadRawData, uploadHistData,
+  getSpotData, getExistingSpots, grabAvoid, formatToSpot, formatToSpotCalc, uploadTrappingData,
 };
 export default controller;

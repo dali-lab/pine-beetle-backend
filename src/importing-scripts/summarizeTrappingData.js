@@ -115,9 +115,9 @@ const formatToHist = (data) => {
   const formattedSpotArray = totalsAndAverages.formattedSpotArray;
 
   // Generate empty spots with county and state indicators
-  const emptySpots = _generateTotalsAndAverages(countyTrapTotals, formattedSpotArray);
-  const countyTrapTotals = emptySpots.countyTrapTotals;
-  const formattedSpotArray = emptySpots.formattedSpotArray;
+  emptySpots = _generateTotalsAndAverages(countyTrapTotals, formattedSpotArray);
+  countyTrapTotals = emptySpots.countyTrapTotals;
+  formattedSpotArray = emptySpots.formattedSpotArray;
 
   /* Fill spots */
   // For each data point...
