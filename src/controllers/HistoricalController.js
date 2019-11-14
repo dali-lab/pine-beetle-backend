@@ -12,13 +12,13 @@ const getHistoricalData = () => {
 /* all historical data is in src/data/SPB2016_toDALI.csv
  * identical info as SPB2016_toDALI.json, converted for convenience
  */
-const getHistoricalDataFilter = (findObject) => {
+const getHistoricalDataFilter = (queryFields) => {
   // grab start and end year provided by user
-  const startDate = findObject.startDate;
-  const endDate = findObject.endDate;
+  const startDate = queryFields.startDate;
+  const endDate = queryFields.endDate;
 
   // find all values with matching fields in the parameters
-  let data = HistoricalData.find(findObject);
+  let data = HistoricalData.find(queryFields);
 
   // query on year (allowing for range)
   if (startDate !== undefined && endDate !== undefined) {
@@ -33,12 +33,12 @@ const getHistoricalDataFilter = (findObject) => {
   return data;
 };
 
-const getDataForPredictiveModel = (findObject) => {
+const getDataForPredictiveModel = (queryFields) => {
   // grab start and end year provided by user
-  const targetYear = findObject.targetYear;
+  const targetYear = queryFields.targetYear;
 
   // find all values with matching fields in the parameters
-  let data = HistoricalData.find(findObject);
+  let data = HistoricalData.find(queryFields);
 
   // query on year (allowing for range)
   data = data.where('year').ne(undefined);
@@ -51,12 +51,12 @@ const getDataForPredictiveModel = (findObject) => {
   return data;
 };
 
-const getDataForSingleYear = (findObject) => {
+const getDataForSingleYear = (queryFields) => {
   // grab start and end year provided by user
-  const targetYear = findObject.targetYear;
+  const targetYear = queryFields.targetYear;
 
   // find all values with matching fields in the parameters
-  let data = HistoricalData.find(findObject);
+  let data = HistoricalData.find(queryFields);
 
   // query on year (allowing for range) then sort based on year
   data = data.where('year').ne(undefined);
