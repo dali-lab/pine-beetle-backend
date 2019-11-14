@@ -6,8 +6,25 @@ import trappingDataController from './controllers/TrappingDataController';
 import { makePredictions } from './runRModel';
 import upload from './importing-scripts/uploadSurvey123toMongo';
 import summarizeTrappingData from './importing-scripts/summarizeTrappingData';
+import PredictionsService from './services/PredictionsService';
+import HistoricalService from './services/HistoricalService';
 
 const router = express();
+
+
+/***************************/
+/* HISTORICAL CONTROLLERS  */
+/***************************/
+
+router.post('/uploadHistorical', (req, res) => {
+  const data = req.body;
+  console.log(data);
+  historicalController.uploadHistorical(data).then((uploaded) => {
+    res.send(uploaded);
+  }).catch((err) => {
+    console.log(err);
+  });
+});
 
 // get all items in the database
 router.get('/getHistoricals', (req, res) => {
@@ -34,100 +51,10 @@ const findYearObject = (collection, year) => {
 
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByYearFilter', (req, res) => {
-  historicalController.getHistoricalDataFilter(req.body).then((data) => {
-    // grab start and end year provided by user
-    // eslint-disable-next-line prefer-destructuring
-    const startDate = req.body.startDate;
-    // eslint-disable-next-line prefer-destructuring
-    const endDate = req.body.endDate;
-
-    // summarize data by year
-    const summarizedDataByYear = [];
-
-    // eslint-disable-next-line guard-for-in
-    for (const entry in data) {
-      const dataObject = JSON.parse(JSON.stringify(data[entry]));
-      // eslint-disable-next-line prefer-destructuring
-      const year = data[entry].year;
-
-      if (year !== null && year !== undefined && year !== '') {
-        const index = findYearObject(summarizedDataByYear, year);
-        const object = summarizedDataByYear[index];
-        if (object !== null && object !== undefined) {
-          object.spots += dataObject.spots;
-          object.spotsPerHundredKm += dataObject.spotsPerHundredKm;
-          object.spbPerTwoWeeks += dataObject.spbPerTwoWeeks;
-          object.cleridsPerTwoWeeks += dataObject.cleridsPerTwoWeeks;
-
-          // add to state array
-          if (dataObject.state !== null && dataObject.state !== undefined && dataObject.state !== '' && !object.state.includes(dataObject.state)) {
-            object.state.push(dataObject.state);
-          }
-
-          // add to nf array
-          if (dataObject.nf !== null && dataObject.nf !== undefined && dataObject.nf !== '' && !object.nf.includes(dataObject.nf)) {
-            object.nf.push(dataObject.nf);
-          }
-
-          // add to forest array
-          if (dataObject.forest !== null && dataObject.forest !== undefined && dataObject.forest !== '' && !object.forest.includes(dataObject.forest)) {
-            object.forest.push(dataObject.forest);
-          }
-        } else {
-          const newObject = dataObject;
-
-          // set state to be array
-          const stateArray = [];
-          if (newObject.state !== null && newObject.state !== undefined && newObject.state !== '') {
-            stateArray.push(newObject.state);
-          }
-          newObject.state = stateArray;
-
-          // set nf to be array
-          const nfArray = [];
-          if (newObject.nf !== null && newObject.nf !== undefined && newObject.nf !== '') {
-            nfArray.push(newObject.nf);
-          }
-          newObject.nf = nfArray;
-
-          // set forest to be array
-          const forestArray = [];
-          if (newObject.forest !== null && newObject.forest !== undefined && newObject.forest !== '') {
-            forestArray.push(newObject.forest);
-          }
-          newObject.forest = forestArray;
-
-          summarizedDataByYear.push(dataObject);
-        }
-      }
-    }
-
-    // if all observations for a year are 0, remove from dataset
-    let i = 0;
-    while (i < summarizedDataByYear.length) {
-      if (summarizedDataByYear[i].spots === 0 && summarizedDataByYear[i].spotsPerHundredKm === 0 && summarizedDataByYear[i].spbPerTwoWeeks === 0 && summarizedDataByYear[i].cleridsPerTwoWeeks === 0) {
-        // remove observation from dataset and year
-        summarizedDataByYear.splice(i, 1);
-      } else {
-        i += 1;
-      }
-    }
-
-    // create a collection of values to return
-    const valuesToReturn = [null, null, summarizedDataByYear];
-
-    if (summarizedDataByYear.length > 0) {
-      // if we deleted the first date, update start date selection
-      if (startDate !== summarizedDataByYear[0].year) {
-        valuesToReturn[0] = summarizedDataByYear[0].year;
-      }
-      // if we deleted the last date, update end date selection
-      if (endDate !== summarizedDataByYear[summarizedDataByYear.length - 1].year) {
-        valuesToReturn[1] = summarizedDataByYear[summarizedDataByYear.length - 1].year;
-      }
-    }
-
-    res.send(valuesToReturn);
+  const queryFields = req.body;
+  historicalController.getHistoricalDataFilter(queryFields).then((data) => {
+    const summarizedDataByYear = HistoricalService.FilterDataByYear(queryFields, data);
+    res.send(summarizedDataByYear);
   });
 });
 
@@ -142,73 +69,9 @@ const findLatLongObject = (collection, lat, long) => {
 
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
-  historicalController.getHistoricalDataFilter(req.body).then((data) => {
-    // grab start and end year provided by user
-    // eslint-disable-next-line prefer-destructuring
-    const startDate = req.body.startDate;
-    // eslint-disable-next-line prefer-destructuring
-    const endDate = req.body.endDate;
-
-    const summarizedDataByLatLong = [];
-
-    for (const entry in data) {
-      const dataObject = JSON.parse(JSON.stringify(data[entry]));
-      const lat = data[entry].latitude;
-      const long = data[entry].longitude;
-
-      if (lat !== null && long !== null && lat !== undefined && long !== undefined) {
-        const index = findLatLongObject(summarizedDataByLatLong, lat, long);
-        const object = summarizedDataByLatLong[index];
-        if (object !== null && object !== undefined) {
-          object.spots += dataObject.spots;
-          object.spotsPerHundredKm += dataObject.spotsPerHundredKm;
-          object.spbPerTwoWeeks += dataObject.spbPerTwoWeeks;
-          object.cleridsPerTwoWeeks += dataObject.cleridsPerTwoWeeks;
-
-          // update start date
-          if (dataObject.year < object.startDate) {
-            object.startDate = dataObject.year;
-          }
-
-          // update end date
-          if (dataObject.year > object.startDate) {
-            object.endDate = dataObject.year;
-          }
-
-          // add to year array
-          if (dataObject.year !== null && dataObject.year !== undefined && dataObject.year !== '' && !object.yearArray.includes(dataObject.year)) {
-            object.yearArray.push(dataObject.year);
-          }
-        } else {
-          const newObject = dataObject;
-
-          // set start date and end date
-          newObject.startDate = dataObject.year;
-          newObject.endDate = dataObject.year;
-
-          // set years array
-          const yearArray = [];
-          if (newObject.year !== null && newObject.year !== undefined && newObject.year !== '') {
-            yearArray.push(newObject.year);
-          }
-          newObject.yearArray = yearArray;
-
-          summarizedDataByLatLong.push(newObject);
-        }
-      }
-    }
-
-    // if all observations for a lat, long are 0, remove from dataset
-    let i = 0;
-    while (i < summarizedDataByLatLong.length) {
-      if (summarizedDataByLatLong[i].spots === 0 && summarizedDataByLatLong[i].spotsPerHundredKm === 0 && summarizedDataByLatLong[i].spbPerTwoWeeks === 0 && summarizedDataByLatLong[i].cleridsPerTwoWeeks === 0) {
-        // remove observation from dataset and year
-        summarizedDataByLatLong.splice(i, 1);
-      } else {
-        i += 1;
-      }
-    }
-
+  const queryFields = req.body;
+  historicalController.getHistoricalDataFilter(queryFields).then((data) => {
+    const summarizedDataByLatLong = HistoricalService.FilterDataByLatLog(queryFields, data);
     res.send(summarizedDataByLatLong);
   });
 });
@@ -225,38 +88,7 @@ const findStateObject = (collection, state) => {
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByState', (req, res) => {
   historicalController.getDataForSingleYear(req.body).then((data) => {
-    const summarizedDataByState = [];
-
-    for (const entry in data) {
-      const dataObject = JSON.parse(JSON.stringify(data[entry]));
-      // eslint-disable-next-line prefer-destructuring
-      const state = data[entry].state;
-
-      if (state !== null && state !== undefined) {
-        const index = findStateObject(summarizedDataByState, state);
-        const object = summarizedDataByState[index];
-        if (object !== null && object !== undefined) {
-          object.spots += dataObject.spots;
-          object.spotsPerHundredKm += dataObject.spotsPerHundredKm;
-          object.spbPerTwoWeeks += dataObject.spbPerTwoWeeks;
-          object.cleridsPerTwoWeeks += dataObject.cleridsPerTwoWeeks;
-        } else {
-          summarizedDataByState.push(dataObject);
-        }
-      }
-    }
-
-    // if all observations for spots, etc. are 0, remove from dataset
-    let i = 0;
-    while (i < summarizedDataByState.length) {
-      if (summarizedDataByState[i].spots === 0 && summarizedDataByState[i].spotsPerHundredKm === 0 && summarizedDataByState[i].spbPerTwoWeeks === 0 && summarizedDataByState[i].cleridsPerTwoWeeks === 0) {
-        // remove observation from dataset and year
-        summarizedDataByState.splice(i, 1);
-      } else {
-        i += 1;
-      }
-    }
-
+    const summarizedDataByState = HistoricalService.FilterDataByState(data);
     res.send(summarizedDataByState);
   });
 });
@@ -305,281 +137,27 @@ router.post('/getUniqueLocalForests', (req, res) => {
 
 // run the R model on forest if specified, otherwise on entire state
 router.post('/getPredictions', (req, res) => {
-  // if user did not specify a state, return 400
   if (req.body.state === null || req.body.state === undefined) {
-    return res.status(400).send({
-      message: 'Cannot run the model on the entire nation. Please specify a state and/or forest.',
-    });
+    return res.status(400).send({message: 'Cannot run the model on the entire nation. Please specify a state and/or forest.',});
   } else {
     historicalController.getDataForPredictiveModel(req.body).then((data) => {
-      // if the user selected a specific national forest or forest, simply run the model
-      if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== '') || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== '')) {
-        // initialize input counts
-        const modelInputs = {
-          SPB: 0,
-          cleridst1: 0,
-          spotst1: 0,
-          spotst2: 0,
-          endobrev: req.body.endobrev,
-          stateCode: 0,
-          forestCode: 0,
-          forest: '',
-        };
-
-        // sum up inputs across these filters
-        for (const entry in data) {
-          modelInputs.stateCode = data[entry].stateCode;
-          modelInputs.forestCode = data[entry].forestCode;
-          modelInputs.forest = data[entry].forest;
-
-          if (data[entry].year === parseInt(req.body.targetYear)) {
-            if (data[entry].spbPerTwoWeeks !== undefined) {
-              modelInputs.SPB += data[entry].spbPerTwoWeeks;
-            }
-          }
-          if (data[entry].year === parseInt(req.body.targetYear - 1)) {
-            if (data[entry].spots !== undefined) {
-              modelInputs.spotst1 += data[entry].spots;
-            }
-            if (data[entry].cleridsPerTwoWeeks !== undefined) {
-              modelInputs.cleridst1 += data[entry].cleridsPerTwoWeeks;
-            }
-          } else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
-            if (data[entry].spots !== undefined) {
-              modelInputs.spotst2 += data[entry].spots;
-            }
-          }
-        }
-
-        // make prediction
-        const results = makePredictions(modelInputs.SPB, modelInputs.cleridst1, modelInputs.spotst1, modelInputs.spotst2, modelInputs.endobrev);
-
-        // get results
-        const expSpotsIfOutbreak = results[2].Predictions;
-        const spots0 = results[3].Predictions;
-        const spots19 = results[4].Predictions;
-        const spots53 = results[5].Predictions;
-        const spots147 = results[6].Predictions;
-        const spots402 = results[7].Predictions;
-        const spots1095 = results[8].Predictions;
-
-        const predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak];
-        const predPromise = Promise.resolve(predictions);
-
-        predPromise.then((value) => {
-          // put model outputs into JSON object
-          const outputs = {
-            prob0spots: value[0],
-            prob19spots: value[1],
-            prob53spots: value[2],
-            prob147spots: value[3],
-            prob402spots: value[4],
-            prob1095spots: value[5],
-            expSpotsIfOutbreak: value[6],
-          };
-
-          res.send({
-            inputs: modelInputs,
-            outputs,
-          });
-        });
-      }
-
-      // split the data up by forests, determine representative forests of the sample, run the model on only representative forests
-      else {
-        // separate all data by forest
-        const forestsData = {};
-
-        // sum up inputs across these filters
-        for (const entry in data) {
-          const forestNames = [data[entry].forest, data[entry].nf];
-          const obj = [null, null];
-
-          // repeat for forest and national forest
-          // eslint-disable-next-line no-plusplus
-          for (let i = 0; i < obj.length; i++) {
-            // if there is a forest to grab, find object, otherwise create one
-            if (forestNames[i] !== null && forestNames[i] !== '') {
-              if (forestsData[forestNames[i]] !== undefined) {
-                obj[i] = forestsData[forestNames[i]];
-              } else {
-                obj[i] = {
-                  SPB: 0,
-                  cleridst1: 0,
-                  spotst1: 0,
-                  spotst2: 0,
-                  endobrev: req.body.endobrev,
-                };
-              }
-            }
-
-            // if we have an object to grab, get statistics for spb, spots, etc.
-            if (obj[i] !== null) {
-              if (data[entry].year === parseInt(req.body.targetYear)) {
-                if (data[entry].spbPerTwoWeeks !== undefined) {
-                  obj[i].SPB += data[entry].spbPerTwoWeeks;
-                }
-              }
-              if (data[entry].year === parseInt(req.body.targetYear - 1)) {
-                if (data[entry].spots !== undefined) {
-                  obj[i].spotst1 += data[entry].spots;
-                }
-                if (data[entry].cleridsPerTwoWeeks !== undefined) {
-                  obj[i].cleridst1 += data[entry].cleridsPerTwoWeeks;
-                }
-              } else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
-                if (data[entry].spots !== undefined) {
-                  obj[i].spotst2 += data[entry].spots;
-                }
-              }
-
-              forestsData[forestNames[i]] = obj[i];
-            }
-          }
-        }
-
-        // grab array of spots values
-        const spots = [];
-        for (const forest in forestsData) {
-          spots.push(forestsData[forest].spotst1);
-        }
-
-        // compute mean and standard deviation of observed spots
-        const meanSpots = math.mean(spots);
-        const sdSpots = math.std(spots);
-
-        // get count of number of forests chosen then determine number of forests to run the model on
-        const numForests = Object.keys(forestsData).length;
-        const numForestsForModel = parseInt(numForests / 4);
-
-        // construct object for forests to run the model on
-        const forestsDataForModel = {};
-        let forestsAdded = 0;
-
-        // get representative forests to run the model on
-        for (const forest in forestsData) {
-          if (forestsAdded < numForestsForModel) {
-            // determine if this spots value is within one standard deviation of the mean
-            if (forestsData[forest].spotst1 >= meanSpots - sdSpots && forestsData[forest].spotst1 <= meanSpots + sdSpots) {
-              forestsDataForModel[forest] = forestsData[forest];
-              delete forestsData[forest];
-              forestsAdded += 1;
-            }
-          }
-        }
-
-        // initialize a collection of sums
-        const sums = {
-          expSpotsIfOutbreak: 0,
-          spots0: 0,
-          spots19: 0,
-          spots53: 0,
-          spots147: 0,
-          spots402: 0,
-          spots1095: 0,
-        };
-
-        const outputSums = {
-          SPB: 0,
-          cleridst1: 0,
-          spotst1: 0,
-          spotst2: 0,
-        };
-
-        // run model on each representative forest
-        for (const forest in forestsDataForModel) {
-          // add to outputSums
-          outputSums.SPB += forestsDataForModel[forest].SPB;
-          outputSums.cleridst1 += forestsDataForModel[forest].cleridst1;
-          outputSums.spotst1 += forestsDataForModel[forest].spotst1;
-          outputSums.spotst2 += forestsDataForModel[forest].spotst2;
-
-          // make prediction
-          const results = makePredictions(forestsDataForModel[forest].SPB, forestsDataForModel[forest].cleridst1, forestsDataForModel[forest].spotst1, forestsDataForModel[forest].spotst2, forestsDataForModel[forest].endobrev);
-
-          // get results
-          sums.expSpotsIfOutbreak += results[2].Predictions;
-          sums.spots0 += results[3].Predictions;
-          sums.spots19 += results[4].Predictions;
-          sums.spots53 += results[5].Predictions;
-          sums.spots147 += results[6].Predictions;
-          sums.spots402 += results[7].Predictions;
-          sums.spots1095 += results[8].Predictions;
-        }
-
-        // get average model inputs
-        const averageModelInputs = {
-          SPB: outputSums.SPB / numForestsForModel,
-          cleridst1: outputSums.cleridst1 / numForestsForModel,
-          spotst1: outputSums.spotst1 / numForestsForModel,
-          spotst2: outputSums.spotst2 / numForestsForModel,
-        };
-
-        const predictions = [sums.spots0 / numForestsForModel, sums.spots19 / numForestsForModel, sums.spots53 / numForestsForModel, sums.spots147 / numForestsForModel, sums.spots402 / numForestsForModel, sums.spots1095 / numForestsForModel, sums.expSpotsIfOutbreak / numForestsForModel];
-        const predPromise = Promise.resolve(predictions);
-
-        predPromise.then((value) => {
-          // put model outputs into JSON object
-          const outputs = {
-            prob0spots: value[0],
-            prob19spots: value[1],
-            prob53spots: value[2],
-            prob147spots: value[3],
-            prob402spots: value[4],
-            prob1095spots: value[5],
-            expSpotsIfOutbreak: value[6],
-          };
-
-          res.send({
-            inputs: averageModelInputs,
-            outputs,
-          });
-          // res.send(value);
-        });
-      }
+      const output = PredictionsService.getPredictions(req, data);
+      res.send(output);
     });
   }
 });
 
+// Returns Spot Predictions
+// Input is historical data (summarized trapping data)
 router.post('/getCustomPredictions', (req, res) => {
-  // get model inputs
-  const SPB = parseInt(req.body.SPB);
-  const cleridst1 = parseInt(req.body.cleridst1);
-  const spotst1 = parseInt(req.body.spotst1);
-  const spotst2 = parseInt(req.body.spotst2);
-  const endobrev = parseInt(req.body.endobrev);
-
-  // make prediction
-  const results = makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev);
-
-  // grab results
-  const expSpotsIfOutbreak = results[2].Predictions;
-  const spots0 = results[3].Predictions;
-  const spots19 = results[4].Predictions;
-  const spots53 = results[5].Predictions;
-  const spots147 = results[6].Predictions;
-  const spots402 = results[7].Predictions;
-  const spots1095 = results[8].Predictions;
-
-  // resolve promise
-  const predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak];
-  const predPromise = Promise.resolve(predictions);
-
-  predPromise.then((value) => {
-    // put model outputs into JSON object
-    const outputs = {
-      prob0spots: value[0],
-      prob19spots: value[1],
-      prob53spots: value[2],
-      prob147spots: value[3],
-      prob402spots: value[4],
-      prob1095spots: value[5],
-      expSpotsIfOutbreak: value[6],
-    };
-
-    res.send(outputs);
-  });
+  const SummarizedDataDTO = req.body;
+  const predictionsOutput = PredictionsService.PredictSpots(SummarizedDataDTO);
+  res.send(predictionsOutput);
 });
+
+/***************************/
+/*TRAPPING DATA CONTROLLERS*/
+/***************************/
 
 router.get('/getSpots', (req, res) => {
   trappingDataController.getSpotData().then((data) => {
@@ -682,16 +260,6 @@ router.post('/uploadSurvey123Fake', (req, res) => {
   },
 
   ]);
-});
-
-router.post('/uploadHistorical', (req, res) => {
-  const data = req.body;
-  console.log(data);
-  historicalController.uploadHistorical(data).then((uploaded) => {
-    res.send(uploaded);
-  }).catch((err) => {
-    console.log(err);
-  });
 });
 
 export default router;
