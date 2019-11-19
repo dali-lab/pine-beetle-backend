@@ -1,5 +1,5 @@
 # Project Pine Beetle
-Last Updated: 3.1.2019
+Last Updated: 11.19.2019
 ## Table of Contents
 - Project Overview
 - Project Architecture
@@ -77,7 +77,7 @@ To locally import the csv file in `src/data/`:
 - See [heroku deployment documentation](https://devcenter.heroku.com/articles/git) for more.
 
 ## Project Status
-As of March 6th, 2019, Project Pine Beetle will not be under active development. It is intended to be under active development again starting in Fall 2019.
+As of November 19th, 2019, Project Pine Beetle will not be under active development. It is intended to be under active development again starting in Winter 2020.
 
 ### Implemented: Fall, 2018
 - Database in MongoDB developed
@@ -103,9 +103,10 @@ As of March 6th, 2019, Project Pine Beetle will not be under active development.
 - Implemented fresh redesigns
 - Constructed private capability for partners to pull Survey123 data to the database
 
-### Expected Implementation: Fall, 2019
-- Improve pipeline from Survey123 to MongoDB for updated previously seen data
-- Fix problems seen with Spring 2019 data collection
+### Implemented: Fall, 2019
+
+### Expected Implementation: Winter, 2020
+- Automate pipeline from Survey123 to MongoDB for updated previously seen data
 - Improve model
 - Improve run/load-times
 - Cache/store previous model runs on server or in database to both improve run times and allow future versions of the predictive model to use previous model runs as inputs
@@ -120,6 +121,11 @@ This product illustrates the threats facing communities in a visual manner. It i
 
 ## Team Members
 
+### Fall 2019
+- Amanda Bak, Project Manager
+- Anuj Varma, Developer
+- Emma Langfitt, Developer
+
 ### Fall 2018
 - Thomas Monfre, Project Manager
 - Madeline Hess, Developer
@@ -133,7 +139,7 @@ This product illustrates the threats facing communities in a visual manner. It i
 - Bella Jacoby, Designer
 
 ## README Authors
-Thomas Monfre, Isabelle Hurley, Madeline Hess.
+Amanda Bak, Anuj Varma, Emma Langfitt.
 
 ## Acknowledgements
 - This project was built in partnership with Professor Carissa Aoki of Bates College and Professor Matt Ayres of Dartmouth College. We thank them for approaching the DALI Lab and cooperating with us to build this product.
