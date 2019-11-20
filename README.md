@@ -105,20 +105,9 @@ As of November 19th, 2019, Project Pine Beetle will not be under active developm
 
 ### Implemented: Fall, 2019
 - Simplified code
-	- Refactored names across files
-	- Deleted legacy code
 - Restructured data models
-	- Created backend model for Spot Data
-	- Deleted legacy data models
-	- Refactored bacekn by renaming Spot model to Trapping data model
-	- Historical model = Summarized trapping data + Spot data
 - Enforced MVC model in backend
-	- Created Controllers Folder with Controllers Files and took the code out of the router file and put it into the controllers files if there was interaction with the database
-	- Created Services Folder with Services Files and took code out of router file and put it in the services files 
 - Ensured functional pipeline from Survey123 to MongoDB
-	- Separated out functionality so pipeline code is more readable
-	- Tested pipeline with local data
-	- Simplified pipeline architecture - instead of diffing survey123 data, the data should just be pulled and replace data in our database for that year, it is more inefficient, however it is reliable.
 
 ### Expected Implementation: Winter, 2020
 - Automate pipeline from Survey123 to MongoDB for updated previously seen data
