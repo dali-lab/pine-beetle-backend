@@ -77,7 +77,7 @@ To locally import the csv file in `src/data/`:
 - See [heroku deployment documentation](https://devcenter.heroku.com/articles/git) for more.
 
 ## Project Status
-As of November 19th, 2019, Project Pine Beetle will not be under active development. It is intended to be under active development again starting in Winter 2020.
+As of November 20th, 2019, Project Pine Beetle will not be under active development. It is intended to be under active development again starting in Winter 2020.
 
 ### Implemented: Fall, 2018
 - Database in MongoDB developed
