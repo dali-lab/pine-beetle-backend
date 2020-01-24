@@ -1,6 +1,28 @@
+const findLatLongObject = (collection, lat, long) => {
+  for (const i in collection) {
+    if (collection[i].latitude === lat && collection[i].longitude === long) {
+      return i;
+    }
+  }
+  return null;
+};
+const findYearObject = (collection, year) => {
+  for (const i in collection) {
+    if (collection[i].year === year) {
+      return i;
+    }
+  }
+  return null;
+};
+
+
 export default class HistoricalService {
 
-FilterDataByLatLog(queryFields, data){
+  randomFunction() {
+    return 'hi';
+  }
+
+FilterDataByLatLog(queryFields, data) {
         // grab start and end year provided by user
     // eslint-disable-next-line prefer-destructuring
     const startDate = queryFields.startDate;

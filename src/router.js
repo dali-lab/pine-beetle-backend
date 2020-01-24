@@ -53,7 +53,8 @@ const findYearObject = (collection, year) => {
 router.post('/getSummarizedDataByYearFilter', (req, res) => {
   const queryFields = req.body;
   historicalController.getHistoricalDataFilter(queryFields).then((data) => {
-    const summarizedDataByYear = HistoricalService.FilterDataByYear(queryFields, data);
+    var b = new HistoricalService()
+    const summarizedDataByYear = b.FilterDataByYear(queryFields, data);
     res.send(summarizedDataByYear);
   });
 });
@@ -71,7 +72,8 @@ const findLatLongObject = (collection, lat, long) => {
 router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
   const queryFields = req.body;
   historicalController.getHistoricalDataFilter(queryFields).then((data) => {
-    const summarizedDataByLatLong = HistoricalService.FilterDataByLatLog(queryFields, data);
+    var a = new HistoricalService()
+    const summarizedDataByLatLong = a.FilterDataByLatLog(queryFields, data);
     res.send(summarizedDataByLatLong);
   });
 });
@@ -141,8 +143,10 @@ router.post('/getPredictions', (req, res) => {
     return res.status(400).send({message: 'Cannot run the model on the entire nation. Please specify a state and/or forest.',});
   } else {
     historicalController.getDataForPredictiveModel(req.body).then((data) => {
-      const output = PredictionsService.getPredictions(req, data);
-      res.send(output);
+      var a = new PredictionsService();
+      a.GetPredictions(req, data).then((output) => {
+        res.send(output)
+      });
     });
   }
 });

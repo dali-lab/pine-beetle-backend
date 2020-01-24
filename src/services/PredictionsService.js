@@ -2,7 +2,9 @@ import { makePredictions } from '../runRModel';
 
 export default class PredictionsService {
 
-  async GetPredictions(SummarizedDataDTO) {
+  async GetPredictions(req, data) { 
+    return new Promise((resolve,reject)=>{
+
       // if the user selected a specific national forest or forest, simply run the model
       if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== '') || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== '')) {
         // initialize input counts
@@ -55,8 +57,9 @@ export default class PredictionsService {
         const spots1095 = results[8].Predictions;
 
         const predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak];
-        const predPromise = Promise.resolve(predictions);
 
+        const predPromise = Promise.resolve(predictions);
+ 
         predPromise.then((value) => {
           // put model outputs into JSON object
           const outputs = {
@@ -68,10 +71,11 @@ export default class PredictionsService {
             prob1095spots: value[5],
             expSpotsIfOutbreak: value[6],
           };
-          return {
+          resolve({
             inputs: modelInputs,
             outputs,
-          }
+
+          })
         });
       }
 
@@ -219,14 +223,20 @@ export default class PredictionsService {
             prob1095spots: value[5],
             expSpotsIfOutbreak: value[6],
           };
+          resolve({
+            'inputs': averageModelInputs,
+            outputs
+          })
           return {
             inputs: averageModelInputs,
             outputs,
           }
         });
       }
+    })
 
   }
+
 
   async PredictSpots(SummarizedDataDTO) {
     // get model inputs
