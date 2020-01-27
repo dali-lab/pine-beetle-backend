@@ -38,7 +38,7 @@ const HistoricalSchema = new Schema({
   year: {
     type: Number,
     min: 1900,
-    max: 2016,
+    max: 2018,
   },
   spbPerTwoWeeks: {
     type: Number,

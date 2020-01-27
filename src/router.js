@@ -119,7 +119,8 @@ router.get('/getUniqueStates', (req, res) => {
 // get all unique years in the database
 router.get('/getUniqueYears', (req, res) => {
   historicalController.getUniqueYears().then((data) => {
-    res.send(data.filter((year) => { return year !== ''; }));
+    var sorted_years = data.filter((year) => { return year !== ''; }).sort()
+    res.send(sorted_years)
   });
 });
 
@@ -144,7 +145,10 @@ router.post('/getPredictions', (req, res) => {
   } else {
     historicalController.getDataForPredictiveModel(req.body).then((data) => {
       var a = new PredictionsService();
+      console.log(req.body)
       a.GetPredictions(req, data).then((output) => {
+        console.log("Returning:")
+        console.log(output)
         res.send(output)
       });
     });
