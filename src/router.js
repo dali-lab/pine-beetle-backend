@@ -145,10 +145,7 @@ router.post('/getPredictions', (req, res) => {
   } else {
     historicalController.getDataForPredictiveModel(req.body).then((data) => {
       var a = new PredictionsService();
-      console.log(req.body)
       a.GetPredictions(req, data).then((output) => {
-        console.log("Returning:")
-        console.log(output)
         res.send(output)
       });
     });
