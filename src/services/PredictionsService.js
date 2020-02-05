@@ -277,4 +277,17 @@ export default class PredictionsService {
       return predictions;
     });
   }
+  comparePredictionOutcome(prediction_outputs,outcome){
+    console.log(prediction_outputs.inputs)
+    console.log(outcome)
+    const predictions = prediction_outputs.outputs
+    const outcome_spots = outcome[0].spots
+
+    return {
+      "forest" : prediction_outputs.inputs.forest,
+      "predictions" : predictions,
+      "spots" : outcome_spots,
+      "assessment": "Algorithm output"
+    }
+  }
 }

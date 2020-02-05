@@ -159,6 +159,22 @@ router.post('/getCustomPredictions', (req, res) => {
   res.send(predictionsOutput);
 });
 
+router.post("/getPredictionAssessment" , (req,res) =>{
+  historicalController.getDataForPredictiveModel(req.body).then((data) =>{
+    const predService = new PredictionsService();
+    req.body.endobrev = 1
+    predService.GetPredictions(req,data).then((predictions) =>{
+      req.body.startDate = req.body.targetYear
+      req.body.endDate = req.body.targetYear
+      historicalController.getHistoricalDataFilter(req.body).then((outcome) =>{
+        const predictionAssesment = predService.comparePredictionOutcome(predictions,outcome)
+        res.send(predictionAssesment)
+      });
+    });
+  });
+});
+
+
 /***************************/
 /*TRAPPING DATA CONTROLLERS*/
 /***************************/
