@@ -277,4 +277,47 @@ export default class PredictionsService {
       return predictions;
     });
   }
+
+  //Takes predictions from get getPredictions functions along with historical data
+  //and returns an analysis
+  comparePredictionOutcome(prediction_outputs,outcome){
+    if (outcome.length === 0 || outcome[0].spots === null){
+      return {
+        "forest" : prediction_outputs.inputs.forest,
+        "predictions" : null,
+        "spots" : null,
+        "withinCorrectBounds": null,
+        "percentError" : null,
+        "missingData" : true
+      }
+    }
+    const predictions = prediction_outputs.outputs
+    const outcome_spots = outcome[0].spots
+    const thresholdValues = [-1,0,19,53,147,402,1095]
+    const predictionValues = 
+    [predictions.prob0spots,
+      predictions.prob19spots,
+      predictions.prob53spots,
+      predictions.prob147spots,
+      predictions.prob402spots,
+      predictions.prob1095spots]
+    var prob_range_index = 0
+
+    //gets an index of when the probability for prediction drops below 50%
+    while (prob_range_index < thresholdValues.length && predictionValues[prob_range_index] >.5){
+      prob_range_index ++
+    }
+    //Checks if historical data falls within this bin
+    const corectThreshhold = outcome_spots >= thresholdValues[prob_range_index] && outcome_spots <= thresholdValues[prob_range_index+1]
+    const percentError = Math.abs(outcome_spots - predictions.expSpotsIfOutbreak)/Math.max(outcome_spots,1)*100
+
+    return {
+      "forest" : prediction_outputs.inputs.forest,
+      "predictions" : predictions,
+      "spots" : outcome_spots,
+      "withinCorrectBounds": corectThreshhold,
+      "percentError" : percentError,
+      "missingData" : true
+    }
+  }
 }
