@@ -12,9 +12,7 @@ import HistoricalService from './services/HistoricalService';
 const router = express();
 
 
-/***************************/
-/* HISTORICAL CONTROLLERS  */
-/***************************/
+// HISTORICAL CONTROLLERS
 
 router.post('/uploadHistorical', (req, res) => {
   const data = req.body;
@@ -40,57 +38,30 @@ router.post('/getHistoricalsFilter', (req, res) => {
   });
 });
 
-const findYearObject = (collection, year) => {
-  for (const i in collection) {
-    if (collection[i].year === year) {
-      return i;
-    }
-  }
-  return null;
-};
-
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByYearFilter', (req, res) => {
   const queryFields = req.body;
   historicalController.getHistoricalDataFilter(queryFields).then((data) => {
-    var b = new HistoricalService()
-    const summarizedDataByYear = b.FilterDataByYear(queryFields, data);
+    const summarizedDataByYear = HistoricalService.filterDataByYear(queryFields, data);
     res.send(summarizedDataByYear);
   });
 });
 
-const findLatLongObject = (collection, lat, long) => {
-  for (const i in collection) {
-    if (collection[i].latitude === lat && collection[i].longitude === long) {
-      return i;
-    }
-  }
-  return null;
-};
 
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
   const queryFields = req.body;
   historicalController.getHistoricalDataFilter(queryFields).then((data) => {
-    var a = new HistoricalService()
-    const summarizedDataByLatLong = a.FilterDataByLatLog(queryFields, data);
+    const summarizedDataByLatLong = HistoricalService.filterDataByLatLog(queryFields, data);
     res.send(summarizedDataByLatLong);
   });
 });
 
-const findStateObject = (collection, state) => {
-  for (const i in collection) {
-    if (collection[i].state === state) {
-      return i;
-    }
-  }
-  return null;
-};
 
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByState', (req, res) => {
   historicalController.getDataForSingleYear(req.body).then((data) => {
-    const summarizedDataByState = HistoricalService.FilterDataByState(data);
+    const summarizedDataByState = HistoricalService.filterDataByState(data);
     res.send(summarizedDataByState);
   });
 });
@@ -140,12 +111,11 @@ router.post('/getUniqueLocalForests', (req, res) => {
 // run the R model on forest if specified, otherwise on entire state
 router.post('/getPredictions', (req, res) => {
   if (req.body.state === null || req.body.state === undefined) {
-    return res.status(400).send({message: 'Cannot run the model on the entire nation. Please specify a state and/or forest.',});
+    return res.status(400).send({ message: 'Cannot run the model on the entire nation. Please specify a state and/or forest.' });
   } else {
     historicalController.getDataForPredictiveModel(req.body).then((data) => {
-      var a = new PredictionsService();
-      a.GetPredictions(req, data).then((output) => {
-        res.send(output)
+      PredictionsService.getPredictions(req, data).then((output) => {
+        res.send(output);
       });
     });
   }
@@ -155,29 +125,28 @@ router.post('/getPredictions', (req, res) => {
 // Input is historical data (summarized trapping data)
 router.post('/getCustomPredictions', (req, res) => {
   const SummarizedDataDTO = req.body;
-  const predictionsOutput = PredictionsService.PredictSpots(SummarizedDataDTO);
-  res.send(predictionsOutput);
+  PredictionsService.predictSpots(SummarizedDataDTO).then((output) => {
+    res.send(output);
+  });
 });
 
-router.post("/getPredictionAssessment" , (req,res) =>{
-  historicalController.getDataForPredictiveModel(req.body).then((data) =>{
-    const predService = new PredictionsService();
-    req.body.endobrev = 1
-    predService.GetPredictions(req,data).then((predictions) =>{
-      req.body.startDate = req.body.targetYear
-      req.body.endDate = req.body.targetYear
-      historicalController.getHistoricalDataFilter(req.body).then((outcome) =>{
-        const predictionAssesment = predService.comparePredictionOutcome(predictions,outcome)
-        res.send(predictionAssesment)
+router.post('/getPredictionAssessment', (req, res) => {
+  historicalController.getDataForPredictiveModel(req.body).then((data) => {
+    req.body.endobrev = 1;
+    PredictionsService.getPredictions(req, data).then((predictions) => {
+      req.body.startDate = req.body.targetYear;
+      req.body.endDate = req.body.targetYear;
+      historicalController.getHistoricalDataFilter(req.body).then((outcome) => {
+        const predictionAssesment = PredictionsService.comparePredictionOutcome(predictions, outcome);
+        res.send(predictionAssesment);
       });
     });
   });
 });
 
 
-/***************************/
-/*TRAPPING DATA CONTROLLERS*/
-/***************************/
+// TRAPPING DATA CONTROLLERS
+
 
 router.get('/getSpots', (req, res) => {
   trappingDataController.getSpotData().then((data) => {

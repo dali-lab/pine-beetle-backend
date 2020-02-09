@@ -1,10 +1,8 @@
 import { makePredictions } from '../runRModel';
 
 export default class PredictionsService {
-
-  async GetPredictions(req, data) { 
-    return new Promise((resolve,reject)=>{
-
+  static async getPredictions(req, data) {
+    return new Promise((resolve, reject) => {
       // if the user selected a specific national forest or forest, simply run the model
       if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== '') || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== '')) {
         // initialize input counts
@@ -59,7 +57,7 @@ export default class PredictionsService {
         const predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak];
 
         const predPromise = Promise.resolve(predictions);
- 
+
         predPromise.then((value) => {
           // put model outputs into JSON object
           const outputs = {
@@ -75,10 +73,9 @@ export default class PredictionsService {
             inputs: modelInputs,
             outputs,
 
-          })
+          });
         });
       }
-
       // split the data up by forests, determine representative forests of the sample, run the model on only representative forests
       else {
         // separate all data by forest
@@ -225,30 +222,29 @@ export default class PredictionsService {
           };
           resolve({
             'inputs': averageModelInputs,
-            outputs
-          })
+            outputs,
+          });
           return {
             inputs: averageModelInputs,
             outputs,
-          }
+          };
         });
       }
-    })
-
+    });
   }
 
 
-  async PredictSpots(SummarizedDataDTO) {
+  static async predictSpots(SummarizedDataDTO) {
     // get model inputs
-    const SPB = parseInt(SummarizedDataDTO.SPB);
-    const cleridst1 = parseInt(SummarizedDataDTO.cleridst1);
-    const spotst1 = parseInt(SummarizedDataDTO.spotst1);
-    const spotst2 = parseInt(SummarizedDataDTO.spotst2);
-    const endobrev = parseInt(SummarizedDataDTO.endobrev);
+
+    const SPB = parseInt(SummarizedDataDTO.SPB, 10);
+    const cleridst1 = parseInt(SummarizedDataDTO.cleridst1, 10);
+    const spotst1 = parseInt(SummarizedDataDTO.spotst1, 10);
+    const spotst2 = parseInt(SummarizedDataDTO.spotst2, 10);
+    const endobrev = parseInt(SummarizedDataDTO.endobrev,10);
 
     // make prediction
     const results = makePredictions(SPB, cleridst1, spotst1, spotst2, endobrev);
-
     // grab results
     const expSpotsIfOutbreak = results[2].Predictions;
     const spots0 = results[3].Predictions;
@@ -260,64 +256,60 @@ export default class PredictionsService {
 
     // resolve promise
     const predictions = [spots0, spots19, spots53, spots147, spots402, spots1095, expSpotsIfOutbreak];
-    const predPromise = Promise.resolve(predictions);
+    //   // put model outputs into JSON object
+    const predictionsJson = {
+      prob0spots: predictions[0],
+      prob19spots: predictions[1],
+      prob53spots: predictions[2],
+      prob147spots: predictions[3],
+      prob402spots: predictions[4],
+      prob1095spots: predictions[5],
+      expSpotsIfOutbreak: predictions[6],
+    };
 
-    predPromise.then((value) => {
-      // put model outputs into JSON object
-      const predictions = {
-        prob0spots: value[0],
-        prob19spots: value[1],
-        prob53spots: value[2],
-        prob147spots: value[3],
-        prob402spots: value[4],
-        prob1095spots: value[5],
-        expSpotsIfOutbreak: value[6],
-      };
-
-      return predictions;
-    });
+    return predictionsJson;
+    // });
   }
 
-  //Takes predictions from get getPredictions functions along with historical data
-  //and returns an analysis
-  comparePredictionOutcome(prediction_outputs,outcome){
-    if (outcome.length === 0 || outcome[0].spots === null){
+  // Takes predictions from get getPredictions functions along with historical data
+  // and returns an analysis
+  static comparePredictionOutcome(predictionOutputs, outcome) {
+    if (outcome.length === 0 || outcome[0].spots === null) {
       return {
-        "forest" : prediction_outputs.inputs.forest,
-        "predictions" : null,
-        "spots" : null,
-        "withinCorrectBounds": null,
-        "percentError" : null,
-        "missingData" : true
-      }
+        forest: predictionOutputs.inputs.forest,
+        predictions: null,
+        spots: null,
+        withinCorrectBounds: null,
+        percentError: null,
+        missingData: true,
+      };
     }
-    const predictions = prediction_outputs.outputs
-    const outcome_spots = outcome[0].spots
-    const thresholdValues = [-1,0,19,53,147,402,1095]
-    const predictionValues = 
-    [predictions.prob0spots,
+    const predictions = predictionOutputs.outputs;
+    const outcomeSpots = outcome[0].spots;
+    const thresholdValues = [-1, 0, 19, 53, 147, 402, 1095];
+    const predictionValues = [predictions.prob0spots,
       predictions.prob19spots,
       predictions.prob53spots,
       predictions.prob147spots,
       predictions.prob402spots,
-      predictions.prob1095spots]
-    var prob_range_index = 0
+      predictions.prob1095spots];
 
-    //gets an index of when the probability for prediction drops below 50%
-    while (prob_range_index < thresholdValues.length && predictionValues[prob_range_index] >.5){
-      prob_range_index ++
+    let probabilityBinIndex = 0;
+    // gets an index of when the probability for prediction drops below 50%
+    while (probabilityBinIndex < thresholdValues.length && predictionValues[probabilityBinIndex] > 0.5) {
+      probabilityBinIndex += 1;
     }
-    //Checks if historical data falls within this bin
-    const corectThreshhold = outcome_spots >= thresholdValues[prob_range_index] && outcome_spots <= thresholdValues[prob_range_index+1]
-    const percentError = Math.abs(outcome_spots - predictions.expSpotsIfOutbreak)/Math.max(outcome_spots,1)*100
+    // Checks if historical data falls within this bin
+    const corectThreshhold = outcomeSpots >= thresholdValues[probabilityBinIndex] && outcomeSpots <= thresholdValues[probabilityBinIndex + 1];
+    const percentError = Math.abs(outcomeSpots - predictions.expSpotsIfOutbreak) / Math.max(outcomeSpots, 1) * 100;
 
     return {
-      "forest" : prediction_outputs.inputs.forest,
-      "predictions" : predictions,
-      "spots" : outcome_spots,
-      "withinCorrectBounds": corectThreshhold,
-      "percentError" : percentError,
-      "missingData" : true
-    }
+      forest: predictionOutputs.inputs.forest,
+      predictions,
+      spots: outcomeSpots,
+      withinCorrectBounds: corectThreshhold,
+      percentError,
+      missingData: true,
+    };
   }
 }

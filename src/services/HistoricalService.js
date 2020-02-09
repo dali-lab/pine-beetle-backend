@@ -6,9 +6,18 @@ const findLatLongObject = (collection, lat, long) => {
   }
   return null;
 };
+
 const findYearObject = (collection, year) => {
   for (const i in collection) {
     if (collection[i].year === year) {
+      return i;
+    }
+  }
+  return null;
+};
+const findStateObject = (collection, state) => {
+  for (const i in collection) {
+    if (collection[i].state === state) {
       return i;
     }
   }
@@ -18,11 +27,8 @@ const findYearObject = (collection, year) => {
 
 export default class HistoricalService {
 
-  randomFunction() {
-    return 'hi';
-  }
 
-FilterDataByLatLog(queryFields, data) {
+  static filterDataByLatLog(queryFields, data) {
         // grab start and end year provided by user
     // eslint-disable-next-line prefer-destructuring
     const startDate = queryFields.startDate;
@@ -91,7 +97,7 @@ FilterDataByLatLog(queryFields, data) {
     return summarizedDataByLatLong;
 }
 
-FilterDataByState(data) {
+  static filterDataByState(data) {
     const summarizedDataByState = [];
 
     for (const entry in data) {
@@ -125,7 +131,8 @@ FilterDataByState(data) {
     }
     return summarizedDataByState;
 }
-FilterDataByYear(queryFields, data) {
+
+  static filterDataByYear(queryFields, data) {
     const startDate = queryFields.startDate;
     const endDate = queryFields.endDate;
 
