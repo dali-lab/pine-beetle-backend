@@ -272,44 +272,32 @@ export default class PredictionsService {
   }
 
   // Takes predictions from get getPredictions functions along with historical data
-  // and returns an analysis
+  // and returns an analysis for true positive/false positive analysis
   static comparePredictionOutcome(predictionOutputs, outcome) {
     if (outcome.length === 0 || outcome[0].spots === null) {
       return {
         forest: predictionOutputs.inputs.forest,
         predictions: null,
         spots: null,
-        withinCorrectBounds: null,
-        percentError: null,
+        outbreakOcurred: null,
+        outbreakPredicted: null,
         missingData: true,
       };
     }
+    // Unpacking data
     const predictions = predictionOutputs.outputs;
     const outcomeSpots = outcome[0].spots;
-    const thresholdValues = [-1, 0, 19, 53, 147, 402, 1095];
-    const predictionValues = [predictions.prob0spots,
-      predictions.prob19spots,
-      predictions.prob53spots,
-      predictions.prob147spots,
-      predictions.prob402spots,
-      predictions.prob1095spots];
 
-    let probabilityBinIndex = 0;
-    // gets an index of when the probability for prediction drops below 50%
-    while (probabilityBinIndex < thresholdValues.length && predictionValues[probabilityBinIndex] > 0.5) {
-      probabilityBinIndex += 1;
-    }
-    // Checks if historical data falls within this bin
-    const corectThreshhold = outcomeSpots >= thresholdValues[probabilityBinIndex] && outcomeSpots <= thresholdValues[probabilityBinIndex + 1];
-    const percentError = Math.abs(outcomeSpots - predictions.expSpotsIfOutbreak) / Math.max(outcomeSpots, 1) * 100;
-
+    // Whether an outbreak occured or was predicted
+    const outbreakOcurred = outcomeSpots > 53;
+    const outbreakPredicted = predictions.prob53spots > 0.5;
     return {
       forest: predictionOutputs.inputs.forest,
       predictions,
       spots: outcomeSpots,
-      withinCorrectBounds: corectThreshhold,
-      percentError,
-      missingData: true,
+      outbreakOcurred,
+      outbreakPredicted,
+      missingData: false,
     };
   }
 }
