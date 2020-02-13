@@ -16,6 +16,7 @@ export default class PredictionsService {
           forestCode: null,
           forest: '',
         };
+        console.log(data);
         // sum up inputs across these filters
         for (const entry in data) {
           modelInputs.stateCode = data[entry].stateCode;
@@ -23,26 +24,27 @@ export default class PredictionsService {
           modelInputs.forest = data[entry].forest;
           
           if (data[entry].year === parseInt(req.body.targetYear)) {
-            if (data[entry].spbPerTwoWeeks !== undefined) {
+            if (data[entry].spbPerTwoWeeks != undefined) {
               modelInputs.SPB += data[entry].spbPerTwoWeeks;
             }
           }
 
           if (data[entry].year === parseInt(req.body.targetYear - 1)) {
-            if (data[entry].spots !== undefined) {
+            if (data[entry].spots != undefined) {
               modelInputs.spotst1 += data[entry].spots;
             }
 
-            if (data[entry].cleridsPerTwoWeeks !== undefined) {
+            if (data[entry].cleridsPerTwoWeeks != undefined) {
               modelInputs.cleridst1 += data[entry].cleridsPerTwoWeeks;
             }
 
           } else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
-            if (data[entry].spots !== undefined) {
+            if (data[entry].spots != undefined) {
               modelInputs.spotst2 += data[entry].spots;
             }
           }
         }
+        console.log(modelInputs);
         const missingData = Object.values(modelInputs).includes(null);
         if (missingData) {
           resolve({
