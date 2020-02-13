@@ -7,39 +7,48 @@ export default class PredictionsService {
       if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== '') || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== '')) {
         // initialize input counts
         const modelInputs = {
-          SPB: 0,
-          cleridst1: 0,
-          spotst1: 0,
-          spotst2: 0,
+          SPB: null,
+          cleridst1: null,
+          spotst1: null,
+          spotst2: null,
           endobrev: req.body.endobrev,
-          stateCode: 0,
-          forestCode: 0,
+          stateCode: null,
+          forestCode: null,
           forest: '',
         };
-
         // sum up inputs across these filters
         for (const entry in data) {
           modelInputs.stateCode = data[entry].stateCode;
           modelInputs.forestCode = data[entry].forestCode;
           modelInputs.forest = data[entry].forest;
-
+          
           if (data[entry].year === parseInt(req.body.targetYear)) {
             if (data[entry].spbPerTwoWeeks !== undefined) {
               modelInputs.SPB += data[entry].spbPerTwoWeeks;
             }
           }
+
           if (data[entry].year === parseInt(req.body.targetYear - 1)) {
             if (data[entry].spots !== undefined) {
               modelInputs.spotst1 += data[entry].spots;
             }
+
             if (data[entry].cleridsPerTwoWeeks !== undefined) {
               modelInputs.cleridst1 += data[entry].cleridsPerTwoWeeks;
             }
+
           } else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
             if (data[entry].spots !== undefined) {
               modelInputs.spotst2 += data[entry].spots;
             }
           }
+        }
+        const missingData = Object.values(modelInputs).includes(null);
+        if (missingData) {
+          resolve({
+            inputs: modelInputs,
+            outputs: null,
+          });
         }
 
         // make prediction
