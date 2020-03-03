@@ -7,50 +7,39 @@ export default class PredictionsService {
       if ((req.body.nf !== undefined && req.body.nf !== null && req.body.nf !== '') || (req.body.forest !== undefined && req.body.forest !== null && req.body.forest !== '')) {
         // initialize input counts
         const modelInputs = {
-          SPB: null,
-          cleridst1: null,
-          spotst1: null,
-          spotst2: null,
+          SPB: 0,
+          cleridst1: 0,
+          spotst1: 0,
+          spotst2: 0,
           endobrev: req.body.endobrev,
-          stateCode: null,
-          forestCode: null,
+          stateCode: 0,
+          forestCode: 0,
           forest: '',
         };
-        console.log(data);
+
         // sum up inputs across these filters
         for (const entry in data) {
           modelInputs.stateCode = data[entry].stateCode;
           modelInputs.forestCode = data[entry].forestCode;
           modelInputs.forest = data[entry].forest;
-          
+
           if (data[entry].year === parseInt(req.body.targetYear)) {
-            if (data[entry].spbPerTwoWeeks != undefined) {
+            if (data[entry].spbPerTwoWeeks !== undefined) {
               modelInputs.SPB += data[entry].spbPerTwoWeeks;
             }
           }
-
           if (data[entry].year === parseInt(req.body.targetYear - 1)) {
-            if (data[entry].spots != undefined) {
+            if (data[entry].spots !== undefined) {
               modelInputs.spotst1 += data[entry].spots;
             }
-
-            if (data[entry].cleridsPerTwoWeeks != undefined) {
+            if (data[entry].cleridsPerTwoWeeks !== undefined) {
               modelInputs.cleridst1 += data[entry].cleridsPerTwoWeeks;
             }
-
           } else if (data[entry].year === parseInt(req.body.targetYear - 2)) {
-            if (data[entry].spots != undefined) {
+            if (data[entry].spots !== undefined) {
               modelInputs.spotst2 += data[entry].spots;
             }
           }
-        }
-        console.log(modelInputs);
-        const missingData = Object.values(modelInputs).includes(null);
-        if (missingData) {
-          resolve({
-            inputs: modelInputs,
-            outputs: null,
-          });
         }
 
         // make prediction
@@ -301,7 +290,7 @@ export default class PredictionsService {
 
     // Whether an outbreak occured or was predicted
     const outbreakOcurred = outcomeSpots > 53;
-    const outbreakPredicted = predictions.prob53spots;
+    const outbreakPredicted = predictions.prob53spots > 0.5;
     return {
       forest: predictionOutputs.inputs.forest,
       predictions,
