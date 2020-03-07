@@ -290,7 +290,7 @@ export default class PredictionsService {
 
     // Whether an outbreak occured or was predicted
     const outbreakOcurred = outcomeSpots > 53;
-    const outbreakPredicted = predictions.prob53spots > 0.5;
+    const outbreakPredicted = predictions.prob53spots;
     return {
       forest: predictionOutputs.inputs.forest,
       predictions,
