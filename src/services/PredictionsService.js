@@ -274,13 +274,15 @@ export default class PredictionsService {
   // Takes predictions from get getPredictions functions along with historical data
   // and returns an analysis for true positive/false positive analysis
   static comparePredictionOutcome(predictionOutputs, outcome) {
+    console.log(predictionOutputs)
+    console.log(outcome)
     if (outcome.length === 0 || outcome[0].spots === null) {
       return {
         forest: predictionOutputs.inputs.forest,
         predictions: null,
         spots: null,
         outbreakOcurred: null,
-        outbreakPredicted: null,
+        outbreakPredicted: (predictionOutputs.outputs !=null) ? predictionOutputs.outputs.prob53spots : null,
         missingData: true,
       };
     }
