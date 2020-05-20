@@ -29,7 +29,6 @@ const getHistoricalDataFilter = (queryFields) => {
   } else if (endDate !== undefined) {
     data = data.where('year').lte(endDate);
   }
-
   return data;
 };
 

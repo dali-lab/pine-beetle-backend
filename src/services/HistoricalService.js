@@ -1,4 +1,5 @@
 const findLatLongObject = (collection, lat, long) => {
+  return null
   for (const i in collection) {
     if (collection[i].latitude === lat && collection[i].longitude === long) {
       return i;
@@ -36,8 +37,10 @@ export default class HistoricalService {
     const endDate = queryFields.endDate;
 
     const summarizedDataByLatLong = [];
-
+    console.log(queryFields)
     for (const entry in data) {
+      console.log("-------------")
+      console.log(data[entry])
       const dataObject = JSON.parse(JSON.stringify(data[entry]));
       const lat = data[entry].latitude;
       const long = data[entry].longitude;
@@ -138,7 +141,6 @@ export default class HistoricalService {
 
     // summarize data by year
     const summarizedDataByYear = [];
-
     for (const entry in data) {
       const dataObject = JSON.parse(JSON.stringify(data[entry]));
       const year = data[entry].year;

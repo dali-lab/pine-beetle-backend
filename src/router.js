@@ -41,6 +41,7 @@ router.post('/getHistoricalsFilter', (req, res) => {
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByYearFilter', (req, res) => {
   const queryFields = req.body;
+  queryFields.endDate = '2021';
   historicalController.getHistoricalDataFilter(queryFields).then((data) => {
     const summarizedDataByYear = HistoricalService.filterDataByYear(queryFields, data);
     res.send(summarizedDataByYear);
@@ -51,6 +52,8 @@ router.post('/getSummarizedDataByYearFilter', (req, res) => {
 // get all items with passed filter, then summarize based on year
 router.post('/getSummarizedDataByLatLongFilter', (req, res) => {
   const queryFields = req.body;
+  queryFields.endDate = '2021';
+  queryFields.startDate = '2018';
   historicalController.getHistoricalDataFilter(queryFields).then((data) => {
     const summarizedDataByLatLong = HistoricalService.filterDataByLatLog(queryFields, data);
     res.send(summarizedDataByLatLong);
