@@ -54,6 +54,5 @@
     "eslint-plugin-react": "^7.20.6",
     "nodemon": "^2.0.4",
     "util": "^0.12.0"
-  },
-  "heroku-run-build-script": true
+  }
 }
