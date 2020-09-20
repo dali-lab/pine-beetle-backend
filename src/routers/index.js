@@ -1,4 +1,4 @@
-import dev from './dev';
+import devRouter from './devRouter';
 
 // eslint-disable-next-line import/prefer-default-export
-export { dev };
+export { devRouter as dev };
