@@ -124,12 +124,17 @@ export const updateUser = (id, fields) => {
         } else {
           try {
             // then save user
-            const updatedUser = await User.updateOne({ _id: id }, {
+            await User.updateOne({ _id: id }, {
               ...fields,
               salted_password: hash,
             });
 
-            resolve(updatedUser);
+            const updatedUser = await getUserById(id);
+
+            resolve({
+              ...RESPONSE_CODES.SUCCESS,
+              user: updatedUser.user,
+            });
           } catch (error) {
             console.log(error);
 
@@ -143,10 +148,17 @@ export const updateUser = (id, fields) => {
     } else {
       // if not updating password, just save now
       User.updateOne({ _id: id }, fields)
-        .then((updatedUser) => {
-          resolve(updatedUser);
+        .then(async () => {
+          const updatedUser = await getUserById(id);
+
+          resolve({
+            ...RESPONSE_CODES.SUCCESS,
+            user: updatedUser.user,
+          });
         })
         .catch((error) => {
+          console.log(error);
+
           reject(new Error({
             code: RESPONSE_CODES.INTERNAL_ERROR,
             error,

@@ -83,6 +83,44 @@ userRouter.route('/:id')
         generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
       );
     }
+  })
+  .put(requireAuth, async (req, res) => {
+    try {
+      const result = await User.updateUser(req.params.id, req.body);
+
+      if (result && result.status === 200) {
+        res.send(generateResponse(RESPONSE_TYPES.SUCCESS, result.user));
+      } else {
+        res.status(result.status || 500).send(
+          generateResponse(result.type),
+        );
+      }
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  })
+  .delete(requireAuth, async (req, res) => {
+    try {
+      const result = await User.deleteUser(req.params.id);
+
+      if (result && result.status === 200) {
+        res.send(generateResponse(RESPONSE_TYPES.SUCCESS));
+      } else {
+        res.status(result.status || 500).send(
+          generateResponse(result.type),
+        );
+      }
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
   });
 
 export default userRouter;
