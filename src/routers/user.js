@@ -63,8 +63,8 @@ userRouter.route('/sign-up')
     }
   });
 
-// given id of user in header, get user info
 userRouter.route('/:id')
+  // given id of user in header, get user info
   .get(requireAuth, async (req, res) => {
     try {
       const result = await User.getUserById(req.params.id);
@@ -84,6 +84,7 @@ userRouter.route('/:id')
       );
     }
   })
+  // given id of user in header, update user info
   .put(requireAuth, async (req, res) => {
     try {
       const result = await User.updateUser(req.params.id, req.body);
@@ -103,6 +104,7 @@ userRouter.route('/:id')
       );
     }
   })
+  // given id of user in header, delete user
   .delete(requireAuth, async (req, res) => {
     try {
       const result = await User.deleteUser(req.params.id);
