@@ -1,9 +1,13 @@
 import RESPONSE_CODES from './response-codes.json';
 import RESPONSE_TYPES from './response-types.json';
 
-// given authorization header, return username and password
-// adapted from: https://gist.github.com/charlesdaniel/1686663
+/**
+ * @description authorization header, return username and password
+ * @param {String} authorization authorization header
+ * @returns {Object} with fields for email and password
+ */
 export const extractCredentialsFromAuthorization = (authorization) => {
+  // adapted from: https://gist.github.com/charlesdaniel/1686663
   const auth = Buffer.from(authorization.split(' ')[1], 'base64').toString().split(':');
 
   return {
