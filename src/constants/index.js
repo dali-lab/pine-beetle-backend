@@ -2,7 +2,7 @@ import RESPONSE_CODES from './response-codes.json';
 import RESPONSE_TYPES from './response-types.json';
 
 /**
- * @description authorization header, return username and password
+ * @description given authorization header, return username and password
  * @param {String} authorization authorization header
  * @returns {Object} with fields for email and password
  */
