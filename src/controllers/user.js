@@ -6,8 +6,6 @@ import { RESPONSE_CODES } from '../constants';
 
 const { SALT_ROUNDS } = process.env;
 
-console.log(User);
-
 /**
  * @description retrieves user object
  * @param {String} email email address of user
