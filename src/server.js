@@ -1,45 +1,59 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import path from 'path';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
-import router from './router';
-require('dotenv').config() // load environment variables
+import dotenv from 'dotenv';
+import allRouters from './routers';
+
+dotenv.config({ silent: true });
 
 // DB Setup
 // NOTE this is where collection is named/which database we direct app to
 const localMongoConnection = 'mongodb://localhost/pb-dev';
+
 const mongoURI = process.env.MONGODB_URI || localMongoConnection;
-mongoose.connect(mongoURI, {useNewUrlParser: true});
-// set mongoose promises to es6 default
-mongoose.Promise = global.Promise;
+const mongooseOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  loggerLevel: 'error',
+  useFindAndModify: false,
+};
+console.log('connecting to database...');
+mongoose.connect(mongoURI, mongooseOptions).then(() => {
+  console.log('connected to database:', mongoURI);
+}).catch((err) => {
+  console.log('error: could not connect to db:', err);
+});
 
 // initialize
 const app = express();
 
-//enable cross origin resource sharing
+// enable cross origin resource sharing
 app.use(cors());
+// additional header specifications
+app.use((_req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 // enable/disable http request logging
 app.use(morgan('dev'));
 
-// enable only if you want static assets from folder static
-app.use(express.static('static'));
-
 // enable json message body for posting data to API, extend default size limit
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyParser.json({ limit: '50mb', extended: true }));
-// app.use(bodyParser)
 
-// prefix API endpoints
-app.use('/v1', router);
+// ROUTES
+Object.entries(allRouters).forEach(([prefix, router]) => {
+  app.use(`/v2/${prefix}`, router);
+});
 
-// allow cors
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
+// Custom 404 middleware
+app.use((_req, res) => {
+  res.status(404).json({ message: 'The route you\'ve requested doesn\'t exist' });
 });
 
 // START THE SERVER
@@ -48,5 +62,3 @@ const port = process.env.PORT || 9090;
 app.listen(port);
 
 console.log(`listening on: ${port}`);
-exports.localMongoConnection = localMongoConnection;
-exports.mongoURI = mongoURI;
