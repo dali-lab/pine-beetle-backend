@@ -4,7 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import * as allRouters from './routers';
+import allRouters from './routers';
 
 dotenv.config({ silent: true });
 
@@ -32,6 +32,12 @@ const app = express();
 
 // enable cross origin resource sharing
 app.use(cors());
+// additional header specifications
+app.use((_req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 // enable/disable http request logging
 app.use(morgan('dev'));
@@ -40,14 +46,9 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyParser.json({ limit: '50mb', extended: true }));
 
-// base route to test connectivity
-app.get('/', (_req, res) => {
-  res.send('hello from pinebeetle api!');
-});
-
 // ROUTES
 Object.entries(allRouters).forEach(([prefix, router]) => {
-  app.use(`/${prefix}`, router);
+  app.use(`/v2/${prefix}`, router);
 });
 
 // Custom 404 middleware

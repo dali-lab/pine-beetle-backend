@@ -1,4 +1,5 @@
-import devRouter from './devRouter';
+import healthcheck from './healthcheck';
 
-// eslint-disable-next-line import/prefer-default-export
-export { devRouter as dev };
+export default {
+  healthcheck,
+};
