@@ -22,7 +22,7 @@ const mongooseOptions = {
 };
 console.log('connecting to database...');
 mongoose.connect(mongoURI, mongooseOptions).then(() => {
-  console.log('connected to database:', mongoURI);
+  console.log('connected to database');
 }).catch((err) => {
   console.log('error: could not connect to db:', err);
 });
