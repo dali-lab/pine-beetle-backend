@@ -105,16 +105,19 @@ export const updateUser = async (id, fields) => {
   }
 
   try {
-    await User.updateOne({ _id: id }, {
-      ...fields,
-      ...password ? { salted_password: password } : {}, // pre-save hook will salt and hash this
-    });
+    await User.updateOne({ _id: id }, fields);
 
-    const updatedUser = await getUserById(id);
+    const user = await User.findById(id);
+
+    if (password) {
+      user.salted_password = password;
+    }
+
+    await user.save();
 
     return {
       ...RESPONSE_CODES.SUCCESS,
-      user: updatedUser.user,
+      user,
     };
   } catch (error) {
     console.log(error);

@@ -17,8 +17,11 @@ const UserSchema = new Schema({
   },
 });
 
-// pre-save schema for salting/hashing user password
-UserSchema.pre('save', async function hashPassword(next) {
+/**
+ * @description Mongoose hook for salting/hashing user password
+ * @param {Function} next
+ */
+async function hashPassword(next) {
   const user = this;
 
   // only hash password if new/modified
@@ -34,7 +37,10 @@ UserSchema.pre('save', async function hashPassword(next) {
     console.log(error);
     return next(error);
   }
-});
+}
+
+// pre-save/update schema for salting/hashing user password
+UserSchema.pre('save', hashPassword);
 
 const UserModel = mongoose.model('User', UserSchema);
 
