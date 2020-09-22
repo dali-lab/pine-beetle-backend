@@ -4,15 +4,15 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import allRouters from './routers';
+import * as routers from './routers';
+
+import { generateResponse, RESPONSE_TYPES } from './constants';
 
 dotenv.config({ silent: true });
 
 // DB Setup
-// NOTE this is where collection is named/which database we direct app to
-const localMongoConnection = 'mongodb://localhost/pb-dev';
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/pb-dev';
 
-const mongoURI = process.env.MONGODB_URI || localMongoConnection;
 const mongooseOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -20,7 +20,7 @@ const mongooseOptions = {
   loggerLevel: 'error',
   useFindAndModify: false,
 };
-console.log('connecting to database...');
+
 mongoose.connect(mongoURI, mongooseOptions).then(() => {
   console.log('connected to database:', mongoURI);
 }).catch((err) => {
@@ -32,6 +32,7 @@ const app = express();
 
 // enable cross origin resource sharing
 app.use(cors());
+
 // additional header specifications
 app.use((_req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -47,13 +48,16 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyParser.json({ limit: '50mb', extended: true }));
 
 // ROUTES
-Object.entries(allRouters).forEach(([prefix, router]) => {
+Object.entries(routers).forEach(([prefix, router]) => {
   app.use(`/v2/${prefix}`, router);
 });
 
-// Custom 404 middleware
+// custom 404 middleware
 app.use((_req, res) => {
-  res.status(404).json({ message: 'The route you\'ve requested doesn\'t exist' });
+  res.status(404).send(generateResponse(
+    RESPONSE_TYPES.NOT_FOUND,
+    'The requested route does not exist',
+  ));
 });
 
 // START THE SERVER
