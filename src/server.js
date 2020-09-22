@@ -6,6 +6,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import * as routers from './routers';
 
+import { generateResponse, RESPONSE_TYPES } from './constants';
+
 dotenv.config({ silent: true });
 
 // DB Setup
@@ -50,9 +52,12 @@ Object.entries(routers).forEach(([prefix, router]) => {
   app.use(`/v2/${prefix}`, router);
 });
 
-// Custom 404 middleware
+// custom 404 middleware
 app.use((_req, res) => {
-  res.status(404).json({ message: 'The route you\'ve requested doesn\'t exist' });
+  res.status(404).send(generateResponse(
+    RESPONSE_TYPES.NOT_FOUND,
+    'The requested route does not exist',
+  ));
 });
 
 // START THE SERVER
