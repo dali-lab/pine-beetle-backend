@@ -1,5 +1,7 @@
 import healthcheck from './healthcheck';
+import user from './user';
 
-export default {
+export {
   healthcheck,
+  user,
 };
