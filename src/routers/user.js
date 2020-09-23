@@ -4,6 +4,7 @@ import { User } from '../controllers';
 import {
   extractCredentialsFromAuthorization,
   generateResponse,
+  COLLECTION_NAMES,
   RESPONSE_CODES,
   RESPONSE_TYPES,
 } from '../constants';
@@ -11,6 +12,27 @@ import {
 import { requireAuth } from '../middleware';
 
 const userRouter = Router();
+
+// get all users
+userRouter.route('/')
+  .get(requireAuth, async (_req, res) => {
+    try {
+      const cursor = global.connection
+        .collection(COLLECTION_NAMES.users)
+        .find({});
+
+      cursor.toArray((error, items) => {
+        if (error) throw new Error(error);
+        res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+      });
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
 
 // given email and password in authorization header, return auth token
 userRouter.route('/login')
@@ -61,6 +83,12 @@ userRouter.route('/sign-up')
         generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
       );
     }
+  });
+
+// check that user auth header is valid (middleware will send 401 if invalid)
+userRouter.route('/auth')
+  .get(requireAuth, async (_req, res) => {
+    res.send(generateResponse(RESPONSE_TYPES.SUCCESS));
   });
 
 userRouter.route('/:id')
