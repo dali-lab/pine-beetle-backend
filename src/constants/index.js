@@ -1,6 +1,11 @@
 import RESPONSE_CODES from './response-codes.json';
 import RESPONSE_TYPES from './response-types.json';
 
+// names of collections in MongoDB Atlas
+const COLLECTION_NAMES = {
+  users: 'users',
+};
+
 /**
  * @description given authorization header, return username and password
  * @param {String} authorization authorization header
@@ -34,6 +39,7 @@ export const generateResponse = (responseType, payload) => {
 };
 
 export {
+  COLLECTION_NAMES,
   RESPONSE_CODES,
   RESPONSE_TYPES,
 };

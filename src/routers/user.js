@@ -4,6 +4,7 @@ import { User } from '../controllers';
 import {
   extractCredentialsFromAuthorization,
   generateResponse,
+  COLLECTION_NAMES,
   RESPONSE_CODES,
   RESPONSE_TYPES,
 } from '../constants';
@@ -17,7 +18,7 @@ userRouter.route('/')
   .get(requireAuth, async (_req, res) => {
     try {
       const cursor = global.connection
-        .collection('users')
+        .collection(COLLECTION_NAMES.users)
         .find({});
 
       cursor.toArray((error, items) => {
