@@ -4,7 +4,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { MongoClient } from 'mongodb';
 import * as routers from './routers';
 
 import { generateResponse, RESPONSE_TYPES } from './constants';
@@ -22,24 +21,14 @@ const mongooseOptions = {
   useFindAndModify: false,
 };
 
-// connect mongoose for user model
+// connect mongoose and mongodb
 mongoose.connect(mongoURI, mongooseOptions).then(() => {
   console.log('mongoose connected to database');
+
+  global.connection = mongoose.connection;
+  console.log('mongo client connected with mongoose');
 }).catch((err) => {
   console.log('error: mongoose could not connect to db:', err);
-});
-
-// connect mongo client for all other collection reads
-MongoClient.connect(mongoURI, (error, db) => {
-  if (error) {
-    console.log('error: mongo client could not connect to db:', error);
-    return;
-  }
-
-  // store db reference in global scope
-  global.connection = db.db(process.env.DATABASE_NAME);
-
-  console.log('mongo client connected to database');
 });
 
 // initialize
