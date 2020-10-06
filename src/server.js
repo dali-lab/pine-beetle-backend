@@ -4,7 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import * as routers from './routers';
+import routers from './routers';
 
 import { generateResponse, RESPONSE_TYPES } from './constants';
 
