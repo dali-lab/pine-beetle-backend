@@ -7,7 +7,7 @@ import user from './user';
 
 export default {
   healthcheck,
-  spotdata: spots,
+  'spot-data': spots,
   'summarized-county-trapping': summarizedCounty,
   'summarized-rangerdistrict-trapping': summarizedRangerDistrict,
   'unsummarized-trapping': unsummarized,

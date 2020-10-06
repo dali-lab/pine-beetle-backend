@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
-import queryFetch from './query-fetch';
+import { specifiedQueryFetch, queryFetch } from './query-fetch';
 
 export {
+  specifiedQueryFetch,
   queryFetch,
 };

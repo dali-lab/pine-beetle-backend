@@ -1,13 +1,12 @@
 /**
- * @description queries database for items in collection based on filter
+ * @description queries database for items in collection based on provided query
  * @param {String} collectionName name of collection in db to query
- * @param {Object} queryParams object of query parameters user specified
- * @param {Array<String>} validQueryFields array of acceptable query fields
+ * @param {Object} query mongo query
  */
-export default (collectionName, queryParams, validQueryFields) => {
+export const specifiedQueryFetch = (collectionName, query) => {
   return new Promise((resolve, reject) => {
-    // generate query based on query params and valid fields
-    const query = Object.entries(queryParams).reduce((acc, [key, value]) => {
+    // cast all possible strings to integers
+    const parsedQuery = Object.entries(query).reduce((acc, [key, value]) => {
       let parsedValue;
 
       try {
@@ -18,17 +17,35 @@ export default (collectionName, queryParams, validQueryFields) => {
 
       return {
         ...acc,
-        ...value && validQueryFields.includes(key) ? { [key]: parsedValue || value } : {},
+        [key]: parsedValue || value,
       };
     }, {});
 
     const cursor = global.connection
       .collection(collectionName)
-      .find(query);
+      .find(parsedQuery);
 
     cursor.toArray((error, items) => {
       if (error) reject(error);
       resolve(items);
     });
   });
+};
+
+/**
+ * @description queries database for items in collection based on filter
+ * @param {String} collectionName name of collection in db to query
+ * @param {Object} queryParams object of query parameters user specified
+ * @param {Array<String>} validQueryFields array of acceptable query fields
+ */
+export const queryFetch = async (collectionName, queryParams, validQueryFields) => {
+  // generate query based on query params and valid fields
+  const query = Object.entries(queryParams).reduce((acc, [key, value]) => {
+    return {
+      ...acc,
+      ...value && validQueryFields.includes(key) ? { [key]: value } : {},
+    };
+  }, {});
+
+  return specifiedQueryFetch(collectionName, query);
 };
