@@ -9,6 +9,10 @@ import {
   RESPONSE_TYPES,
 } from '../constants';
 
+import {
+  queryFetch,
+} from '../utils';
+
 import { requireAuth } from '../middleware';
 
 const userRouter = Router();
@@ -17,14 +21,8 @@ const userRouter = Router();
 userRouter.route('/')
   .get(requireAuth, async (_req, res) => {
     try {
-      const cursor = global.connection
-        .collection(COLLECTION_NAMES.users)
-        .find({});
-
-      cursor.toArray((error, items) => {
-        if (error) throw new Error(error);
-        res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
-      });
+      const items = await queryFetch(COLLECTION_NAMES.users);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);
 
