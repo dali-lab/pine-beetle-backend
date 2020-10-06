@@ -1,9 +1,9 @@
 /**
  * @description queries database for items in collection based on provided query
  * @param {String} collectionName name of collection in db to query
- * @param {Object} query mongo query
+ * @param {Object} [query] mongo query
  */
-export const specifiedQueryFetch = (collectionName, query) => {
+export const specifiedQueryFetch = (collectionName, query = {}) => {
   return new Promise((resolve, reject) => {
     // cast all possible strings to integers
     const parsedQuery = Object.entries(query).reduce((acc, [key, value]) => {
@@ -35,10 +35,10 @@ export const specifiedQueryFetch = (collectionName, query) => {
 /**
  * @description queries database for items in collection based on filter
  * @param {String} collectionName name of collection in db to query
- * @param {Object} queryParams object of query parameters user specified
- * @param {Array<String>} validQueryFields array of acceptable query fields
+ * @param {Object} [queryParams] object of query parameters user specified
+ * @param {Array<String>} [validQueryFields] array of acceptable query fields
  */
-export const queryFetch = async (collectionName, queryParams, validQueryFields) => {
+export const queryFetch = async (collectionName, queryParams = {}, validQueryFields = []) => {
   // generate query based on query params and valid fields
   const query = Object.entries(queryParams).reduce((acc, [key, value]) => {
     return {
