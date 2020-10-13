@@ -3,6 +3,8 @@ import RESPONSE_TYPES from './response-types.json';
 
 // names of collections in MongoDB Atlas
 const COLLECTION_NAMES = {
+  predictionsCounty: 'countypredictions',
+  predictionsRangerDistrict: 'rdpredictions',
   spots: 'spotdatas',
   summarizedCounty: 'summarizedcountytrappings',
   summarizedRangerDistrict: 'summarizedrangerdistricttrappings',
