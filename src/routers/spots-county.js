@@ -12,10 +12,10 @@ import {
   queryFetch,
 } from '../utils';
 
-const unsummarizedRouter = Router();
+const spotDataCountyRouter = Router();
 
 // query items in collection
-unsummarizedRouter.route('/')
+spotDataCountyRouter.route('/')
   .get(async (req, res) => {
     const validQueryFields = [
       'county',
@@ -39,7 +39,7 @@ unsummarizedRouter.route('/')
   });
 
 // user specified query (allows for mongo-specific syntax)
-unsummarizedRouter.route('/query')
+spotDataCountyRouter.route('/query')
   .post(async (req, res) => {
     try {
       const items = await specifiedQueryFetch(COLLECTION_NAMES.spotsCounty, req.body);
@@ -53,4 +53,4 @@ unsummarizedRouter.route('/query')
     }
   });
 
-export default unsummarizedRouter;
+export default spotDataCountyRouter;
