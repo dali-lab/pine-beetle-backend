@@ -12,23 +12,22 @@ import {
   queryFetch,
 } from '../utils';
 
-const unsummarizedRouter = Router();
+const spotDataCountyRouter = Router();
 
 // query items in collection
-unsummarizedRouter.route('/')
+spotDataCountyRouter.route('/')
   .get(async (req, res) => {
     const validQueryFields = [
       'county',
       'fips',
       'hostAc',
-      'rangerDistrict',
-      'spbCount',
+      'spots',
       'state',
       'year',
     ];
 
     try {
-      const items = await queryFetch(COLLECTION_NAMES.spots, req.query, validQueryFields);
+      const items = await queryFetch(COLLECTION_NAMES.spotsCounty, req.query, validQueryFields);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);
@@ -40,10 +39,10 @@ unsummarizedRouter.route('/')
   });
 
 // user specified query (allows for mongo-specific syntax)
-unsummarizedRouter.route('/query')
+spotDataCountyRouter.route('/query')
   .post(async (req, res) => {
     try {
-      const items = await specifiedQueryFetch(COLLECTION_NAMES.spots, req.body);
+      const items = await specifiedQueryFetch(COLLECTION_NAMES.spotsCounty, req.body);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);
@@ -54,4 +53,4 @@ unsummarizedRouter.route('/query')
     }
   });
 
-export default unsummarizedRouter;
+export default spotDataCountyRouter;
