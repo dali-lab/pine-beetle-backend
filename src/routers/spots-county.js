@@ -21,14 +21,13 @@ unsummarizedRouter.route('/')
       'county',
       'fips',
       'hostAc',
-      'rangerDistrict',
-      'spbCount',
+      'spots',
       'state',
       'year',
     ];
 
     try {
-      const items = await queryFetch(COLLECTION_NAMES.spots, req.query, validQueryFields);
+      const items = await queryFetch(COLLECTION_NAMES.spotsCounty, req.query, validQueryFields);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);
@@ -43,7 +42,7 @@ unsummarizedRouter.route('/')
 unsummarizedRouter.route('/query')
   .post(async (req, res) => {
     try {
-      const items = await specifiedQueryFetch(COLLECTION_NAMES.spots, req.body);
+      const items = await specifiedQueryFetch(COLLECTION_NAMES.spotsCounty, req.body);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);
