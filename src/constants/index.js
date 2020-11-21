@@ -5,7 +5,7 @@ import RESPONSE_TYPES from './response-types.json';
 const COLLECTION_NAMES = {
   predictionsCounty: 'countypredictions',
   predictionsRangerDistrict: 'rdpredictions',
-  spotsCounty: 'spotdatacountys',
+  spotsCounty: 'spotdatacounties',
   spotsRangerDistrict: 'spotdatarangerdistricts',
   summarizedCounty: 'summarizedcountytrappings',
   summarizedRangerDistrict: 'summarizedrangerdistricttrappings',
