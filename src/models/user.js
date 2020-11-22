@@ -7,10 +7,11 @@ dotenv.config({ silent: true });
 const { SALT_ROUNDS } = process.env;
 
 const UserSchema = new Schema({
+  date_created: Date,
   email: String,
-  salted_password: String,
   first_name: String,
   last_name: String,
+  salted_password: String,
 }, {
   toJSON: {
     virtuals: true,
