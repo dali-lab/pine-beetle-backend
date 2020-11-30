@@ -10,6 +10,7 @@ import {
 } from '../constants';
 
 import {
+  sendPasswordResetEmail,
   queryFetch,
 } from '../utils';
 
@@ -182,6 +183,23 @@ userRouter.route('/:id')
         generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
       );
     }
+  });
+
+// send forgot password email to user
+userRouter.route('/forgot-password/:email')
+  .get(async (req, res) => {
+    const {
+      email,
+    } = req.params;
+
+    const user = await User.getUserByEmail(email);
+    const newPassword = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 10);
+
+    await User.updateUser(user._id, { password: newPassword });
+
+    const emailResult = await sendPasswordResetEmail(user.email, newPassword);
+
+    res.send(generateResponse(RESPONSE_TYPES.SUCCESS, emailResult));
   });
 
 export default userRouter;
