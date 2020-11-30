@@ -22,7 +22,12 @@ userRouter.route('/')
   .get(requireAuth, async (_req, res) => {
     try {
       const items = await queryFetch(COLLECTION_NAMES.users);
-      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items.map((user) => {
+        return {
+          ...user,
+          salted_password: undefined,
+        };
+      })));
     } catch (error) {
       console.log(error);
 
