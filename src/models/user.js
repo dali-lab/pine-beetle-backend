@@ -18,6 +18,11 @@ const UserSchema = new Schema({
   },
 });
 
+// index on email
+UserSchema.index({
+  email: 1,
+}, { unique: true });
+
 /**
  * @description Mongoose hook for salting/hashing user password
  * @param {Function} next
