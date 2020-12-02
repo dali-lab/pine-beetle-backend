@@ -69,6 +69,7 @@ export const createUser = async (fields) => {
   user.last_name = lastName;
   user.email = email;
   user.salted_password = password; // pre-save hook will salt and hash this
+  user.date_created = new Date();
 
   try {
     const savedUser = await user.save();
@@ -150,12 +151,11 @@ export const deleteUser = async (id) => {
  * @returns {Promise<Object>} promise that resolves to object with result field of authenticated and user if authed
  */
 export const isAuthedUser = async (credentials) => {
-  try {
-    const user = await getUserByEmail(credentials.email);
+  const user = await getUserByEmail(credentials.email);
+  if (!user || user === RESPONSE_CODES.NOT_FOUND) throw new Error(RESPONSE_CODES.NOT_FOUND.type);
 
-    if (!user) throw new Error(RESPONSE_CODES.INTERNAL_ERROR.type);
-
-    if (user.salted_password) {
+  if (user.salted_password) {
+    try {
       const result = await bcrypt.compare(credentials.password, user.salted_password);
 
       // explicit check to only evaluate boolean
@@ -164,17 +164,17 @@ export const isAuthedUser = async (credentials) => {
         result: result === true,
         ...result === true ? { user } : {},
       };
-    } else {
-      throw new Error(RESPONSE_CODES.INTERNAL_ERROR.type);
-    }
-  } catch (error) {
-    console.log(error);
+    } catch (error) {
+      console.log(error);
 
-    if (error.type) throw new Error(error);
-    throw new Error({
-      ...RESPONSE_CODES.INTERNAL_ERROR,
-      error,
-    });
+      if (error.type) throw new Error(error);
+      throw new Error({
+        ...RESPONSE_CODES.INTERNAL_ERROR,
+        error,
+      });
+    }
+  } else {
+    throw new Error(RESPONSE_CODES.INTERNAL_ERROR.type);
   }
 };
 
@@ -185,4 +185,14 @@ export const isAuthedUser = async (credentials) => {
 export const tokenForUser = (email) => {
   const timestamp = new Date().getTime();
   return jwt.encode({ sub: email, iat: timestamp }, process.env.AUTH_SECRET);
+};
+
+export const userWithEmailExists = async (email) => {
+  try {
+    const user = await getUserByEmail(email);
+    return user !== RESPONSE_CODES.NOT_FOUND;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };

@@ -1,7 +1,8 @@
 import countyPredictions from './county-predictions';
 import healthcheck from './healthcheck';
 import rangerDistrictPredictions from './ranger-district-predictions';
-import spots from './spots';
+import spotsCounty from './spots-county';
+import spotsRangerDistrict from './spots-rangerdistrict';
 import summarizedCounty from './summarized-county';
 import summarizedRangerDistrict from './summarized-ranger-district';
 import unsummarized from './unsummarized';
@@ -11,7 +12,8 @@ export default {
   'county-prediction': countyPredictions,
   healthcheck,
   'rd-prediction': rangerDistrictPredictions,
-  'spot-data': spots,
+  'spot-data-county': spotsCounty,
+  'spot-data-rangerdistrict': spotsRangerDistrict,
   'summarized-county-trapping': summarizedCounty,
   'summarized-rangerdistrict-trapping': summarizedRangerDistrict,
   'unsummarized-trapping': unsummarized,
