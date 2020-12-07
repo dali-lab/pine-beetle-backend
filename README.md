@@ -76,6 +76,10 @@ When users change their user data (including password), they must send their aut
 
 No request to the frontend ever sends the `salted_password` field. We also keep the auth secret and salt rounds stored in environment variables, so as to keep the authentication process secure.
 
+## Routes
+
+See all available routes and their documentation [here](./docs/ROUTES.md).
+
 ## Code Style
 
 We use async/await for all asynchronous functions.

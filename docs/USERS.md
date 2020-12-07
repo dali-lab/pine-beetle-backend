@@ -33,3 +33,7 @@ Returns JWT auth token for user if salted and hashed version of password matches
 
 Expects authorization header with Bearer token.
 Returns 200 with no payload if auth header is valid. This route can be used on the automation server for verifying protected routes.
+
+## `GET /user/forgot-password/:email`
+
+Generates random new password for user with provided email (if a user object for that email exists). Sends email with this new password to the user's email. User can then check their email to get their new password and login.
