@@ -1,6 +1,6 @@
-# Project Pine Beetle Frontend
+# Project Pine Beetle Backend
 
-This is a React app for rendering the Pine Beetle Prediction client application.
+This is a Node server for interacting with the Pine Beetle Prediction client application.
 
 ## Project Overview
 
