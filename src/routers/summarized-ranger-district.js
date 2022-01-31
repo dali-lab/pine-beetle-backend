@@ -18,15 +18,57 @@ const summarizedRDRouter = Router();
 summarizedRDRouter.route('/')
   .get(async (req, res) => {
     const validQueryFields = [
-      'cleridCount',
       'rangerDistrict',
-      'spbCount',
       'state',
       'year',
+      'federalNameOld',
+      'federalNameOlder',
+      'hasSPBTrapping',
+      'isValidForPrediction',
+      'hasSpotst0',
+      'hasPredictionAndOutcome',
+      'endobrev',
+      'totalTrappingDays',
+      'trapCount',
+      'daysPerTrap',
+      'spbCount',
+      'spbPer2Weeks',
+      'spbPer2WeeksOrig',
+      'cleridsPer2Weeks',
+      'cleridst1',
+      'spotst0',
+      'spotst1',
+      'spotst2',
+      'pi',
+      'mu',
+      'expSpotsIfOutbreak',
+      'probSpotsGT0',
+      'probSpotsGT20',
+      'probSpotsGT50',
+      'probSpotsGT150',
+      'probSpotsGT400',
+      'probSpotsGT1000',
+      'ln(spbPer2Weeks+1)',
+      'ln(cleridsPer2Weeks+1)',
+      'ln(spotst0+1)',
+      'logit(Prob>50)',
+      'predSpotslogUnits',
+      'predSpotsorigUnits',
+      'residualSpotslogUnits',
     ];
 
+    const { startYear, endYear } = req.query;
+
+    // explicitly sets query for start and end year
+    const query = {
+      ...req.query,
+      ...(startYear && !endYear ? { year: { $gte: startYear } } : {}),
+      ...(!startYear && endYear ? { year: { $lte: endYear } } : {}),
+      ...(startYear && endYear ? { year: { $gte: startYear, $lte: endYear } } : {}),
+    };
+
     try {
-      const items = await queryFetch(COLLECTION_NAMES.summarizedRangerDistrict, req.query, validQueryFields);
+      const items = await queryFetch(COLLECTION_NAMES.summarizedRangerDistrict, query, validQueryFields);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);

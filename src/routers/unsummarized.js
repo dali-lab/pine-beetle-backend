@@ -25,7 +25,8 @@ unsummarizedRouter.route('/')
       'county',
       'daysActive',
       'endobrev',
-      'fips',
+      'FIPS',
+      'globalID',
       'latitude',
       'longitude',
       'lure',
@@ -36,12 +37,21 @@ unsummarizedRouter.route('/')
       'startDate',
       'state',
       'trap',
-      'week',
       'year',
     ];
 
+    const { startYear, endYear } = req.query;
+
+    // explicitly sets query for start and end year
+    const query = {
+      ...req.query,
+      ...(startYear && !endYear ? { year: { $gte: startYear } } : {}),
+      ...(!startYear && endYear ? { year: { $lte: endYear } } : {}),
+      ...(startYear && endYear ? { year: { $gte: startYear, $lte: endYear } } : {}),
+    };
+
     try {
-      const items = await queryFetch(COLLECTION_NAMES.unsummarized, req.query, validQueryFields);
+      const items = await queryFetch(COLLECTION_NAMES.unsummarized, query, validQueryFields);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);
