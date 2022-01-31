@@ -6,8 +6,8 @@ import user from './user';
 
 export default {
   healthcheck,
-  'summarized-counties': summarizedCounty,
-  'summarized-rangerdistricts': summarizedRangerDistrict,
+  'summarized-county': summarizedCounty,
+  'summarized-rangerdistrict': summarizedRangerDistrict,
   'unsummarized-trapping': unsummarized,
   user,
 };
