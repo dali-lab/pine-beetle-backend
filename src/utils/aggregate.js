@@ -9,13 +9,41 @@
  */
 function createMatchStage(location, startYear, endYear, state, loc) {
   return {
-    $match: {
-      ...(startYear && !endYear ? { year: { $gte: startYear } } : {}),
-      ...(!startYear && endYear ? { year: { $lte: endYear } } : {}),
-      ...(startYear && endYear ? { year: { $gte: startYear, $lte: endYear } } : {}),
-      ...(state ? { state } : {}),
-      ...(loc ? { [location]: loc } : {}),
-    },
+    ...(startYear && !endYear ? { year: { $gte: startYear } } : {}),
+    ...(!startYear && endYear ? { year: { $lte: endYear } } : {}),
+    ...(startYear && endYear ? { year: { $gte: startYear, $lte: endYear } } : {}),
+    ...(state ? { state } : {}),
+    ...(loc ? { [location]: loc } : {}),
+  };
+}
+
+/**
+ * @description generates pipeline code for computing grouped fields
+ * @returns {Object} output object for pipeline
+ */
+function createComputedFields() {
+  return {
+    avgSpbPer2Weeks: { $avg: '$spbPer2Weeks' },
+    avgCleridsPer2Weeks: { $avg: '$cleridsPer2Weeks' },
+    avgSpotst0: { $avg: '$spotst0' },
+    sumSpbPer2Weeks: { $sum: '$spbPer2Weeks' },
+    sumCleridsPer2Weeks: { $sum: '$cleridsPer2Weeks' },
+    sumSpotst0: { $sum: '$spotst0' },
+  };
+}
+
+/**
+ * @description specifies what computed fields to include in the project stage
+ * @returns {Object} output object for pipeline
+ */
+function projectComputedFields() {
+  return {
+    avgSpbPer2Weeks: 1,
+    avgCleridsPer2Weeks: 1,
+    avgSpotst0: 1,
+    sumSpbPer2Weeks: 1,
+    sumCleridsPer2Weeks: 1,
+    sumSpotst0: 1,
   };
 }
 
@@ -30,13 +58,13 @@ function createMatchStage(location, startYear, endYear, state, loc) {
    */
 export function generateYearPipeline(location, startYear, endYear, state, loc) {
   return [
-    createMatchStage(location, startYear, endYear, state, loc),
+    {
+      $match: createMatchStage(location, startYear, endYear, state, loc),
+    },
     {
       $group: {
         _id: '$year',
-        spbPer2Weeks: { $sum: '$spbPer2Weeks' },
-        cleridsPer2Weeks: { $sum: '$cleridsPer2Weeks' },
-        spotst0: { $sum: '$spotst0' },
+        ...createComputedFields(),
       },
     },
     {
@@ -46,9 +74,7 @@ export function generateYearPipeline(location, startYear, endYear, state, loc) {
       $project: {
         _id: 0,
         year: '$_id',
-        spbPer2Weeks: 1,
-        cleridsPer2Weeks: 1,
-        spotst0: 1,
+        ...projectComputedFields(),
       },
     },
   ];
@@ -65,13 +91,13 @@ export function generateYearPipeline(location, startYear, endYear, state, loc) {
    */
 export function generateStatePipeline(location, startYear, endYear, state, loc) {
   return [
-    createMatchStage(location, startYear, endYear, state, loc),
+    {
+      $match: createMatchStage(location, startYear, endYear, state, loc),
+    },
     {
       $group: {
         _id: '$state',
-        spbPer2Weeks: { $sum: '$spbPer2Weeks' },
-        cleridsPer2Weeks: { $sum: '$cleridsPer2Weeks' },
-        spotst0: { $sum: '$spotst0' },
+        ...createComputedFields(),
       },
     },
     {
@@ -81,9 +107,7 @@ export function generateStatePipeline(location, startYear, endYear, state, loc) 
       $project: {
         _id: 0,
         state: '$_id',
-        spbPer2Weeks: 1,
-        cleridsPer2Weeks: 1,
-        spotst0: 1,
+        ...projectComputedFields(),
       },
     },
   ];
@@ -100,13 +124,13 @@ export function generateStatePipeline(location, startYear, endYear, state, loc) 
    */
 export function generateLocationPipeline(location, startYear, endYear, state, loc) {
   return [
-    createMatchStage(location, startYear, endYear, state, loc),
+    {
+      $match: createMatchStage(location, startYear, endYear, state, loc),
+    },
     {
       $group: {
         _id: `$${location}`,
-        spbPer2Weeks: { $sum: '$spbPer2Weeks' },
-        cleridsPer2Weeks: { $sum: '$cleridsPer2Weeks' },
-        spotst0: { $sum: '$spotst0' },
+        ...createComputedFields(),
       },
     },
     {
@@ -116,9 +140,7 @@ export function generateLocationPipeline(location, startYear, endYear, state, lo
       $project: {
         _id: 0,
         [location]: '$_id',
-        spbPer2Weeks: 1,
-        cleridsPer2Weeks: 1,
-        spotst0: 1,
+        ...projectComputedFields(),
       },
     },
   ];
