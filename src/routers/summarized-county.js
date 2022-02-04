@@ -8,6 +8,10 @@ import {
 } from '../constants';
 
 import {
+  aggregate,
+  generateLocationPipeline,
+  generateStatePipeline,
+  generateYearPipeline,
   specifiedQueryFetch,
   queryFetch,
 } from '../utils';
@@ -83,6 +87,96 @@ summarizedCountyRouter.route('/query')
   .post(async (req, res) => {
     try {
       const items = await specifiedQueryFetch(COLLECTION_NAMES.summarizedCounty, req.body);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// sum up values, grouped by year
+summarizedCountyRouter.route('/aggregate/year')
+  .get(async (req, res) => {
+    const {
+      county,
+      endYear,
+      startYear,
+      state,
+    } = req.query;
+
+    const pipeline = generateYearPipeline(
+      'county',
+      parseInt(startYear, 10),
+      parseInt(endYear, 10),
+      state,
+      county,
+    );
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// sum up values, grouped by state
+summarizedCountyRouter.route('/aggregate/state')
+  .get(async (req, res) => {
+    const {
+      county,
+      endYear,
+      startYear,
+      state,
+    } = req.query;
+
+    const pipeline = generateStatePipeline(
+      'county',
+      parseInt(startYear, 10),
+      parseInt(endYear, 10),
+      state,
+      county,
+    );
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// sum up values, grouped by county
+summarizedCountyRouter.route('/aggregate/county')
+  .get(async (req, res) => {
+    const {
+      county,
+      endYear,
+      startYear,
+      state,
+    } = req.query;
+
+    const pipeline = generateLocationPipeline(
+      'county',
+      parseInt(startYear, 10),
+      parseInt(endYear, 10),
+      state,
+      county,
+    );
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);

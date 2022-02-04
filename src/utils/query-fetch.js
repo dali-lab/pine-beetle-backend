@@ -11,7 +11,7 @@ function parseObjectValuesToInt(obj) {
       try {
         parsedValue = parseInt(value, 10);
       } catch (error) {
-        console.log(error);
+        parsedValue = value;
       }
     } else if (typeof value === 'object') {
       parsedValue = parseObjectValuesToInt(value);
