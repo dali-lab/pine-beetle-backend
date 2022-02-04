@@ -12,6 +12,9 @@ import {
   generateLocationPipeline,
   generateStatePipeline,
   generateYearPipeline,
+  generateYearListPipeline,
+  generateStateListPipeline,
+  generateLocationListPipeline,
   specifiedQueryFetch,
   queryFetch,
 } from '../utils';
@@ -179,6 +182,64 @@ summarizedRDRouter.route('/aggregate/rangerDistrict')
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// get list of available years in database
+summarizedRDRouter.route('/years/list')
+  .get(async (_req, res) => {
+    const pipeline = generateYearListPipeline();
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items.map(({ year }) => {
+        return year;
+      })));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// get list of available states in database
+summarizedRDRouter.route('/states/list')
+  .get(async (_req, res) => {
+    const pipeline = generateStateListPipeline();
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items.map(({ state }) => {
+        return state;
+      })));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// get list of available ranger districts in database for given  year
+summarizedRDRouter.route('/rangerDistricts/list')
+  .get(async (req, res) => {
+    const { state } = req.query;
+    const pipeline = generateLocationListPipeline('rangerDistrict', state);
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items.map(({ rangerDistrict }) => {
+        return rangerDistrict;
+      })));
     } catch (error) {
       console.log(error);
 

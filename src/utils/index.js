@@ -12,6 +12,9 @@ import {
   generateLocationPipeline,
   generateStatePipeline,
   generateYearPipeline,
+  generateYearListPipeline,
+  generateStateListPipeline,
+  generateLocationListPipeline,
 } from './aggregate';
 
 export {
@@ -19,6 +22,9 @@ export {
   generateLocationPipeline,
   generateStatePipeline,
   generateYearPipeline,
+  generateYearListPipeline,
+  generateStateListPipeline,
+  generateLocationListPipeline,
   queryFetch,
   sendPasswordResetEmail,
   specifiedQueryFetch,

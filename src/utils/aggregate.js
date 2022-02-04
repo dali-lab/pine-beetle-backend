@@ -29,6 +29,8 @@ function createComputedFields() {
     sumSpbPer2Weeks: { $sum: '$spbPer2Weeks' },
     sumCleridsPer2Weeks: { $sum: '$cleridsPer2Weeks' },
     sumSpotst0: { $sum: '$spotst0' },
+    minSpotst0: { $min: '$spotst0' },
+    maxSpotst0: { $max: '$spotst0' },
   };
 }
 
@@ -44,6 +46,8 @@ function projectComputedFields() {
     sumSpbPer2Weeks: 1,
     sumCleridsPer2Weeks: 1,
     sumSpotst0: 1,
+    minSpotst0: 1,
+    maxSpotst0: 1,
   };
 }
 
@@ -129,7 +133,10 @@ export function generateLocationPipeline(location, startYear, endYear, state, lo
     },
     {
       $group: {
-        _id: `$${location}`,
+        _id: {
+          [location]: `$${location}`,
+          state: '$state',
+        },
         ...createComputedFields(),
       },
     },
@@ -139,10 +146,47 @@ export function generateLocationPipeline(location, startYear, endYear, state, lo
     {
       $project: {
         _id: 0,
-        [location]: '$_id',
+        [location]: `$_id.${location}`,
+        state: '$_id.state',
         ...projectComputedFields(),
       },
     },
+  ];
+}
+
+/**
+ * @description generates a mongoDB aggregation pipeline to list all available years in data
+ */
+export function generateYearListPipeline() {
+  return [
+    { $group: { _id: '$year' } },
+    { $sort: { _id: 1 } },
+    { $project: { _id: 0, year: '$_id' } },
+  ];
+}
+
+/**
+ * @description generates a mongoDB aggregation pipeline to list all available states in data
+ */
+export function generateStateListPipeline() {
+  return [
+    { $group: { _id: '$state' } },
+    { $sort: { _id: 1 } },
+    { $project: { _id: 0, state: '$_id' } },
+  ];
+}
+
+/**
+ * @description generates a mongoDB aggregation pipeline to list all available counties in data
+ * @param {String} location either 'county' or 'rangerDistrict'
+ * @param {String} state state abbreviation to find available counties in
+ */
+export function generateLocationListPipeline(location, state) {
+  return [
+    { $match: { state } },
+    { $group: { _id: `$${location}` } },
+    { $sort: { _id: 1 } },
+    { $project: { _id: 0, [location]: '$_id' } },
   ];
 }
 

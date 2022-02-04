@@ -12,6 +12,9 @@ import {
   generateLocationPipeline,
   generateStatePipeline,
   generateYearPipeline,
+  generateYearListPipeline,
+  generateStateListPipeline,
+  generateLocationListPipeline,
   specifiedQueryFetch,
   queryFetch,
 } from '../utils';
@@ -178,6 +181,64 @@ summarizedCountyRouter.route('/aggregate/county')
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// get list of available years in database
+summarizedCountyRouter.route('/years/list')
+  .get(async (_req, res) => {
+    const pipeline = generateYearListPipeline();
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items.map(({ year }) => {
+        return year;
+      })));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// get list of available states in database
+summarizedCountyRouter.route('/states/list')
+  .get(async (_req, res) => {
+    const pipeline = generateStateListPipeline();
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items.map(({ state }) => {
+        return state;
+      })));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// get list of available counties in database for given  year
+summarizedCountyRouter.route('/counties/list')
+  .get(async (req, res) => {
+    const { state } = req.query;
+    const pipeline = generateLocationListPipeline('county', state);
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items.map(({ county }) => {
+        return county;
+      })));
     } catch (error) {
       console.log(error);
 
