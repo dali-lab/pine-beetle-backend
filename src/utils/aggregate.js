@@ -12,8 +12,8 @@ function createMatchStage(location, startYear, endYear, state, loc) {
     ...(startYear && !endYear ? { year: { $gte: startYear } } : {}),
     ...(!startYear && endYear ? { year: { $lte: endYear } } : {}),
     ...(startYear && endYear ? { year: { $gte: startYear, $lte: endYear } } : {}),
-    ...(state ? { state } : {}),
-    ...(loc ? { [location]: loc } : {}),
+    ...(state ? { state: { $in: state.split(',') } } : {}),
+    ...(loc ? { [location]: { $in: loc.split(',') } } : {}),
   };
 }
 
