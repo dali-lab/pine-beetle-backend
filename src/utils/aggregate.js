@@ -177,13 +177,13 @@ export function generateStateListPipeline() {
 }
 
 /**
- * @description generates a mongoDB aggregation pipeline to list all available counties in data
+ * @description generates a mongoDB aggregation pipeline to list all available counties or ranger districts in data
  * @param {String} location either 'county' or 'rangerDistrict'
  * @param {String} state state abbreviation to find available counties in
  */
 export function generateLocationListPipeline(location, state) {
   return [
-    { $match: { state } },
+    { $match: state ? { state } : {} },
     { $group: { _id: `$${location}` } },
     { $sort: { _id: 1 } },
     { $project: { _id: 0, [location]: '$_id' } },
