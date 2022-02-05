@@ -156,9 +156,16 @@ export function generateLocationPipeline(location, startYear, endYear, state, lo
 
 /**
  * @description generates a mongoDB aggregation pipeline to list all available years in data
+ * @param {Object} [filters] optional filters for isHistorical and isPrediction
  */
-export function generateYearListPipeline() {
+export function generateYearListPipeline({ isHistorical, isPrediction }) {
   return [
+    {
+      $match: {
+        ...(isHistorical ? { $or: [{ hasSPBTrapping: 1 }, { hasSpotst0: 1 }] } : {}),
+        ...(isPrediction ? { isValidForPrediction: 1 } : {}),
+      },
+    },
     { $group: { _id: '$year' } },
     { $sort: { _id: 1 } },
     { $project: { _id: 0, year: '$_id' } },
@@ -167,9 +174,16 @@ export function generateYearListPipeline() {
 
 /**
  * @description generates a mongoDB aggregation pipeline to list all available states in data
+ * @param {Object} [filters] optional filters for isHistorical and isPrediction
  */
-export function generateStateListPipeline() {
+export function generateStateListPipeline({ isHistorical, isPrediction }) {
   return [
+    {
+      $match: {
+        ...(isHistorical ? { $or: [{ hasSPBTrapping: 1 }, { hasSpotst0: 1 }] } : {}),
+        ...(isPrediction ? { isValidForPrediction: 1 } : {}),
+      },
+    },
     { $group: { _id: '$state' } },
     { $sort: { _id: 1 } },
     { $project: { _id: 0, state: '$_id' } },
@@ -180,10 +194,17 @@ export function generateStateListPipeline() {
  * @description generates a mongoDB aggregation pipeline to list all available counties or ranger districts in data
  * @param {String} location either 'county' or 'rangerDistrict'
  * @param {String} state state abbreviation to find available counties in
+ * @param {Object} [filters] optional filters for isHistorical and isPrediction
  */
-export function generateLocationListPipeline(location, state) {
+export function generateLocationListPipeline(location, state, { isHistorical, isPrediction }) {
   return [
-    { $match: state ? { state } : {} },
+    {
+      $match: {
+        ...(state ? { state } : {}),
+        ...(isHistorical ? { $or: [{ hasSPBTrapping: 1 }, { hasSpotst0: 1 }] } : {}),
+        ...(isPrediction ? { isValidForPrediction: 1 } : {}),
+      },
+    },
     { $group: { _id: `$${location}` } },
     { $sort: { _id: 1 } },
     { $project: { _id: 0, [location]: '$_id' } },

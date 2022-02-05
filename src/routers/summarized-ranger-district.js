@@ -193,8 +193,13 @@ summarizedRDRouter.route('/aggregate/rangerDistrict')
 
 // get list of available years in database
 summarizedRDRouter.route('/years/list')
-  .get(async (_req, res) => {
-    const pipeline = generateYearListPipeline();
+  .get(async (req, res) => {
+    const {
+      isHistorical,
+      isPrediction,
+    } = req.query;
+
+    const pipeline = generateYearListPipeline({ isHistorical, isPrediction });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
@@ -212,8 +217,13 @@ summarizedRDRouter.route('/years/list')
 
 // get list of available states in database
 summarizedRDRouter.route('/states/list')
-  .get(async (_req, res) => {
-    const pipeline = generateStateListPipeline();
+  .get(async (req, res) => {
+    const {
+      isHistorical,
+      isPrediction,
+    } = req.query;
+
+    const pipeline = generateStateListPipeline({ isHistorical, isPrediction });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
@@ -232,8 +242,13 @@ summarizedRDRouter.route('/states/list')
 // get list of available ranger districts in database for given  year
 summarizedRDRouter.route('/rangerDistricts/list')
   .get(async (req, res) => {
-    const { state } = req.query;
-    const pipeline = generateLocationListPipeline('rangerDistrict', state);
+    const {
+      isHistorical,
+      isPrediction,
+      state,
+    } = req.query;
+
+    const pipeline = generateLocationListPipeline('rangerDistrict', state, { isHistorical, isPrediction });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
