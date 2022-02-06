@@ -62,13 +62,21 @@ function projectComputedFields() {
 /**
    * @description generates a mongoDB aggregation pipeline by year
    * @param {String} location either 'county' or 'rangerDistrict'
-   * @param {Number} [startYear] optional start year to filter on
-   * @param {Number} [endYear] optional end year to filter on
-   * @param {String} [state] optional state to filter on
-   * @param {String} [loc] optional sublocation to filter on (name of county or ranger district)
+   * @param {Object} [filters={}] optional filter object
+   * @param {Number} [filters.startYear] optional start year to filter on
+   * @param {Number} [filters.endYear] optional end year to filter on
+   * @param {String} [filters.state] optional state to filter on
+   * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
    * @returns
    */
-export function generateYearPipeline(location, startYear, endYear, state, loc) {
+export function generateYearPipeline(location, filters = {}) {
+  const {
+    endYear,
+    loc,
+    startYear,
+    state,
+  } = filters;
+
   return [
     {
       $match: createMatchStage(location, {
@@ -97,13 +105,21 @@ export function generateYearPipeline(location, startYear, endYear, state, loc) {
 /**
    * @description generates a mongoDB aggregation pipeline by year
    * @param {String} location either 'county' or 'rangerDistrict'
-   * @param {Number} [startYear] optional start year to filter on
-   * @param {Number} [endYear] optional end year to filter on
-   * @param {String} [state] optional state to filter on
-   * @param {String} [loc] optional sublocation to filter on (name of county or ranger district)
+   * @param {Object} [filters={}] optional filter object
+   * @param {Number} [filters.startYear] optional start year to filter on
+   * @param {Number} [filters.endYear] optional end year to filter on
+   * @param {String} [filters.state] optional state to filter on
+   * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
    * @returns
    */
-export function generateStatePipeline(location, startYear, endYear, state, loc) {
+export function generateStatePipeline(location, filters = {}) {
+  const {
+    endYear,
+    loc,
+    startYear,
+    state,
+  } = filters;
+
   return [
     {
       $match: createMatchStage(location, {
@@ -132,13 +148,21 @@ export function generateStatePipeline(location, startYear, endYear, state, loc) 
 /**
    * @description generates a mongoDB aggregation pipeline by year
    * @param {String} location either 'county' or 'rangerDistrict'
-   * @param {Number} [startYear] optional start year to filter on
-   * @param {Number} [endYear] optional end year to filter on
-   * @param {String} [state] optional state to filter on
-   * @param {String} [loc] optional sublocation to filter on (name of county or ranger district)
+   * @param {Object} [filters={}] optional filter object
+   * @param {Number} [filters.startYear] optional start year to filter on
+   * @param {Number} [filters.endYear] optional end year to filter on
+   * @param {String} [filters.state] optional state to filter on
+   * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
    * @returns
    */
-export function generateLocationPipeline(location, startYear, endYear, state, loc) {
+export function generateLocationPipeline(location, filters = {}) {
+  const {
+    endYear,
+    loc,
+    startYear,
+    state,
+  } = filters;
+
   return [
     {
       $match: createMatchStage(location, {
@@ -171,7 +195,11 @@ export function generateLocationPipeline(location, startYear, endYear, state, lo
 /**
  * @description generates a mongoDB aggregation pipeline to list all available years in data
  * @param {String} location either 'county' or 'rangerDistrict'
- * @param {Object} [filters={}] optional filters for isHistorical and isPrediction
+ * @param {Object} [filters={}] optional filter object
+ * @param {Boolean} [filters.isHistorical] optional flag for whether or not to filter on hasSPBTrappig or hasSpotst0
+ * @param {Boolean} [filters.isPrediction] optional flag whether or not to filter on isValidForPrediction
+ * @param {String} [filters.state] optional state to filter on
+ * @param {String} [filters.loc] optional sublocation (county or ranger district) to filter on
  */
 export function generateYearListPipeline(location, filters = {}) {
   const {
@@ -197,7 +225,12 @@ export function generateYearListPipeline(location, filters = {}) {
 
 /**
  * @description generates a mongoDB aggregation pipeline to list all available states in data
- * @param {Object} [filters={}] optional filters for isHistorical and isPrediction
+ * @param {String} location either 'county' or 'rangerDistrict'
+ * @param {Object} [filters={}] optional filter object
+ * @param {Boolean} [filters.isHistorical] optional flag for whether or not to filter on hasSPBTrappig or hasSpotst0
+ * @param {Boolean} [filters.isPrediction] optional flag whether or not to filter on isValidForPrediction
+ * @param {Number} [filters.startYear] optional start year to filter on
+ * @param {Number} [filters.endYear] optional end year to filter on
  */
 export function generateStateListPipeline(location, filters = {}) {
   const {
@@ -224,7 +257,12 @@ export function generateStateListPipeline(location, filters = {}) {
 /**
  * @description generates a mongoDB aggregation pipeline to list all available counties or ranger districts in data
  * @param {String} location either 'county' or 'rangerDistrict'
- * @param {Object} [filters={}] optional filters for isHistorical and isPrediction
+ * @param {Object} [filters={}] optional filter object
+ * @param {Boolean} [filters.isHistorical] optional flag for whether or not to filter on hasSPBTrappig or hasSpotst0
+ * @param {Boolean} [filters.isPrediction] optional flag whether or not to filter on isValidForPrediction
+ * @param {Number} [filters.startYear] optional start year to filter on
+ * @param {Number} [filters.endYear] optional end year to filter on
+ * @param {String} [filters.state] optional state to filter on
  */
 export function generateLocationListPipeline(location, filters = {}) {
   const {

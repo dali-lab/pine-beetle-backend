@@ -111,13 +111,12 @@ summarizedRDRouter.route('/aggregate/year')
       state,
     } = req.query;
 
-    const pipeline = generateYearPipeline(
-      'rangerDistrict',
-      parseInt(startYear, 10),
-      parseInt(endYear, 10),
-      state,
+    const pipeline = generateYearPipeline('rangerDistrict', {
+      endYear: parseInt(endYear, 10),
       rangerDistrict,
-    );
+      startYear: parseInt(startYear, 10),
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
@@ -141,13 +140,12 @@ summarizedRDRouter.route('/aggregate/state')
       state,
     } = req.query;
 
-    const pipeline = generateStatePipeline(
-      'rangerDistrict',
-      parseInt(startYear, 10),
-      parseInt(endYear, 10),
-      state,
+    const pipeline = generateStatePipeline('rangerDistrict', {
+      endYear: parseInt(endYear, 10),
       rangerDistrict,
-    );
+      startYear: parseInt(startYear, 10),
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
@@ -171,13 +169,12 @@ summarizedRDRouter.route('/aggregate/rangerDistrict')
       state,
     } = req.query;
 
-    const pipeline = generateLocationPipeline(
-      'rangerDistrict',
-      parseInt(startYear, 10),
-      parseInt(endYear, 10),
-      state,
+    const pipeline = generateLocationPipeline('rangerDistrict', {
+      endYear: parseInt(endYear, 10),
       rangerDistrict,
-    );
+      startYear: parseInt(startYear, 10),
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);

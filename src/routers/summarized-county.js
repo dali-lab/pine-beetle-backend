@@ -110,13 +110,12 @@ summarizedCountyRouter.route('/aggregate/year')
       state,
     } = req.query;
 
-    const pipeline = generateYearPipeline(
-      'county',
-      parseInt(startYear, 10),
-      parseInt(endYear, 10),
-      state,
+    const pipeline = generateYearPipeline('county', {
       county,
-    );
+      endYear: parseInt(endYear, 10),
+      startYear: parseInt(startYear, 10),
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
@@ -140,13 +139,12 @@ summarizedCountyRouter.route('/aggregate/state')
       state,
     } = req.query;
 
-    const pipeline = generateStatePipeline(
-      'county',
-      parseInt(startYear, 10),
-      parseInt(endYear, 10),
-      state,
+    const pipeline = generateStatePipeline('county', {
       county,
-    );
+      endYear: parseInt(endYear, 10),
+      startYear: parseInt(startYear, 10),
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
@@ -170,13 +168,12 @@ summarizedCountyRouter.route('/aggregate/county')
       state,
     } = req.query;
 
-    const pipeline = generateLocationPipeline(
-      'county',
-      parseInt(startYear, 10),
-      parseInt(endYear, 10),
-      state,
+    const pipeline = generateLocationPipeline('county', {
       county,
-    );
+      endYear: parseInt(endYear, 10),
+      startYear: parseInt(startYear, 10),
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
