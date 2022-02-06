@@ -194,11 +194,18 @@ summarizedCountyRouter.route('/aggregate/county')
 summarizedCountyRouter.route('/years/list')
   .get(async (req, res) => {
     const {
+      county,
       isHistorical,
       isPrediction,
+      state,
     } = req.query;
 
-    const pipeline = generateYearListPipeline({ isHistorical, isPrediction });
+    const pipeline = generateYearListPipeline('county', {
+      isHistorical,
+      isPrediction,
+      loc: county,
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
@@ -218,11 +225,18 @@ summarizedCountyRouter.route('/years/list')
 summarizedCountyRouter.route('/states/list')
   .get(async (req, res) => {
     const {
+      endYear,
       isHistorical,
       isPrediction,
+      startYear,
     } = req.query;
 
-    const pipeline = generateStateListPipeline({ isHistorical, isPrediction });
+    const pipeline = generateStateListPipeline('county', {
+      endYear: endYear ? parseInt(endYear, 10) : undefined,
+      isHistorical,
+      isPrediction,
+      startYear: startYear ? parseInt(startYear, 10) : undefined,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
@@ -242,12 +256,20 @@ summarizedCountyRouter.route('/states/list')
 summarizedCountyRouter.route('/counties/list')
   .get(async (req, res) => {
     const {
+      endYear,
       isHistorical,
       isPrediction,
+      startYear,
       state,
     } = req.query;
 
-    const pipeline = generateLocationListPipeline('county', state, { isHistorical, isPrediction });
+    const pipeline = generateLocationListPipeline('county', {
+      endYear: endYear ? parseInt(endYear, 10) : undefined,
+      isHistorical,
+      isPrediction,
+      startYear: startYear ? parseInt(startYear, 10) : undefined,
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);

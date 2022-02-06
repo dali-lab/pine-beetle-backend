@@ -197,9 +197,16 @@ summarizedRDRouter.route('/years/list')
     const {
       isHistorical,
       isPrediction,
+      rangerDistrict,
+      state,
     } = req.query;
 
-    const pipeline = generateYearListPipeline({ isHistorical, isPrediction });
+    const pipeline = generateYearListPipeline('rangerDistrict', {
+      isHistorical,
+      isPrediction,
+      loc: rangerDistrict,
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
@@ -219,11 +226,18 @@ summarizedRDRouter.route('/years/list')
 summarizedRDRouter.route('/states/list')
   .get(async (req, res) => {
     const {
+      endYear,
       isHistorical,
       isPrediction,
+      startYear,
     } = req.query;
 
-    const pipeline = generateStateListPipeline({ isHistorical, isPrediction });
+    const pipeline = generateStateListPipeline('rangerDistrict', {
+      endYear: endYear ? parseInt(endYear, 10) : undefined,
+      isHistorical,
+      isPrediction,
+      startYear: startYear ? parseInt(startYear, 10) : undefined,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
@@ -243,12 +257,20 @@ summarizedRDRouter.route('/states/list')
 summarizedRDRouter.route('/rangerDistricts/list')
   .get(async (req, res) => {
     const {
+      endYear,
       isHistorical,
       isPrediction,
+      startYear,
       state,
     } = req.query;
 
-    const pipeline = generateLocationListPipeline('rangerDistrict', state, { isHistorical, isPrediction });
+    const pipeline = generateLocationListPipeline('rangerDistrict', {
+      endYear: endYear ? parseInt(endYear, 10) : undefined,
+      isHistorical,
+      isPrediction,
+      startYear: startYear ? parseInt(startYear, 10) : undefined,
+      state,
+    });
 
     try {
       const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
