@@ -1,6 +1,6 @@
 {
-  "name": "pine-beetle-prediction-backend",
-  "version": "2.0.0",
+  "name": "pine-beetle-backend",
+  "version": "3.0.0",
   "description": "",
   "author": "",
   "main": "src/server.js",
@@ -15,7 +15,7 @@
   },
   "license": "ISC",
   "engines": {
-    "node": ">=12 <=15",
+    "node": ">=12 <=17",
     "npm": "^6.14.0",
     "yarn": "^1.22.0"
   },

@@ -1,25 +1,36 @@
 /**
- * @description queries database for items in collection based on provided query
- * @param {String} collectionName name of collection in db to query
- * @param {Object} [query] mongo query
+ * @description recursively casts all possible string values to ints in object
+ * @param {Object} obj object to parse
+ * @returns {Object} object with same keys, and all possible values casted to ints
  */
-export const specifiedQueryFetch = (collectionName, query = {}) => {
-  return new Promise((resolve, reject) => {
-    // cast all possible strings to integers
-    const parsedQuery = Object.entries(query).reduce((acc, [key, value]) => {
-      let parsedValue;
+function parseObjectValuesToInt(obj) {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    let parsedValue;
 
+    if (typeof value === 'string') {
       try {
         parsedValue = parseInt(value, 10);
       } catch (error) {
-        console.log(error);
+        parsedValue = value;
       }
+    } else if (typeof value === 'object') {
+      parsedValue = parseObjectValuesToInt(value);
+    }
 
-      return {
-        ...acc,
-        [key]: parsedValue || value,
-      };
-    }, {});
+    return { ...acc, [key]: parsedValue || value };
+  }, {});
+}
+
+/**
+ * @description queries database for items in collection based on provided query -- uses mongo syntax
+ * @param {String} collectionName name of collection in db to query
+ * @param {Object} [query] mongo query
+ * @returns {Promise<Object[]>} result from database
+ */
+export function specifiedQueryFetch(collectionName, query = {}) {
+  return new Promise((resolve, reject) => {
+    // cast all possible strings to integers
+    const parsedQuery = parseObjectValuesToInt(query);
 
     const cursor = global.connection
       .collection(collectionName)
@@ -30,22 +41,23 @@ export const specifiedQueryFetch = (collectionName, query = {}) => {
       resolve(items);
     });
   });
-};
+}
 
 /**
  * @description queries database for items in collection based on filter
  * @param {String} collectionName name of collection in db to query
  * @param {Object} [queryParams] object of query parameters user specified
  * @param {Array<String>} [validQueryFields] array of acceptable query fields
+ * @returns {Promise<Object[]>} result from database
  */
-export const queryFetch = async (collectionName, queryParams = {}, validQueryFields = []) => {
-  // generate query based on query params and valid fields
+export async function queryFetch(collectionName, queryParams = {}, validQueryFields = []) {
+  // filter out unspecified fields in query
   const query = Object.entries(queryParams).reduce((acc, [key, value]) => {
     return {
       ...acc,
-      ...value && validQueryFields.includes(key) ? { [key]: value } : {},
+      ...(validQueryFields.includes(key) ? { [key]: value } : {}),
     };
   }, {});
 
   return specifiedQueryFetch(collectionName, query);
-};
+}
