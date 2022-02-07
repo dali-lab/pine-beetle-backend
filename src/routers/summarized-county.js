@@ -111,8 +111,8 @@ summarizedCountyRouter.route('/aggregate/year')
     } = req.query;
 
     const pipeline = generateYearPipeline('county', {
-      county,
       endYear: parseInt(endYear, 10),
+      loc: county,
       startYear: parseInt(startYear, 10),
       state,
     });
@@ -140,8 +140,8 @@ summarizedCountyRouter.route('/aggregate/state')
     } = req.query;
 
     const pipeline = generateStatePipeline('county', {
-      county,
       endYear: parseInt(endYear, 10),
+      loc: county,
       startYear: parseInt(startYear, 10),
       state,
     });
@@ -169,8 +169,8 @@ summarizedCountyRouter.route('/aggregate/county')
     } = req.query;
 
     const pipeline = generateLocationPipeline('county', {
-      county,
       endYear: parseInt(endYear, 10),
+      loc: county,
       startYear: parseInt(startYear, 10),
       state,
     });
