@@ -113,7 +113,7 @@ summarizedRDRouter.route('/aggregate/year')
 
     const pipeline = generateYearPipeline('rangerDistrict', {
       endYear: parseInt(endYear, 10),
-      rangerDistrict,
+      loc: rangerDistrict,
       startYear: parseInt(startYear, 10),
       state,
     });
@@ -142,7 +142,7 @@ summarizedRDRouter.route('/aggregate/state')
 
     const pipeline = generateStatePipeline('rangerDistrict', {
       endYear: parseInt(endYear, 10),
-      rangerDistrict,
+      loc: rangerDistrict,
       startYear: parseInt(startYear, 10),
       state,
     });
@@ -171,7 +171,7 @@ summarizedRDRouter.route('/aggregate/rangerDistrict')
 
     const pipeline = generateLocationPipeline('rangerDistrict', {
       endYear: parseInt(endYear, 10),
-      rangerDistrict,
+      loc: rangerDistrict,
       startYear: parseInt(startYear, 10),
       state,
     });
