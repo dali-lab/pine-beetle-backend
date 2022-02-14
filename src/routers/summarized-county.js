@@ -19,6 +19,10 @@ import {
   queryFetch,
 } from '../utils';
 
+import {
+  requireAuth,
+} from '../middleware';
+
 const summarizedCountyRouter = Router();
 
 // query items in collection
@@ -87,7 +91,7 @@ summarizedCountyRouter.route('/')
 
 // user specified query (allows for mongo-specific syntax)
 summarizedCountyRouter.route('/query')
-  .post(async (req, res) => {
+  .post(requireAuth, async (req, res) => {
     try {
       const items = await specifiedQueryFetch(COLLECTION_NAMES.summarizedCounty, req.body);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));

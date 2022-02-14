@@ -13,7 +13,8 @@ User can supply query params for:
 - `county`
 - `daysActive`
 - `endobrev`
-- `fips`
+- `FIPS`
+- `globalID`
 - `latitude`
 - `longitude`
 - `lure`
@@ -24,11 +25,12 @@ User can supply query params for:
 - `startDate`
 - `state`
 - `trap`
-- `week`
 - `year`
+- `startYear`
+- `endYear`
 
 ## `POST /unsummarized-trapping/query`
 
-Returns unsummarized trapping objects that match provided mongo query.
+Returns unsummarized trapping objects that match provided MongoDB-style query. Requires auth.
 
-User can supply mongo query in body.
+User can supply MongoDB-style query in body.
