@@ -1,23 +1,25 @@
 /**
- * @description recursively casts all possible string values to ints in object
+ * @description recursively casts all possible string values to ints in object and null strings to null
  * @param {Object} obj object to parse
- * @returns {Object} object with same keys, and all possible values casted to ints
+ * @returns {Object} object with same keys, and all possible values casted to ints or nulls
  */
-function parseObjectValuesToInt(obj) {
+function parseObjectValuesToIntOrNull(obj) {
   return Object.entries(obj).reduce((acc, [key, value]) => {
     let parsedValue;
 
-    if (typeof value === 'string') {
+    if (value === 'null') {
+      parsedValue = null;
+    } else if (typeof value === 'string') {
       try {
         parsedValue = parseInt(value, 10);
       } catch (error) {
         parsedValue = value;
       }
     } else if (typeof value === 'object') {
-      parsedValue = parseObjectValuesToInt(value);
+      parsedValue = parseObjectValuesToIntOrNull(value);
     }
 
-    return { ...acc, [key]: parsedValue || value };
+    return { ...acc, [key]: parsedValue === undefined ? value : parsedValue };
   }, {});
 }
 
@@ -30,7 +32,7 @@ function parseObjectValuesToInt(obj) {
 export function specifiedQueryFetch(collectionName, query = {}) {
   return new Promise((resolve, reject) => {
     // cast all possible strings to integers
-    const parsedQuery = parseObjectValuesToInt(query);
+    const parsedQuery = parseObjectValuesToIntOrNull(query);
 
     const cursor = global.connection
       .collection(collectionName)
