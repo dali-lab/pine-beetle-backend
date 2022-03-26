@@ -12,6 +12,10 @@ import {
   queryFetch,
 } from '../utils';
 
+import {
+  requireAuth,
+} from '../middleware';
+
 const unsummarizedRouter = Router();
 
 // query items in collection
@@ -25,7 +29,8 @@ unsummarizedRouter.route('/')
       'county',
       'daysActive',
       'endobrev',
-      'fips',
+      'FIPS',
+      'globalID',
       'latitude',
       'longitude',
       'lure',
@@ -36,12 +41,21 @@ unsummarizedRouter.route('/')
       'startDate',
       'state',
       'trap',
-      'week',
       'year',
     ];
 
+    const { startYear, endYear } = req.query;
+
+    // explicitly sets query for start and end year
+    const query = {
+      ...req.query,
+      ...(startYear && !endYear ? { year: { $gte: startYear } } : {}),
+      ...(!startYear && endYear ? { year: { $lte: endYear } } : {}),
+      ...(startYear && endYear ? { year: { $gte: startYear, $lte: endYear } } : {}),
+    };
+
     try {
-      const items = await queryFetch(COLLECTION_NAMES.unsummarized, req.query, validQueryFields);
+      const items = await queryFetch(COLLECTION_NAMES.unsummarized, query, validQueryFields);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);
@@ -54,7 +68,7 @@ unsummarizedRouter.route('/')
 
 // user specified query (allows for mongo-specific syntax)
 unsummarizedRouter.route('/query')
-  .post(async (req, res) => {
+  .post(requireAuth, async (req, res) => {
     try {
       const items = await specifiedQueryFetch(COLLECTION_NAMES.unsummarized, req.body);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
