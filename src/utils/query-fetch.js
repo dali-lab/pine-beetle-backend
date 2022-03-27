@@ -35,9 +35,17 @@ export function specifiedQueryFetch(collectionName, query = {}) {
     // cast all possible strings to integers
     const parsedQuery = parseObjectValuesToIntOrNull(query);
 
+    const { county, rangerDistrict } = parsedQuery;
+
+    const fixedParsedQuery = {
+      ...parsedQuery,
+      ...(county ? { county: { $in: county.split(',') } } : {}),
+      ...(rangerDistrict ? { rangerDistrict: { $in: rangerDistrict.split(',') } } : {}),
+    };
+
     const cursor = global.connection
       .collection(collectionName)
-      .find(parsedQuery);
+      .find(fixedParsedQuery);
 
     cursor.toArray((error, items) => {
       if (error) reject(error);
