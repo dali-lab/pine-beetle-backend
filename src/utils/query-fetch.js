@@ -10,16 +10,17 @@ function parseObjectValuesToIntOrNull(obj) {
     if (value === 'null') {
       parsedValue = null;
     } else if (typeof value === 'string') {
-      try {
-        parsedValue = parseInt(value, 10);
-      } catch (error) {
-        parsedValue = value;
-      }
+      parsedValue = parseInt(value, 10);
     } else if (typeof value === 'object') {
       parsedValue = parseObjectValuesToIntOrNull(value);
     }
 
-    return { ...acc, [key]: parsedValue === undefined ? value : parsedValue };
+    return {
+      ...acc,
+      [key]: parsedValue === undefined || Number.isNaN(parsedValue)
+        ? value
+        : parsedValue,
+    };
   }, {});
 }
 
