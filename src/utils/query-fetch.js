@@ -10,16 +10,17 @@ function parseObjectValuesToIntOrNull(obj) {
     if (value === 'null') {
       parsedValue = null;
     } else if (typeof value === 'string') {
-      try {
-        parsedValue = parseInt(value, 10);
-      } catch (error) {
-        parsedValue = value;
-      }
+      parsedValue = parseInt(value, 10);
     } else if (typeof value === 'object') {
       parsedValue = parseObjectValuesToIntOrNull(value);
     }
 
-    return { ...acc, [key]: parsedValue === undefined ? value : parsedValue };
+    return {
+      ...acc,
+      [key]: parsedValue === undefined || Number.isNaN(parsedValue)
+        ? value
+        : parsedValue,
+    };
   }, {});
 }
 
@@ -34,9 +35,17 @@ export function specifiedQueryFetch(collectionName, query = {}) {
     // cast all possible strings to integers
     const parsedQuery = parseObjectValuesToIntOrNull(query);
 
+    const { county, rangerDistrict } = parsedQuery;
+
+    const fixedParsedQuery = {
+      ...parsedQuery,
+      ...(county ? { county: { $in: county.split(',') } } : {}),
+      ...(rangerDistrict ? { rangerDistrict: { $in: rangerDistrict.split(',') } } : {}),
+    };
+
     const cursor = global.connection
       .collection(collectionName)
-      .find(parsedQuery);
+      .find(fixedParsedQuery);
 
     cursor.toArray((error, items) => {
       if (error) reject(error);
