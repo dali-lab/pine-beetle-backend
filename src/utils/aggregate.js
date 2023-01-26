@@ -1,3 +1,5 @@
+const ROUND_EPSILON = 0.0000001; // for 0.5 rounding down sometimes error
+
 /**
  * @description creates the $match stage of an aggregation pipeline
  * @param {String} location either 'county' or 'rangerDistrict'
@@ -31,8 +33,9 @@ function createMatchStage(location, filters = {}) {
  */
 function createComputedFields() {
   return {
-    avgSpbPer2Weeks: { $avg: '$spbPer2Weeks' },
-    avgCleridsPer2Weeks: { $avg: '$cleridsPer2Weeks' },
+    avgLnSpbPlusOne: { $avg: '$ln(spbPer2Weeks+1)' },
+    avgLnCleridsPlusOne: { $avg: '$ln(cleridsPer2Weeks+1)' },
+    avgLogitProb50: { $avg: '$logit(Prob>50)' },
     avgSpotst0: { $avg: '$spotst0' },
     sumSpbPer2Weeks: { $sum: '$spbPer2Weeks' },
     sumCleridsPer2Weeks: { $sum: '$cleridsPer2Weeks' },
@@ -48,8 +51,19 @@ function createComputedFields() {
  */
 function projectComputedFields() {
   return {
-    avgSpbPer2Weeks: 1,
-    avgCleridsPer2Weeks: 1,
+    avgSpbPer2Weeks: { $round: { $sum: [ROUND_EPSILON - 1, { $exp: '$avgLnSpbPlusOne' }] } }, // exp of log mean
+    avgCleridsPer2Weeks: { $round: { $sum: [ROUND_EPSILON - 1, { $exp: '$avgLnCleridsPlusOne' }] } }, // exp of log mean
+    avgProbGreater50: {
+      $round: [{
+        $sum: [ROUND_EPSILON, {
+          $divide: [ // inverse logit function
+            { $exp: '$avgLogitProb50' },
+            { $sum: [1, { $exp: '$avgLogitProb50' }] },
+          ],
+        }],
+      }, 3], // round to three decimal places
+    },
+    avgLogitProb50: 1,
     avgSpotst0: 1,
     sumSpbPer2Weeks: 1,
     sumCleridsPer2Weeks: 1,
