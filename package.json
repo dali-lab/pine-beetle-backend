@@ -5,19 +5,16 @@
   "author": "",
   "main": "src/server.js",
   "scripts": {
-    "test": "eslint src",
+    "lint": "eslint src",
     "dev": "nodemon src/server.js --exec babel-node",
     "start": "babel-node src/server.js",
     "clean": "rm -rf dist/",
     "build": "yarn clean; babel src -d dist --copy-files --no-copy-ignored",
-    "prod": "yarn build; node dist/server.js",
-    "heroku-postbuild": "echo Skip build on Heroku"
+    "prod": "yarn build; node dist/server.js"
   },
   "license": "ISC",
   "engines": {
-    "node": ">=12 <=16",
-    "npm": "^6.14.0",
-    "yarn": "^1.22.0"
+    "node": ">=16 <=18"
   },
   "nodemonConfig": {
     "signal": "SIGHUP",
