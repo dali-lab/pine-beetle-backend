@@ -1,4 +1,5 @@
 import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
@@ -35,6 +36,9 @@ const app = express();
 
 // enable cross origin resource sharing
 app.use(cors());
+
+// use gzip compression
+app.use(compression());
 
 // additional header specifications
 app.use((_req, res, next) => {

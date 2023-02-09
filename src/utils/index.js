@@ -10,6 +10,7 @@ import {
 import {
   aggregate,
   generateLocationPipeline,
+  generateSparsePipeline,
   generateStatePipeline,
   generateYearPipeline,
   generateYearListPipeline,
@@ -20,6 +21,7 @@ import {
 export {
   aggregate,
   generateLocationPipeline,
+  generateSparsePipeline,
   generateStatePipeline,
   generateYearPipeline,
   generateYearListPipeline,

@@ -10,6 +10,7 @@ import {
 import {
   aggregate,
   generateLocationPipeline,
+  generateSparsePipeline,
   generateStatePipeline,
   generateYearPipeline,
   generateYearListPipeline,
@@ -94,6 +95,35 @@ summarizedCountyRouter.route('/query')
   .post(requireAuth, async (req, res) => {
     try {
       const items = await specifiedQueryFetch(COLLECTION_NAMES.summarizedCounty, req.body);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+// only fetch some fields
+summarizedCountyRouter.route('/sparse')
+  .get(async (req, res) => {
+    const {
+      county,
+      endYear,
+      startYear,
+      state,
+    } = req.query;
+
+    const pipeline = generateSparsePipeline('county', {
+      endYear: parseInt(endYear, 10),
+      loc: county,
+      startYear: parseInt(startYear, 10),
+      state,
+    });
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedCounty, pipeline);
       res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
     } catch (error) {
       console.log(error);
