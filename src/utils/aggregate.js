@@ -37,10 +37,9 @@ function projectSparseFields(location) {
     year: 1,
     state: 1,
     [location]: 1,
-    'ln(spbPer2Weeks+1)': 1,
+    'ln(spotst0+1)': 1,
     spbPer2Weeks: 1,
     probSpotsGT50: 1,
-    spotst0: 1,
   };
 }
 
