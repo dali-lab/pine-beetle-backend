@@ -1,3 +1,5 @@
+const ROUND_EPSILON = 0.0000001; // for 0.5 rounding down sometimes error
+
 /**
  * @description creates the $match stage of an aggregation pipeline
  * @param {String} location either 'county' or 'rangerDistrict'
@@ -26,13 +28,66 @@ function createMatchStage(location, filters = {}) {
 }
 
 /**
+ * @description generates pipeline code for sparse fields
+ * @param {String} location either 'county' or 'rangerDistrict'
+ * @returns {Object} output object for pipeline
+ */
+function projectSparseFields(location) {
+  return {
+    year: 1,
+    state: 1,
+    [location]: 1,
+    'ln(spotst0+1)': 1,
+    spbPer2Weeks: 1,
+    probSpotsGT50: 1,
+  };
+}
+
+/**
+ * @description generates a mongoDB aggregation pipeline to sparse fetch only a few fields
+ * @param {String} location either 'county' or 'rangerDistrict'
+ * @param {Object} [filters={}] optional filter object
+ * @param {Number} [filters.startYear] optional start year to filter on
+ * @param {Number} [filters.endYear] optional end year to filter on
+ * @param {String} [filters.state] optional state to filter on
+ * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
+ * @returns
+ */
+export function generateSparsePipeline(location, filters = {}) {
+  const {
+    endYear,
+    loc,
+    startYear,
+    state,
+  } = filters;
+
+  return [
+    {
+      $match: createMatchStage(location, {
+        startYear, endYear, state, loc,
+      }),
+    },
+    {
+      $project: {
+        _id: 0,
+        ...projectSparseFields(location),
+      },
+    },
+    {
+      $sort: { year: 1 },
+    },
+  ];
+}
+
+/**
  * @description generates pipeline code for computing grouped fields
  * @returns {Object} output object for pipeline
  */
 function createComputedFields() {
   return {
-    avgSpbPer2Weeks: { $avg: '$spbPer2Weeks' },
-    avgCleridsPer2Weeks: { $avg: '$cleridsPer2Weeks' },
+    avgLnSpbPlusOne: { $avg: '$ln(spbPer2Weeks+1)' },
+    avgLnCleridsPlusOne: { $avg: '$ln(cleridsPer2Weeks+1)' },
+    avgLogitProb50: { $avg: '$logit(Prob>50)' },
     avgSpotst0: { $avg: '$spotst0' },
     sumSpbPer2Weeks: { $sum: '$spbPer2Weeks' },
     sumCleridsPer2Weeks: { $sum: '$cleridsPer2Weeks' },
@@ -48,8 +103,19 @@ function createComputedFields() {
  */
 function projectComputedFields() {
   return {
-    avgSpbPer2Weeks: 1,
-    avgCleridsPer2Weeks: 1,
+    avgSpbPer2Weeks: { $round: { $sum: [ROUND_EPSILON - 1, { $exp: '$avgLnSpbPlusOne' }] } }, // exp of log mean
+    avgCleridsPer2Weeks: { $round: { $sum: [ROUND_EPSILON - 1, { $exp: '$avgLnCleridsPlusOne' }] } }, // exp of log mean
+    avgProbGreater50: {
+      $round: [{
+        $sum: [ROUND_EPSILON, {
+          $divide: [ // inverse logit function
+            { $exp: '$avgLogitProb50' },
+            { $sum: [1, { $exp: '$avgLogitProb50' }] },
+          ],
+        }],
+      }, 3], // round to three decimal places
+    },
+    avgLogitProb50: 1,
     avgSpotst0: 1,
     sumSpbPer2Weeks: 1,
     sumCleridsPer2Weeks: 1,
@@ -60,15 +126,15 @@ function projectComputedFields() {
 }
 
 /**
-   * @description generates a mongoDB aggregation pipeline by year
-   * @param {String} location either 'county' or 'rangerDistrict'
-   * @param {Object} [filters={}] optional filter object
-   * @param {Number} [filters.startYear] optional start year to filter on
-   * @param {Number} [filters.endYear] optional end year to filter on
-   * @param {String} [filters.state] optional state to filter on
-   * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
-   * @returns
-   */
+ * @description generates a mongoDB aggregation pipeline by year
+ * @param {String} location either 'county' or 'rangerDistrict'
+ * @param {Object} [filters={}] optional filter object
+ * @param {Number} [filters.startYear] optional start year to filter on
+ * @param {Number} [filters.endYear] optional end year to filter on
+ * @param {String} [filters.state] optional state to filter on
+ * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
+ * @returns
+ */
 export function generateYearPipeline(location, filters = {}) {
   const {
     endYear,
@@ -103,15 +169,15 @@ export function generateYearPipeline(location, filters = {}) {
 }
 
 /**
-   * @description generates a mongoDB aggregation pipeline by year
-   * @param {String} location either 'county' or 'rangerDistrict'
-   * @param {Object} [filters={}] optional filter object
-   * @param {Number} [filters.startYear] optional start year to filter on
-   * @param {Number} [filters.endYear] optional end year to filter on
-   * @param {String} [filters.state] optional state to filter on
-   * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
-   * @returns
-   */
+ * @description generates a mongoDB aggregation pipeline by year
+ * @param {String} location either 'county' or 'rangerDistrict'
+ * @param {Object} [filters={}] optional filter object
+ * @param {Number} [filters.startYear] optional start year to filter on
+ * @param {Number} [filters.endYear] optional end year to filter on
+ * @param {String} [filters.state] optional state to filter on
+ * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
+ * @returns
+ */
 export function generateStatePipeline(location, filters = {}) {
   const {
     endYear,
@@ -146,15 +212,15 @@ export function generateStatePipeline(location, filters = {}) {
 }
 
 /**
-   * @description generates a mongoDB aggregation pipeline by year
-   * @param {String} location either 'county' or 'rangerDistrict'
-   * @param {Object} [filters={}] optional filter object
-   * @param {Number} [filters.startYear] optional start year to filter on
-   * @param {Number} [filters.endYear] optional end year to filter on
-   * @param {String} [filters.state] optional state to filter on
-   * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
-   * @returns
-   */
+ * @description generates a mongoDB aggregation pipeline by year
+ * @param {String} location either 'county' or 'rangerDistrict'
+ * @param {Object} [filters={}] optional filter object
+ * @param {Number} [filters.startYear] optional start year to filter on
+ * @param {Number} [filters.endYear] optional end year to filter on
+ * @param {String} [filters.state] optional state to filter on
+ * @param {String} [filters.loc] optional sublocation to filter on (name of county or ranger district)
+ * @returns
+ */
 export function generateLocationPipeline(location, filters = {}) {
   const {
     endYear,

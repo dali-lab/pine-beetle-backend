@@ -1,5 +1,5 @@
 import express from 'express';
-import bodyParser from 'body-parser';
+import compression from 'compression';
 import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
@@ -37,6 +37,9 @@ const app = express();
 // enable cross origin resource sharing
 app.use(cors());
 
+// use gzip compression
+app.use(compression());
+
 // additional header specifications
 app.use((_req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -47,9 +50,8 @@ app.use((_req, res, next) => {
 // enable/disable http request logging
 app.use(morgan('dev'));
 
-// enable json message body for posting data to API, extend default size limit
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.use(bodyParser.json({ limit: '50mb', extended: true }));
+app.use(express.json({ extended: true, limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // ROUTES
 Object.entries(routers).forEach(([prefix, router]) => {

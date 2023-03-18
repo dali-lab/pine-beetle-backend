@@ -10,6 +10,7 @@ import {
 import {
   aggregate,
   generateLocationPipeline,
+  generateSparsePipeline,
   generateStatePipeline,
   generateYearPipeline,
   generateYearListPipeline,
@@ -105,6 +106,34 @@ summarizedRDRouter.route('/query')
     }
   });
 
+// fetch only a few fields
+summarizedRDRouter.route('/sparse')
+  .get(async (req, res) => {
+    const {
+      endYear,
+      rangerDistrict,
+      startYear,
+      state,
+    } = req.query;
+
+    const pipeline = generateSparsePipeline('rangerDistrict', {
+      endYear: parseInt(endYear, 10),
+      loc: rangerDistrict,
+      startYear: parseInt(startYear, 10),
+      state,
+    });
+
+    try {
+      const items = await aggregate(COLLECTION_NAMES.summarizedRangerDistrict, pipeline);
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, items));
+    } catch (error) {
+      console.log(error);
+
+      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
 // sum up values, grouped by year
 summarizedRDRouter.route('/aggregate/year')
   .get(async (req, res) => {
