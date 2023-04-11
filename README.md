@@ -39,7 +39,7 @@ src/
     utils/          [utility functions]
     server.js       [server setup file]
 .babelrc            [babel setup]
-.eslintrc        	[eslint setup]
+.eslintrc           [eslint setup]
 Procfile            [heroku setup]
 package.json        [package]
 yarn.lock           [lockfile]
