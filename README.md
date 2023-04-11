@@ -31,16 +31,18 @@ You must have [Node](https://nodejs.org) and [yarn](https://yarnpkg.com/) instal
 
 ```
 src/
-	constants/          [all constants and mapping files]
-	controllers/        [controllers for performing CRUD on the models]
-	middleware/	        [middleware functions for each request]
-	models/		        [all data models]
-	routers/	        [all routers for exposing routes and calling controller functions]
-	utils/		        [utility functions]
-	server.js	        [server setup file]
-.babelrc		        [babel setup]
-.eslintrc	        	[eslint setup]
-package.json	        [package]
+    constants/      [all constants and mapping files]
+    controllers/    [controllers for performing CRUD on the models]
+    middleware/	    [middleware functions for each request]
+    models/         [all data models]
+    routers/        [all routers for exposing routes and calling controller functions]
+    utils/          [utility functions]
+    server.js       [server setup file]
+.babelrc            [babel setup]
+.eslintrc        	[eslint setup]
+Procfile            [heroku setup]
+package.json        [package]
+yarn.lock           [lockfile]
 ```
 
 ### Data Flow
