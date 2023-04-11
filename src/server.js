@@ -16,9 +16,7 @@ const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/pb-dev';
 const mongooseOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex: true,
   loggerLevel: 'error',
-  useFindAndModify: false,
 };
 
 // connect mongoose and mongodb
