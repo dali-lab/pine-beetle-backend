@@ -10,7 +10,7 @@ On the frontend, this application provides valuable information for USFS researc
 
 On the backend, this application aggregates data collected from USFS and state forest rangers on outbreaks and beetle counts, then uses those values to display historical data and future predictions. The predictive model used to generate predictions is written in R. All data is stored in a MongoDB database, allowing for easy pre and post-processing. Using an Express server, all calculations are made in JavaScript (outside of the predictive model and Mongo summarization/aggregation algorithms), and all data is stored in JSON format.
 
-Project Pine Beetle is a collaboration between Professor Matt Ayres of Dartmouth College, Professor Carissa Aoki of Bates College, the United States Forest Service (USFS), and the Dartmouth Applied Learning and Innovation (DALI) Lab.
+Project Pine Beetle is a collaboration between Professor Matt Ayres of Dartmouth College, Professor Carissa Aoki of Maryland Institute College of Art, the United States Forest Service (USFS), and the Dartmouth Applied Learning and Innovation (DALI) Lab.
 
 ## Architecture
 
@@ -31,21 +31,21 @@ You must have [Node](https://nodejs.org) and [yarn](https://yarnpkg.com/) instal
 
 ```
 src/
-	constants/						[all constants and mapping files]
-	controllers/					[controllers for performing CRUD on the models]
-	middleware/						[middleware functions for each request]
-	models/							[all data models]
-	routers/						[all routers for exposing routes and calling controller functions]
-	utils/							[utility functions]
-	index.js						[server setup file]
-.babelrc							[babel setup]
-.eslintrc							[eslint setup]
-package.json						[package]
+	constants/          [all constants and mapping files]
+	controllers/        [controllers for performing CRUD on the models]
+	middleware/	        [middleware functions for each request]
+	models/		        [all data models]
+	routers/	        [all routers for exposing routes and calling controller functions]
+	utils/		        [utility functions]
+	server.js	        [server setup file]
+.babelrc		        [babel setup]
+.eslintrc	        	[eslint setup]
+package.json	        [package]
 ```
 
 ### Data Flow
 
-Requests come in via the routers defined in `routers/`. Each router is hooked up to the main server file (`src/index.js`). Each request may be prefixed with a middleware function if authentication is required to access the route.
+Requests come in via the routers defined in `routers/`. Each router is hooked up to the main server file (`src/server.js`). Each request may be prefixed with a middleware function if authentication is required to access the route.
 
 This server only fetches data for each of the data collections (trapping, spot, and predictions). For user data and authentication, we perform reads and writes to the database.
 
@@ -102,12 +102,15 @@ This is determined by the `MONGODB_URI` environment variable that is set in Hero
 
 ## Contributors
 
-- Thomas Monfre
 - Jeff Liu
-- Angela Zhang
 
 ### Past Project Members
 
+- Alex Lopez
+- Grace Wang
+- Maria Cristoforo
+- Thomas Monfre
+- Angela Zhang
 - Nathan Schneider
 - John McCambridge
 - Madeline Hess
