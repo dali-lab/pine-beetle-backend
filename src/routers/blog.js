@@ -8,6 +8,7 @@ import {
 } from '../constants';
 import { queryFetch } from '../utils';
 import { Blog, User } from '../controllers';
+import { requireAuth } from '../middleware';
 
 const blogRouter = Router();
 
@@ -43,7 +44,7 @@ blogRouter
     }
   })
   // given id, update blog post
-  .put(async (req, res) => {
+  .put(requireAuth, async (req, res) => {
     try {
       const result = await Blog.updateBlogPost(req.params.id, req.body);
 
@@ -62,7 +63,7 @@ blogRouter
     }
   })
   // given id, delete blog post
-  .delete(async (req, res) => {
+  .delete(requireAuth, async (req, res) => {
     try {
       const result = await Blog.deleteBlogPost(req.params.id);
 
@@ -80,19 +81,7 @@ blogRouter
   });
 
 // given JSON body of blog post info, create blog post object
-blogRouter.route('/create').post(async (req, res) => {
-  // ensure provided authorization headers
-  if (!req.headers.authorization) {
-    return res
-      .status(RESPONSE_CODES.UNAUTHORIZED.status)
-      .send(
-        generateResponse(
-          RESPONSE_TYPES.UNAUTHORIZED,
-          'Must provide authorization header with basic auth (email and password)',
-        ),
-      );
-  }
-
+blogRouter.route('/create').post(requireAuth, async (req, res) => {
   const credentials = extractCredentialsFromAuthorization(
     req.headers.authorization,
   );
