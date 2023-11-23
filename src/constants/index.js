@@ -7,6 +7,7 @@ const COLLECTION_NAMES = {
   summarizedRangerDistrict: 'summarizedrangerdistricts',
   unsummarized: 'unsummarizedtrappings',
   users: 'users',
+  blogPost: 'blogs',
 };
 
 /**
@@ -41,8 +42,8 @@ export const generateResponse = (responseType, payload) => {
   };
 };
 
-export {
-  COLLECTION_NAMES,
-  RESPONSE_CODES,
-  RESPONSE_TYPES,
+export { 
+  COLLECTION_NAMES, 
+  RESPONSE_CODES, 
+  RESPONSE_TYPES, 
 };

@@ -1,20 +1,6 @@
 import { RESPONSE_CODES } from '../constants';
 import { Blog } from '../models';
-
-/**
- * @description retrieves all blog post objects
- * @returns {Promise<Array<Blog>>} promise that resolves to blog posts array or error
- */
-export const getBlogPosts = async () => {
-  try {
-    const posts = await Blog.find({});
-    if (posts) return posts;
-    return RESPONSE_CODES.NOT_FOUND;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-};
+import mongoose from 'mongoose';
 
 /**
  * @description retrieves blog post object
@@ -39,12 +25,36 @@ export const getBlogPostById = async (id) => {
 };
 
 /**
+ * @description retrieves blog all blog posts by given author
+ * @param {String} id author id
+ * @returns {Promise<Blog[]>} promise that resolves to blog post objects array or error
+ */
+export const getBlogPostsByAuthorId = async (id) => {
+  try {
+    const blogPosts = await Blog.find({ authorId: id });
+
+    if (blogPosts) {
+      return {
+        ...RESPONSE_CODES.SUCCESS,
+        blogPosts,
+      };
+    }
+    return RESPONSE_CODES.NOT_FOUND;
+  } catch (error) {
+    console.error(error);
+    return RESPONSE_CODES.NOT_FOUND;
+  }
+};
+
+/**
  * @description creates blog post object in database
- * @param {Object} fields blog post fields (title, body, imgUrl)
+ * @param {Object} fields blog post fields (title, body)
+ * @param {File} uploadedFile the image that was uploaded by the user
+ * @param {Object} user user who created the blog post
  * @returns {Promise<Blog>} promise that resolves to blog object or error
  */
-export const createBlogPost = async (fields, user) => {
-  const { title, body, imgUrl } = fields;
+export const createBlogPost = async (fields, uploadedFile, user) => {
+  const { title, body } = fields;
 
   const post = new Blog();
 
@@ -52,30 +62,40 @@ export const createBlogPost = async (fields, user) => {
 
   post.title = title;
   post.body = body;
-  post.img_url = imgUrl || null;
   post.author = `${firstName} ${lastName}`;
   post.authorId = id;
+  post.image = uploadedFile?.path || null;
 
   try {
     const savedPost = await post.save();
-    return savedPost;
+    return savedPost.toJSON();
   } catch (error) {
-    console.log(error);
-
-    throw new Error({
-      code: RESPONSE_CODES.INTERNAL_ERROR,
-      error,
-    });
+    if (error.name === 'ValidationError') {
+      if (error.errors.title) {
+        const errorToThrow = new Error(error.errors.title.properties.message);
+        errorToThrow.code = RESPONSE_CODES.VALIDATION_ERROR;
+        throw errorToThrow;
+      } else if (error.errors.body) {
+        const errorToThrow = new Error(error.errors.body.properties.message);
+        errorToThrow.code = RESPONSE_CODES.VALIDATION_ERROR;
+        throw errorToThrow;
+      }
+    } else {
+      throw new Error({
+        code: RESPONSE_CODES.INTERNAL_ERROR,
+        error,
+      });
+    }
   }
 };
 
 /**
  * @description update blog post object
- * @param {Object} fields blog post fields (title, body, imgUrl)
+ * @param {Object} fields blog post fields (title, body, image)
  * @param {String} id blog post id
  * @returns {Promise<Blog>} promise that resolves to blog object or error
  */
-export const updateBlogPost = async (id, fields) => {
+export const updateBlogPost = async (id, fields, uploadedFile) => {
   const { id: providedId, _id: providedUnderId } = fields;
 
   // reject update of id
@@ -87,31 +107,50 @@ export const updateBlogPost = async (id, fields) => {
   }
 
   try {
-    await Blog.updateOne({ _id: id }, fields);
+    const postId = mongoose.Types.ObjectId(id);
 
-    const blogPost = await Blog.findById(id);
+    await Blog.updateOne(
+      { _id: postId },
+      { ...fields, image: uploadedFile?.path || null },
+    );
+
+    const blogPost = await Blog.findById(postId);
 
     await blogPost.save();
 
     return {
       ...RESPONSE_CODES.SUCCESS,
-      blogPost,
+      blogPost: blogPost.toJSON(),
     };
   } catch (error) {
-    console.log(error);
-
-    throw new Error({ code: RESPONSE_CODES.INTERNAL_ERROR }, error);
+    if (error.name === 'ValidationError') {
+      if (error.errors.title) {
+        const errorToThrow = new Error(error.errors.title.properties.message);
+        errorToThrow.code = RESPONSE_CODES.VALIDATION_ERROR;
+        throw errorToThrow;
+      } else if (error.errors.body) {
+        const errorToThrow = new Error(error.errors.body.properties.message);
+        errorToThrow.code = RESPONSE_CODES.VALIDATION_ERROR;
+        throw errorToThrow;
+      }
+    } else {
+      throw new Error({
+        code: RESPONSE_CODES.INTERNAL_ERROR,
+        error,
+      });
+    }
   }
 };
 
 /**
  * @description removes blog post with given id
  * @param {String} id blog post id
+ * @param {String} userId id of a user who requests deletion
  * @returns {Promise<Blog>} promise that resolves to success object or error
  */
-export const deleteBlogPost = async (id) => {
+export const deleteBlogPost = async (id, userId) => {
   try {
-    await Blog.deleteOne({ _id: id });
+    await Blog.deleteOne({ authorId: userId, _id: id });
     return RESPONSE_CODES.SUCCESS;
   } catch (error) {
     console.log(error);
