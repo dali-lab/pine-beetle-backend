@@ -8,7 +8,7 @@ import {
 import { queryFetch } from '../utils';
 import { Blog, User } from '../controllers';
 import { requireAuth } from '../middleware';
-import uploadFile from '../utils/upload-file';
+import { uploadFile } from '../utils/upload-file';
 
 const blogRouter = Router();
 
