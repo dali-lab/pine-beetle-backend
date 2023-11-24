@@ -22,3 +22,7 @@ Deletes blog post object of specified `id` in the database
 
 Expects authorization header with Bearer token.
 Creates blog post with fields provided in multipart/form-data body. Requires `title` and `body`, has optional `image` field. `author` is fetched from the session info.
+
+## `GET /blog/user/:id`
+
+Returns blog post object of specified author `id` in the database.
