@@ -1,6 +1,6 @@
+import mongoose from 'mongoose';
 import { RESPONSE_CODES } from '../constants';
 import { Blog } from '../models';
-import mongoose from 'mongoose';
 
 /**
  * @description retrieves blog post object
@@ -80,12 +80,11 @@ export const createBlogPost = async (fields, uploadedFile, user) => {
         errorToThrow.code = RESPONSE_CODES.VALIDATION_ERROR;
         throw errorToThrow;
       }
-    } else {
-      throw new Error({
-        code: RESPONSE_CODES.INTERNAL_ERROR,
-        error,
-      });
     }
+    throw new Error({
+      code: RESPONSE_CODES.INTERNAL_ERROR,
+      error,
+    });
   }
 };
 
@@ -107,7 +106,7 @@ export const updateBlogPost = async (id, fields, uploadedFile) => {
   }
 
   try {
-    const postId = mongoose.Types.ObjectId(id);
+    const postId = new mongoose.Types.ObjectId(id);
 
     await Blog.updateOne(
       { _id: postId },
@@ -133,12 +132,11 @@ export const updateBlogPost = async (id, fields, uploadedFile) => {
         errorToThrow.code = RESPONSE_CODES.VALIDATION_ERROR;
         throw errorToThrow;
       }
-    } else {
-      throw new Error({
-        code: RESPONSE_CODES.INTERNAL_ERROR,
-        error,
-      });
     }
+    throw new Error({
+      code: RESPONSE_CODES.INTERNAL_ERROR,
+      error,
+    });
   }
 };
 

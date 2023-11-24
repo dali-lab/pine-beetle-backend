@@ -17,7 +17,9 @@ const COLLECTION_NAMES = {
  */
 export const extractCredentialsFromAuthorization = (authorization) => {
   // adapted from: https://gist.github.com/charlesdaniel/1686663
-  const auth = Buffer.from(authorization.split(' ')[1], 'base64').toString().split(':');
+  const auth = Buffer.from(authorization.split(' ')[1], 'base64')
+    .toString()
+    .split(':');
 
   return {
     email: auth[0],
@@ -38,12 +40,10 @@ export const generateResponse = (responseType, payload) => {
   return {
     status,
     type,
-    ...(status === RESPONSE_CODES.SUCCESS.status ? { data: payload } : { error: payload }),
+    ...(status === RESPONSE_CODES.SUCCESS.status
+      ? { data: payload }
+      : { error: payload }),
   };
 };
 
-export { 
-  COLLECTION_NAMES, 
-  RESPONSE_CODES, 
-  RESPONSE_TYPES, 
-};
+export { COLLECTION_NAMES, RESPONSE_CODES, RESPONSE_TYPES };

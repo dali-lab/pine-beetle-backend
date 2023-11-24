@@ -5,13 +5,14 @@ const uploadFilePath = path.resolve(__dirname, '../..', 'public/uploads');
 
 const storageFile = multer.diskStorage({
   destination: uploadFilePath,
-  filename: (_req, file, fn) =>
-    fn(
+  filename: (_req, file, fn) => {
+    return fn(
       null,
       `${new Date().getTime().toString()}-${file.fieldname}${path.extname(
         file.originalname,
       )}`,
-    ),
+    );
+  },
 });
 
 const uploadFile = multer({
@@ -35,7 +36,7 @@ const uploadFile = multer({
       return callback(null, true);
     }
 
-    callback(
+    return callback(
       new Error(
         'Invalid file type. Only PNG, JPG, and JPEG files are allowed!',
       ),
@@ -43,4 +44,4 @@ const uploadFile = multer({
   },
 }).single('image');
 
-export { uploadFile };
+export default uploadFile;

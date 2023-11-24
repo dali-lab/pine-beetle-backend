@@ -4,12 +4,11 @@ import {
   RESPONSE_CODES,
   RESPONSE_TYPES,
   generateResponse,
-  extractCredentialsFromAuthorization,
 } from '../constants';
 import { queryFetch } from '../utils';
 import { Blog, User } from '../controllers';
 import { requireAuth } from '../middleware';
-import { uploadFile } from '../utils/upload-file';
+import uploadFile from '../utils/upload-file';
 
 const blogRouter = Router();
 
@@ -54,9 +53,13 @@ blogRouter
       );
 
       if (result && result.status === 200) {
-        res.send(generateResponse(RESPONSE_TYPES.SUCCESS, result.blogPost));
+        return res.send(
+          generateResponse(RESPONSE_TYPES.SUCCESS, result.blogPost),
+        );
       } else {
-        res.status(result.status || 500).send(generateResponse(result.type));
+        return res
+          .status(result.status || 500)
+          .send(generateResponse(result.type));
       }
     } catch (error) {
       return res
