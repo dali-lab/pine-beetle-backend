@@ -59,7 +59,10 @@ app.use(express.json({ extended: true, limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve static files from the public/uploads directory
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+app.use(
+  '/v3/uploads',
+  express.static(path.join(__dirname, '../public/uploads')),
+);
 
 // ROUTES
 Object.entries(routers).forEach(([prefix, router]) => {

@@ -3,11 +3,10 @@ import multer from 'multer';
 
 const uploadFilePath = path.resolve(__dirname, '../..', 'public/uploads');
 
-const getFileUrl = (originalUrl) => {
-  if (originalUrl) {
-    const url = new URL(originalUrl);
-    url.pathname = url.pathname.replace('/app/public', '');
-    return url.toString();
+const getFilePath = (originalPath) => {
+  if (originalPath) {
+    const newPath = originalPath.split('/public')[1];
+    return newPath || originalPath;
   }
   return null;
 };
@@ -53,4 +52,4 @@ const uploadFile = multer({
   },
 }).single('image');
 
-export { uploadFile, getFileUrl };
+export { uploadFile, getFilePath };
