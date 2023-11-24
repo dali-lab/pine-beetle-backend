@@ -187,6 +187,14 @@ export const tokenForUser = (email) => {
   return jwt.encode({ sub: email, iat: timestamp }, process.env.AUTH_SECRET);
 };
 
+export const getUserByJWT = async (authorization) => {
+  const JWTtoken = authorization.split(' ')[1];
+  const decoded = jwt.decode(JWTtoken, process.env.AUTH_SECRET);
+  const user = await getUserByEmail(decoded.sub);
+
+  return user;
+};
+
 export const userWithEmailExists = async (email) => {
   try {
     const user = await getUserByEmail(email);
