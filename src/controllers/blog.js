@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { RESPONSE_CODES } from '../constants';
 import { Blog } from '../models';
+import { getFileUrl } from '../utils/upload-file';
 
 /**
  * @description retrieves blog post object
@@ -60,11 +61,13 @@ export const createBlogPost = async (fields, uploadedFile, user) => {
 
   const { first_name: firstName, last_name: lastName, _id: id } = user;
 
+  const imagePath = getFileUrl(uploadedFile?.path);
+
   post.title = title;
   post.body = body;
   post.author = `${firstName} ${lastName}`;
   post.authorId = id;
-  post.image = uploadedFile?.path || null;
+  post.image = imagePath;
 
   try {
     const savedPost = await post.save();

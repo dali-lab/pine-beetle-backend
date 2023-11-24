@@ -3,6 +3,15 @@ import multer from 'multer';
 
 const uploadFilePath = path.resolve(__dirname, '../..', 'public/uploads');
 
+const getFileUrl = (originalUrl) => {
+  if (originalUrl) {
+    const url = new URL(originalUrl);
+    url.pathname = url.pathname.replace('/app/public', '');
+    return url.toString();
+  }
+  return null;
+};
+
 const storageFile = multer.diskStorage({
   destination: uploadFilePath,
   filename: (_req, file, fn) => {
@@ -44,4 +53,4 @@ const uploadFile = multer({
   },
 }).single('image');
 
-export default uploadFile;
+export { uploadFile, getFileUrl };
