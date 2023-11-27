@@ -111,10 +111,12 @@ export const updateBlogPost = async (id, fields, uploadedFile) => {
   try {
     const postId = new mongoose.Types.ObjectId(id);
 
-    await Blog.updateOne(
-      { _id: postId },
-      { ...fields, image: uploadedFile?.path || null },
-    );
+    if (uploadedFile) {
+      const imagePath = getFilePath(uploadedFile?.path);
+      await Blog.updateOne({ _id: postId }, { ...fields, image: imagePath });
+    } else {
+      await Blog.updateOne({ _id: postId }, fields);
+    }
 
     const blogPost = await Blog.findById(postId);
 
