@@ -18,6 +18,11 @@ import {
   generateLocationListPipeline,
 } from './aggregate';
 
+import {
+  uploadFileToFirebase,
+  uploadFile,
+} from './upload-file';
+
 export {
   aggregate,
   generateLocationPipeline,
@@ -30,4 +35,6 @@ export {
   queryFetch,
   sendPasswordResetEmail,
   specifiedQueryFetch,
+  uploadFile,
+  uploadFileToFirebase,
 };

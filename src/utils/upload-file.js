@@ -1,15 +1,26 @@
 import * as path from 'path';
 import multer from 'multer';
+import admin from './firebase-admin';
+
+const bucket = admin.storage().bucket();
+
+const uploadFileToFirebase = async (filePath, destination) => {
+  await bucket.upload(filePath, {
+    destination,
+  });
+
+  // Get public URL for the file
+  const file = bucket.file(destination);
+  const signedUrls = await file.getSignedUrl({
+    action: 'read',
+    expires: '03-09-2491',
+  });
+
+  const publicUrl = signedUrls[0];
+  return publicUrl;
+};
 
 const uploadFilePath = path.resolve(__dirname, '../..', 'public/uploads');
-
-const getFilePath = (originalPath) => {
-  if (originalPath) {
-    const newPath = originalPath.split('/public')[1];
-    return newPath || originalPath;
-  }
-  return null;
-};
 
 const storageFile = multer.diskStorage({
   destination: uploadFilePath,
@@ -52,4 +63,4 @@ const uploadFile = multer({
   },
 }).single('image');
 
-export { uploadFile, getFilePath };
+export { uploadFile, uploadFileToFirebase };
