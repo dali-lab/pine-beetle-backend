@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { RESPONSE_CODES } from '../constants';
 import { Blog } from '../models';
-import { getFilePath } from '../utils/upload-file';
+import { uploadFileToFirebase } from '../utils';
 
 /**
  * @description retrieves blog post object
@@ -61,14 +61,17 @@ export const createBlogPost = async (fields, uploadedFile, user) => {
 
   const { first_name: firstName, last_name: lastName, _id: id } = user;
 
-  const imagePath = getFilePath(uploadedFile?.path);
-
   post.title = title;
   post.body = body;
   post.author = `${firstName} ${lastName}`;
   post.authorId = id;
-  post.image = imagePath;
-
+  if (uploadedFile) {
+    const filePath = await uploadFileToFirebase(
+      uploadedFile.path,
+      `uploads/${uploadedFile.filename}`,
+    );
+    post.image = filePath;
+  }
   try {
     const savedPost = await post.save();
     return savedPost.toJSON();
@@ -112,8 +115,12 @@ export const updateBlogPost = async (id, fields, uploadedFile) => {
     const postId = new mongoose.Types.ObjectId(id);
 
     if (uploadedFile) {
-      const imagePath = getFilePath(uploadedFile?.path);
-      await Blog.updateOne({ _id: postId }, { ...fields, image: imagePath });
+      const filePath = await uploadFileToFirebase(
+        uploadedFile.path,
+        `uploads/${uploadedFile.filename}`,
+      );
+
+      await Blog.updateOne({ _id: postId }, { ...fields, image: filePath });
     } else {
       await Blog.updateOne({ _id: postId }, fields);
     }

@@ -5,10 +5,9 @@ import {
   RESPONSE_TYPES,
   generateResponse,
 } from '../constants';
-import { queryFetch } from '../utils';
+import { queryFetch, uploadFile } from '../utils';
 import { Blog, User } from '../controllers';
 import { requireAuth } from '../middleware';
-import { uploadFile } from '../utils/upload-file';
 
 const blogRouter = Router();
 
