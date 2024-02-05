@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
 import routers from './routers';
 
 import { generateResponse, RESPONSE_TYPES } from './constants';
@@ -20,14 +21,17 @@ const mongooseOptions = {
 };
 
 // connect mongoose and mongodb
-mongoose.connect(mongoURI, mongooseOptions).then(() => {
-  console.log('mongoose connected to database');
+mongoose
+  .connect(mongoURI, mongooseOptions)
+  .then(() => {
+    console.log('mongoose connected to database');
 
-  global.connection = mongoose.connection;
-  console.log('mongo client connected with mongoose');
-}).catch((err) => {
-  console.log('error: mongoose could not connect to db:', err);
-});
+    global.connection = mongoose.connection;
+    console.log('mongo client connected with mongoose');
+  })
+  .catch((err) => {
+    console.log('error: mongoose could not connect to db:', err);
+  });
 
 // initialize
 const app = express();
@@ -41,7 +45,10 @@ app.use(compression());
 // additional header specifications
 app.use((_req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
   next();
 });
 
@@ -51,6 +58,12 @@ app.use(morgan('dev'));
 app.use(express.json({ extended: true, limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// Serve static files from the public/uploads directory
+app.use(
+  '/v3/uploads',
+  express.static(path.join(__dirname, '../public/uploads')),
+);
+
 // ROUTES
 Object.entries(routers).forEach(([prefix, router]) => {
   app.use(`/v3/${prefix}`, router);
@@ -58,10 +71,14 @@ Object.entries(routers).forEach(([prefix, router]) => {
 
 // custom 404 middleware
 app.use((_req, res) => {
-  res.status(404).send(generateResponse(
-    RESPONSE_TYPES.NOT_FOUND,
-    'The requested route does not exist',
-  ));
+  res
+    .status(404)
+    .send(
+      generateResponse(
+        RESPONSE_TYPES.NOT_FOUND,
+        'The requested route does not exist',
+      ),
+    );
 });
 
 // START THE SERVER

@@ -26,5 +26,9 @@
     "NO_CONTENT": {
         "status": 200,
         "type": "NOTHING TO UPDATE"
+    },
+    "VALIDATION_ERROR": {
+        "status": 403,
+        "type": "VALIDATION_ERROR"
     }
 }
