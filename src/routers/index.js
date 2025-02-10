@@ -4,6 +4,7 @@ import summarizedRangerDistrict from './summarized-ranger-district';
 import unsummarized from './unsummarized';
 import user from './user';
 import blog from './blog';
+import histogram from './histogram';
 
 export default {
   healthcheck,
@@ -12,4 +13,5 @@ export default {
   'unsummarized-trapping': unsummarized,
   user,
   blog,
+  histogram,
 };

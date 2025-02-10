@@ -8,6 +8,7 @@ const COLLECTION_NAMES = {
   unsummarized: 'unsummarizedtrappings',
   users: 'users',
   blogPost: 'blogs',
+  histogram: 'histogram',
 };
 
 /**
