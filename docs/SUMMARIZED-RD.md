@@ -118,3 +118,13 @@ User can filter the data with the following query params:
 - `endYear`
 - `isHistorical` -- whether or not to filter on just historical data
 - `isPrediction` -- whether or not to filter on just prediction data
+
+## `GET /summarized-rangerdistrict/rangerDistricts/results`
+
+Returns a list of sorted rangerdistrict names represented in the data.
+
+User can filter the data with the following query params:
+
+- `state`
+- `year`
+- `rangerDistrict`

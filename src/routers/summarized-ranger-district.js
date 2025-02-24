@@ -18,6 +18,7 @@ import {
   generateLocationListPipeline,
   specifiedQueryFetch,
   queryFetch,
+  getResults,
 } from '../utils';
 
 import {
@@ -311,6 +312,26 @@ summarizedRDRouter.route('/rangerDistricts/list')
       console.log(error);
 
       res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+summarizedRDRouter.route('/rangerDistricts/results')
+  .get(async (req, res) => {
+    const {
+      year,
+      rangerDistrict,
+      state,
+    } = req.query;
+
+    try {
+      const rangerDistricts = await getResults(COLLECTION_NAMES.summarizedRangerDistrict, { rangerDistrict, state, year });
+      return res.send(generateResponse(RESPONSE_TYPES.SUCCESS, rangerDistricts));
+    } catch (error) {
+      console.log(error);
+
+      return res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
         generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
       );
     }

@@ -23,6 +23,8 @@ import {
   uploadFile,
 } from './upload-file';
 
+import getResults from './results';
+
 export {
   aggregate,
   generateLocationPipeline,
@@ -32,6 +34,7 @@ export {
   generateYearListPipeline,
   generateStateListPipeline,
   generateLocationListPipeline,
+  getResults,
   queryFetch,
   sendPasswordResetEmail,
   specifiedQueryFetch,
