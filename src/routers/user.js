@@ -171,20 +171,29 @@ userRouter.route('/:id')
   })
   // given id of user in header, delete user
   .delete(requireAuth, async (req, res) => {
+    const requestingUser = await User.getUserByJWT(req.headers.authorization);
     try {
+      if (requestingUser.id === req.params.id) {
+        return res.status(RESPONSE_CODES.UNAUTHORIZED.status).send(
+          generateResponse(RESPONSE_TYPES.UNAUTHORIZED, {
+            message: 'You cannot delete yourself',
+          }),
+        );
+      }
+
       const result = await User.deleteUser(req.params.id);
 
       if (result && result.status === 200) {
-        res.send(generateResponse(RESPONSE_TYPES.SUCCESS));
+        return res.send(generateResponse(RESPONSE_TYPES.SUCCESS));
       } else {
-        res.status(result.status || 500).send(
+        return res.status(result.status || 500).send(
           generateResponse(result.type),
         );
       }
     } catch (error) {
       console.log(error);
 
-      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+      return res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
         generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
       );
     }
