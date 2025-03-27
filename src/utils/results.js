@@ -21,7 +21,7 @@ const getResults = async (collectionName, filters = {}) => {
       state: record.state,
       county: record.county || undefined,
       rangerDistrict: record.rangerDistrict || undefined,
-      probSpotsGT20: record.probSpotsGT20,
+      probSpotsGT50: record.probSpotsGT50,
       sumSpots: record.spotst0,
     };
   });

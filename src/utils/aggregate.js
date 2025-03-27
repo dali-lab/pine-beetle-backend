@@ -94,6 +94,7 @@ function createComputedFields() {
     sumSpotst0: { $sum: '$spotst0' },
     minSpotst0: { $min: '$spotst0' },
     maxSpotst0: { $max: '$spotst0' },
+    isValidForPrediction: { $sum: '$isValidForPrediction' },
   };
 }
 
@@ -115,6 +116,16 @@ function projectComputedFields() {
         }],
       }, 3], // round to three decimal places
     },
+    avgSpbPerTrapPer2Weeks: {
+      $round: {
+        $cond: {
+          if: { $eq: ['$isValidForPrediction', 0] },
+          then: 0,
+          else: { $divide: ['$sumSpbPer2Weeks', '$isValidForPrediction'] },
+        },
+      },
+    },
+    trapCount: 1,
     avgLogitProb50: 1,
     avgSpotst0: 1,
     sumSpbPer2Weeks: 1,
