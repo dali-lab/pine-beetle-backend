@@ -18,6 +18,7 @@ import {
   generateLocationListPipeline,
   specifiedQueryFetch,
   queryFetch,
+  getResults,
 } from '../utils';
 
 import {
@@ -311,6 +312,26 @@ summarizedCountyRouter.route('/counties/list')
       console.log(error);
 
       res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+        generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+      );
+    }
+  });
+
+summarizedCountyRouter.route('/counties/results')
+  .get(async (req, res) => {
+    const {
+      year,
+      county,
+      state,
+    } = req.query;
+
+    try {
+      const counties = await getResults(COLLECTION_NAMES.summarizedCounty, { county, state, year });
+      return res.send(generateResponse(RESPONSE_TYPES.SUCCESS, counties));
+    } catch (error) {
+      console.log(error);
+
+      return res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
         generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
       );
     }
