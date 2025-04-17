@@ -19,6 +19,7 @@ import {
   specifiedQueryFetch,
   queryFetch,
   getResults,
+  getChartData,
 } from '../utils';
 
 import {
@@ -336,5 +337,19 @@ summarizedRDRouter.route('/rangerDistricts/results')
       );
     }
   });
+
+summarizedRDRouter.route('/rangerDistricts/scatter-chart').get(async (_req, res) => {
+  try {
+    const rangerDistricts = await getChartData(COLLECTION_NAMES.summarizedRangerDistrict);
+
+    return res.send(generateResponse(RESPONSE_TYPES.SUCCESS, rangerDistricts));
+  } catch (error) {
+    console.log(error);
+
+    return res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+      generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
+    );
+  }
+});
 
 export default summarizedRDRouter;

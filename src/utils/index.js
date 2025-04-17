@@ -25,6 +25,8 @@ import {
 
 import getResults from './results';
 
+import getChartData from './chart-service';
+
 export {
   aggregate,
   generateLocationPipeline,
@@ -34,6 +36,7 @@ export {
   generateYearListPipeline,
   generateStateListPipeline,
   generateLocationListPipeline,
+  getChartData,
   getResults,
   queryFetch,
   sendPasswordResetEmail,
