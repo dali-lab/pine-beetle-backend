@@ -18,6 +18,7 @@ const getChartData = async (collectionName) => {
         rangerDistrict: record.rangerDistrict || undefined,
         probSpotsGT50: record.probSpotsGT50,
         lnSpots: record['ln(spotst0+1)'],
+        spotst0: record.spotst0,
       };
     });
 
