@@ -1,8 +1,11 @@
 /* eslint-disable import/prefer-default-export */
-import User from './user';
 import Blog from './blog';
+import Comment from './comment';
+import Like from './like';
+import User from './user';
 
 export {
-  User,
-  Blog,
+    Blog,
+    Comment,
+    Like, User
 };

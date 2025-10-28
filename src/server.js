@@ -1,9 +1,9 @@
-import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
-import morgan from 'morgan';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import express from 'express';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
 import path from 'path';
 import routers from './routers';
 
@@ -36,8 +36,18 @@ mongoose
 // initialize
 const app = express();
 
+// Trust proxy to get real IP addresses (for Heroku, AWS, etc.)
+app.set('trust proxy', true);
+
 // enable cross origin resource sharing
-app.use(cors());
+// app.use(cors());
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: false
+}));
 
 // use gzip compression
 app.use(compression());
