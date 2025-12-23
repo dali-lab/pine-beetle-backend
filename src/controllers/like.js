@@ -141,4 +141,3 @@ export const toggleLike = async (postId, req) => {
     };
   }
 };
-

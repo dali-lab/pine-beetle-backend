@@ -26,7 +26,7 @@ import {
 import getResults from './results';
 
 import getChartData from './chart-service';
-import { sanitizeToText } from './sanitize';
+import sanitizeToText from './sanitize';
 
 export {
   aggregate,

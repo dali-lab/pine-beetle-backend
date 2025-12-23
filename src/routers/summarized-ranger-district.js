@@ -1,29 +1,29 @@
 import { Router } from 'express';
 
 import {
-    COLLECTION_NAMES,
-    generateResponse,
-    RESPONSE_CODES,
-    RESPONSE_TYPES,
+  COLLECTION_NAMES,
+  generateResponse,
+  RESPONSE_CODES,
+  RESPONSE_TYPES,
 } from '../constants';
 
 import {
-    aggregate,
-    generateLocationListPipeline,
-    generateLocationPipeline,
-    generateSparsePipeline,
-    generateStateListPipeline,
-    generateStatePipeline,
-    generateYearListPipeline,
-    generateYearPipeline,
-    getChartData,
-    getResults,
-    queryFetch,
-    specifiedQueryFetch,
+  aggregate,
+  generateLocationListPipeline,
+  generateLocationPipeline,
+  generateSparsePipeline,
+  generateStateListPipeline,
+  generateStatePipeline,
+  generateYearListPipeline,
+  generateYearPipeline,
+  getChartData,
+  getResults,
+  queryFetch,
+  specifiedQueryFetch,
 } from '../utils';
 
 import {
-    requireAuth,
+  requireAuth,
 } from '../middleware';
 
 const summarizedRDRouter = Router();
@@ -420,21 +420,23 @@ summarizedRDRouter.route('/download')
       const headers = Object.keys(items[0]);
       const csvContent = [
         headers.join(','),
-        ...items.map(item => headers.map(header => {
-          const value = item[header];
-          // Escape commas and quotes in CSV
-          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        }).join(','))
+        ...items.map((item) => {
+          return headers.map((header) => {
+            const value = item[header];
+            // Escape commas and quotes in CSV
+            if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          }).join(',');
+        }),
       ].join('\n');
 
-      res.send(csvContent);
+      return res.send(csvContent);
     } catch (error) {
       console.log(error);
 
-      res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
+      return res.status(RESPONSE_CODES.INTERNAL_ERROR.status).send(
         generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error),
       );
     }

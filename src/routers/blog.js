@@ -5,7 +5,9 @@ import {
   RESPONSE_TYPES,
   generateResponse,
 } from '../constants';
-import { Blog, Comment, Like, User } from '../controllers';
+import {
+  Blog, Comment, Like, User,
+} from '../controllers';
 import { requireAuth } from '../middleware';
 import { queryFetch, uploadFile } from '../utils';
 

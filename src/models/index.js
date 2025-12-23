@@ -5,7 +5,7 @@ import Like from './like';
 import User from './user';
 
 export {
-    Blog,
-    Comment,
-    Like, User
+  Blog,
+  Comment,
+  Like, User,
 };

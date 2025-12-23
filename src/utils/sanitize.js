@@ -7,5 +7,8 @@ const SANITIZE_OPTIONS = {
   disallowedTagsMode: 'discard',
 };
 
-export const sanitizeToText = (value = '') =>
-  sanitizeHtml(String(value), SANITIZE_OPTIONS).trim();
+const sanitizeToText = (value = '') => {
+  return sanitizeHtml(String(value), SANITIZE_OPTIONS).trim();
+};
+
+export default sanitizeToText;

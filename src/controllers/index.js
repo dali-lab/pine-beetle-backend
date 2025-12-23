@@ -5,4 +5,6 @@ import * as Histogram from './histogram';
 import * as Like from './like';
 import * as User from './user';
 
-export { Blog, Comment, Histogram, Like, User };
+export {
+  Blog, Comment, Histogram, Like, User,
+};
