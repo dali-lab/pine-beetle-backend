@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
 import { RESPONSE_CODES } from '../constants';
 import { Comment, Blog } from '../models';
+import { sanitizeToText } from '../utils';
 import { getUserByJWT } from './user';
+
+const MAX_COMMENT_LENGTH = 1000;
 
 /**
  * @description retrieves all comments for a blog post
@@ -57,10 +60,19 @@ export const createComment = async (postId, body, req) => {
   try {
     const { content } = body;
 
-    if (!content || content.trim() === '') {
+    const cleaned = sanitizeToText(content);
+
+    if (!cleaned) {
       return {
         ...RESPONSE_CODES.BAD_REQUEST,
         error: { message: 'Comment content is required' },
+      };
+    }
+
+    if (cleaned.length > MAX_COMMENT_LENGTH) {
+      return {
+        ...RESPONSE_CODES.BAD_REQUEST,
+        error: { message: `Comment must be under ${MAX_COMMENT_LENGTH} characters` },
       };
     }
 
@@ -96,7 +108,7 @@ export const createComment = async (postId, body, req) => {
     const comment = new Comment();
     comment.postId = new mongoose.Types.ObjectId(postId);
     comment.userId = userId;
-    comment.content = content.trim();
+    comment.content = cleaned;
     comment.author = `${firstName} ${lastName}`;
 
     const savedComment = await comment.save();
@@ -123,4 +135,3 @@ export const createComment = async (postId, body, req) => {
     };
   }
 };
-

@@ -26,6 +26,7 @@ import {
 import getResults from './results';
 
 import getChartData from './chart-service';
+import { sanitizeToText } from './sanitize';
 
 export {
   aggregate,
@@ -41,6 +42,7 @@ export {
   queryFetch,
   sendPasswordResetEmail,
   specifiedQueryFetch,
+  sanitizeToText,
   uploadFile,
   uploadFileToFirebase,
 };
