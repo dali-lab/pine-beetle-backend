@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { RESPONSE_CODES } from '../constants';
-import { Like, Blog } from '../models';
+import { Blog, Like } from '../models';
 import { getUserByJWT } from './user';
 
 /**
@@ -11,7 +11,6 @@ import { getUserByJWT } from './user';
  */
 export const getLikes = async (postId, req) => {
   try {
-    // Verify blog post exists
     const blogPost = await Blog.findById(postId);
     if (!blogPost) {
       return {
@@ -23,7 +22,6 @@ export const getLikes = async (postId, req) => {
     const likes = await Like.find({ postId })
       .populate('userId', 'first_name last_name email');
 
-    // Check if current user has liked the post
     let userHasLiked = false;
     if (req.headers.authorization) {
       try {
@@ -33,7 +31,6 @@ export const getLikes = async (postId, req) => {
           userHasLiked = !!userLike;
         }
       } catch (error) {
-        // User not authenticated, ignore
       }
     }
 
@@ -62,7 +59,6 @@ export const getLikes = async (postId, req) => {
  */
 export const toggleLike = async (postId, req) => {
   try {
-    // Verify blog post exists
     const blogPost = await Blog.findById(postId);
     if (!blogPost) {
       return {
@@ -71,7 +67,6 @@ export const toggleLike = async (postId, req) => {
       };
     }
 
-    // Get user from JWT
     let user;
     try {
       user = await getUserByJWT(req.headers.authorization);
@@ -91,14 +86,12 @@ export const toggleLike = async (postId, req) => {
 
     const { _id: userId } = user;
 
-    // Check if like already exists
     const existingLike = await Like.findOne({
       postId: new mongoose.Types.ObjectId(postId),
       userId,
     });
 
     if (existingLike) {
-      // Unlike: remove the like
       await Like.deleteOne({ _id: existingLike._id });
       const remainingLikes = await Like.find({ postId });
 
@@ -111,7 +104,6 @@ export const toggleLike = async (postId, req) => {
       };
     }
 
-    // Like: create new like
     const like = new Like();
     like.postId = new mongoose.Types.ObjectId(postId);
     like.userId = userId;
@@ -129,7 +121,6 @@ export const toggleLike = async (postId, req) => {
   } catch (error) {
     console.error('Error toggling like:', error);
     if (error.code === 11000) {
-      // Duplicate key error (shouldn't happen due to index, but handle it)
       return {
         ...RESPONSE_CODES.BAD_REQUEST,
         error: { message: 'You have already liked this post' },
