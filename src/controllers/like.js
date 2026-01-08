@@ -31,6 +31,7 @@ export const getLikes = async (postId, req) => {
           userHasLiked = !!userLike;
         }
       } catch (error) {
+        // User not authenticated, ignore
       }
     }
 
