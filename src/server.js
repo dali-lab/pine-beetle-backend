@@ -74,6 +74,24 @@ app.use(
   express.static(path.join(__dirname, '../public/uploads')),
 );
 
+// Middleware to check database connection (skip for healthcheck)
+app.use('/v3', (req, res, next) => {
+  if (req.path === '/healthcheck') {
+    return next();
+  }
+
+  if (!global.connection || global.connection.readyState !== 1) {
+    return res.status(503).send(
+      generateResponse(
+        RESPONSE_TYPES.INTERNAL_ERROR,
+        'Database connection not ready. Please try again in a moment.',
+      ),
+    );
+  }
+
+  next();
+});
+
 // ROUTES
 Object.entries(routers).forEach(([prefix, router]) => {
   app.use(`/v3/${prefix}`, router);

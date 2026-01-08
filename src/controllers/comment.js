@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { RESPONSE_CODES } from '../constants';
-import { Comment, Blog } from '../models';
+import { Blog, Comment } from '../models';
 import { sanitizeToText } from '../utils';
 import { getUserByJWT } from './user';
 
@@ -52,13 +52,13 @@ export const getComments = async (postId, options = {}) => {
 /**
  * @description creates a comment on a blog post
  * @param {String} postId blog post id
- * @param {Object} body comment body with content field
+ * @param {Object} body comment body with content and optional author field
  * @param {Object} req request object (used to get user from JWT)
  * @returns {Promise<Object>} promise that resolves to comment object or error
  */
 export const createComment = async (postId, body, req) => {
   try {
-    const { content } = body;
+    const { content, author } = body;
 
     const cleaned = sanitizeToText(content);
 
@@ -105,11 +105,19 @@ export const createComment = async (postId, body, req) => {
 
     const { first_name: firstName, last_name: lastName, _id: userId } = user;
 
+    let authorName;
+    if (author && author.trim() !== '') {
+      const cleanedAuthor = sanitizeToText(author);
+      authorName = cleanedAuthor || 'Anonymous';
+    } else {
+      authorName = 'Anonymous';
+    }
+
     const comment = new Comment();
     comment.postId = new mongoose.Types.ObjectId(postId);
     comment.userId = userId;
     comment.content = cleaned;
-    comment.author = `${firstName} ${lastName}`;
+    comment.author = authorName;
 
     const savedComment = await comment.save();
     const populatedComment = await Comment.findById(savedComment._id)

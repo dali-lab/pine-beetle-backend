@@ -32,6 +32,11 @@ function parseObjectValuesToIntOrNull(obj) {
  */
 export function specifiedQueryFetch(collectionName, query = {}) {
   return new Promise((resolve, reject) => {
+    if (!global.connection) {
+      reject(new Error('Database connection not established'));
+      return;
+    }
+
     // cast all possible strings to integers
     const parsedQuery = parseObjectValuesToIntOrNull(query);
 

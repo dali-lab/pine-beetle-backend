@@ -88,6 +88,10 @@ export const computeHistogramData = async () => {
 };
 
 export const saveHistogramData = async (histogramData) => {
+  if (!global.connection) {
+    throw new Error('Database connection not established');
+  }
+
   const cursor = global.connection.collection('histogram');
 
   const { frequency, frequencyArray } = histogramData;

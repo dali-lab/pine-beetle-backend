@@ -1,25 +1,25 @@
 import { Router } from 'express';
 
 import {
-  generateResponse,
   COLLECTION_NAMES,
+  generateResponse,
   RESPONSE_CODES,
   RESPONSE_TYPES,
 } from '../constants';
 
 import {
   aggregate,
+  generateLocationListPipeline,
   generateLocationPipeline,
   generateSparsePipeline,
-  generateStatePipeline,
-  generateYearPipeline,
-  generateYearListPipeline,
   generateStateListPipeline,
-  generateLocationListPipeline,
-  specifiedQueryFetch,
-  queryFetch,
-  getResults,
+  generateStatePipeline,
+  generateYearListPipeline,
+  generateYearPipeline,
   getChartData,
+  getResults,
+  queryFetch,
+  specifiedQueryFetch,
 } from '../utils';
 
 import {
@@ -234,8 +234,8 @@ summarizedCountyRouter.route('/years/list')
     } = req.query;
 
     const pipeline = generateYearListPipeline('county', {
-      isHistorical,
-      isPrediction,
+      isHistorical: isHistorical === '1' || isHistorical === 'true' || isHistorical === true,
+      isPrediction: isPrediction === '1' || isPrediction === 'true' || isPrediction === true,
       loc: county,
       state,
     });
@@ -266,8 +266,8 @@ summarizedCountyRouter.route('/states/list')
 
     const pipeline = generateStateListPipeline('county', {
       endYear: endYear ? parseInt(endYear, 10) : undefined,
-      isHistorical,
-      isPrediction,
+      isHistorical: isHistorical === '1' || isHistorical === 'true' || isHistorical === true,
+      isPrediction: isPrediction === '1' || isPrediction === 'true' || isPrediction === true,
       startYear: startYear ? parseInt(startYear, 10) : undefined,
     });
 
@@ -298,8 +298,8 @@ summarizedCountyRouter.route('/counties/list')
 
     const pipeline = generateLocationListPipeline('county', {
       endYear: endYear ? parseInt(endYear, 10) : undefined,
-      isHistorical,
-      isPrediction,
+      isHistorical: isHistorical === '1' || isHistorical === 'true' || isHistorical === true,
+      isPrediction: isPrediction === '1' || isPrediction === 'true' || isPrediction === true,
       startYear: startYear ? parseInt(startYear, 10) : undefined,
       state,
     });
