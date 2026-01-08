@@ -103,7 +103,7 @@ export const createComment = async (postId, body, req) => {
       };
     }
 
-    const { first_name: firstName, last_name: lastName, _id: userId } = user;
+    const { _id: userId } = user;
 
     let authorName;
     if (author && author.trim() !== '') {

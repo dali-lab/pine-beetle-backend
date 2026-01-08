@@ -89,7 +89,7 @@ app.use('/v3', (req, res, next) => {
     );
   }
 
-  next();
+  return next();
 });
 
 // ROUTES
