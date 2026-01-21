@@ -52,13 +52,13 @@ export const getComments = async (postId, options = {}) => {
 /**
  * @description creates a comment on a blog post
  * @param {String} postId blog post id
- * @param {Object} body comment body with content and optional author field
- * @param {Object} req request object (used to get user from JWT)
+ * @param {Object} body comment body with content
+ * @param {Object} req request object (used to get user from JWT if available)
  * @returns {Promise<Object>} promise that resolves to comment object or error
  */
 export const createComment = async (postId, body, req) => {
   try {
-    const { content, author } = body;
+    const { content } = body;
 
     const cleaned = sanitizeToText(content);
 
@@ -85,48 +85,33 @@ export const createComment = async (postId, body, req) => {
       };
     }
 
-    // Get user from JWT
-    let user;
-    try {
-      user = await getUserByJWT(req.headers.authorization);
-    } catch (error) {
-      return {
-        ...RESPONSE_CODES.UNAUTHORIZED,
-        error: { message: 'User must be logged in to comment' },
-      };
-    }
-
-    if (!user) {
-      return {
-        ...RESPONSE_CODES.UNAUTHORIZED,
-        error: { message: 'User must be logged in to comment' },
-      };
-    }
-
-    const { _id: userId } = user;
-
-    let authorName;
-    if (author && author.trim() !== '') {
-      const cleanedAuthor = sanitizeToText(author);
-      authorName = cleanedAuthor || 'Anonymous';
-    } else {
-      authorName = 'Anonymous';
+    // Try to get user from JWT if available (optional for non-logged-in users)
+    let userId = null;
+    if (req.headers.authorization) {
+      try {
+        const user = await getUserByJWT(req.headers.authorization);
+        if (user && typeof user === 'object' && user._id) {
+          userId = user._id;
+        }
+      } catch (error) {
+        // User not authenticated, continue as anonymous
+      }
     }
 
     const comment = new Comment();
     comment.postId = new mongoose.Types.ObjectId(postId);
     comment.userId = userId;
     comment.content = cleaned;
-    comment.author = authorName;
 
     const savedComment = await comment.save();
-    const populatedComment = await Comment.findById(savedComment._id)
-      .populate('userId', 'first_name last_name email');
+    if (userId) {
+      await savedComment.populate('userId', 'first_name last_name email');
+    }
 
     return {
       ...RESPONSE_CODES.SUCCESS,
       status: 201,
-      data: populatedComment,
+      data: savedComment,
       message: 'Comment created successfully',
     };
   } catch (error) {

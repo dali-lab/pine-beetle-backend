@@ -4,6 +4,15 @@ import { Blog, Like } from '../models';
 import { getUserByJWT } from './user';
 
 /**
+ * @description gets anonymous identifier from request (must be client-provided)
+ * @param {Object} req request object
+ * @returns {String|null} anonymous identifier or null if not provided
+ */
+const getAnonymousId = (req) => {
+  return req.body?.anonymousId || req.headers['x-anonymous-id'] || null;
+};
+
+/**
  * @description retrieves all likes for a blog post
  * @param {String} postId blog post id
  * @param {Object} req request object (used to check if user is logged in)
@@ -26,12 +35,22 @@ export const getLikes = async (postId, req) => {
     if (req.headers.authorization) {
       try {
         const user = await getUserByJWT(req.headers.authorization);
-        if (user) {
+        if (user && typeof user === 'object' && user._id) {
           const userLike = await Like.findOne({ postId, userId: user._id });
           userHasLiked = !!userLike;
         }
       } catch (error) {
-        // User not authenticated, ignore
+        const anonymousId = getAnonymousId(req);
+        if (anonymousId) {
+          const anonymousLike = await Like.findOne({ postId, anonymousId });
+          userHasLiked = !!anonymousLike;
+        }
+      }
+    } else {
+      const anonymousId = getAnonymousId(req);
+      if (anonymousId) {
+        const anonymousLike = await Like.findOne({ postId, anonymousId });
+        userHasLiked = !!anonymousLike;
       }
     }
 
@@ -55,7 +74,7 @@ export const getLikes = async (postId, req) => {
 /**
  * @description toggles a like on a blog post (likes if not liked, unlikes if liked)
  * @param {String} postId blog post id
- * @param {Object} req request object (used to get user from JWT)
+ * @param {Object} req request object (used to get user from JWT if available, or anonymousId from body/header)
  * @returns {Promise<Object>} promise that resolves to like/unlike result or error
  */
 export const toggleLike = async (postId, req) => {
@@ -68,39 +87,51 @@ export const toggleLike = async (postId, req) => {
       };
     }
 
-    let user;
-    try {
-      user = await getUserByJWT(req.headers.authorization);
-    } catch (error) {
-      return {
-        ...RESPONSE_CODES.UNAUTHORIZED,
-        error: { message: 'User must be logged in to like a post' },
-      };
+    let userId = null;
+    let anonymousId = null;
+
+    if (req.headers.authorization) {
+      try {
+        const user = await getUserByJWT(req.headers.authorization);
+        if (user && typeof user === 'object' && user._id) {
+          userId = user._id;
+        }
+      } catch (error) {
+        // Continue as anonymous
+      }
     }
 
-    if (!user) {
-      return {
-        ...RESPONSE_CODES.UNAUTHORIZED,
-        error: { message: 'User must be logged in to like a post' },
-      };
+    if (!userId) {
+      anonymousId = getAnonymousId(req);
+      if (!anonymousId) {
+        return {
+          ...RESPONSE_CODES.BAD_REQUEST,
+          error: { message: 'Anonymous identifier (anonymousId) is required for non-logged-in users' },
+        };
+      }
     }
 
-    const { _id: userId } = user;
-
-    const existingLike = await Like.findOne({
+    const query = {
       postId: new mongoose.Types.ObjectId(postId),
-      userId,
-    });
+    };
+
+    if (userId) {
+      query.userId = userId;
+    } else {
+      query.anonymousId = anonymousId;
+    }
+
+    const existingLike = await Like.findOne(query);
 
     if (existingLike) {
       await Like.deleteOne({ _id: existingLike._id });
-      const remainingLikes = await Like.find({ postId });
+      const count = await Like.countDocuments({ postId: new mongoose.Types.ObjectId(postId) });
 
       return {
         ...RESPONSE_CODES.SUCCESS,
         data: {
           liked: false,
-          count: remainingLikes.length,
+          count,
         },
       };
     }
@@ -108,15 +139,16 @@ export const toggleLike = async (postId, req) => {
     const like = new Like();
     like.postId = new mongoose.Types.ObjectId(postId);
     like.userId = userId;
+    like.anonymousId = anonymousId;
 
     await like.save();
-    const allLikes = await Like.find({ postId });
+    const count = await Like.countDocuments({ postId: new mongoose.Types.ObjectId(postId) });
 
     return {
       ...RESPONSE_CODES.SUCCESS,
       data: {
         liked: true,
-        count: allLikes.length,
+        count,
       },
     };
   } catch (error) {

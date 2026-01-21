@@ -10,15 +10,12 @@ const CommentSchema = new Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'A comment must have an author'],
+      required: false,
     },
     content: {
       type: String,
       required: [true, 'A comment must have content'],
-    },
-    author: {
-      type: String,
-      required: true,
+      maxlength: [1000, 'Comment must be under 1000 characters'],
     },
   },
   {
@@ -28,6 +25,8 @@ const CommentSchema = new Schema(
     timestamps: { createdAt: 'date_created', updatedAt: 'date_edited' },
   },
 );
+
+CommentSchema.index({ postId: 1 });
 
 const CommentModel = mongoose.model('Comment', CommentSchema);
 

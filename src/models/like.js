@@ -10,7 +10,11 @@ const LikeSchema = new Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'A like must have a user'],
+      required: false,
+    },
+    anonymousId: {
+      type: String,
+      required: false,
     },
   },
   {
@@ -21,8 +25,10 @@ const LikeSchema = new Schema(
   },
 );
 
-// Ensure a user can only like a post once
-LikeSchema.index({ postId: 1, userId: 1 }, { unique: true });
+// Ensure a logged-in user can only like a post once (sparse index allows multiple null userIds)
+LikeSchema.index({ postId: 1, userId: 1 }, { unique: true, sparse: true });
+// Ensure an anonymous user can only like a post once per anonymousId
+LikeSchema.index({ postId: 1, anonymousId: 1 }, { unique: true, sparse: true });
 
 const LikeModel = mongoose.model('Like', LikeSchema);
 

@@ -195,6 +195,20 @@ export const getUserByJWT = async (authorization) => {
   return user;
 };
 
+/**
+ * @description gets authenticated user from JWT token, throws error if not authenticated
+ * @param {String} authorization authorization header from request
+ * @returns {Promise<User>} promise that resolves to user object
+ * @throws {Error} if user is not authenticated or token is invalid
+ */
+export const requireAuthenticatedUser = async (authorization) => {
+  const user = await getUserByJWT(authorization);
+  if (!user || user === RESPONSE_CODES.NOT_FOUND) {
+    throw new Error('Invalid token');
+  }
+  return user;
+};
+
 export const userWithEmailExists = async (email) => {
   try {
     const user = await getUserByEmail(email);
