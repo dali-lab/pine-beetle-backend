@@ -36,11 +36,7 @@ mongoose
 // initialize
 const app = express();
 
-// Trust proxy to get real IP addresses (for Heroku, AWS, etc.)
 app.set('trust proxy', true);
-
-// enable cross origin resource sharing
-// app.use(cors());
 
 app.use(cors({
   origin: '*',

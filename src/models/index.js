@@ -7,5 +7,6 @@ import User from './user';
 export {
   Blog,
   Comment,
-  Like, User,
+  Like,
+  User,
 };

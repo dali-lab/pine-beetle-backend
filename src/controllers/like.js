@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { RESPONSE_CODES } from '../constants';
 import { Blog, Like } from '../models';
-import { getUserByJWT } from './user';
+import { getOptionalUser } from './user';
 
 /**
  * @description gets anonymous identifier from request (must be client-provided)
@@ -32,20 +32,12 @@ export const getLikes = async (postId, req) => {
       .populate('userId', 'first_name last_name email');
 
     let userHasLiked = false;
-    if (req.headers.authorization) {
-      try {
-        const user = await getUserByJWT(req.headers.authorization);
-        if (user && typeof user === 'object' && user._id) {
-          const userLike = await Like.findOne({ postId, userId: user._id });
-          userHasLiked = !!userLike;
-        }
-      } catch (error) {
-        const anonymousId = getAnonymousId(req);
-        if (anonymousId) {
-          const anonymousLike = await Like.findOne({ postId, anonymousId });
-          userHasLiked = !!anonymousLike;
-        }
-      }
+    const user = await getOptionalUser(req);
+    const userId = user ? user._id : null;
+
+    if (userId) {
+      const userLike = await Like.findOne({ postId, userId });
+      userHasLiked = !!userLike;
     } else {
       const anonymousId = getAnonymousId(req);
       if (anonymousId) {
@@ -87,19 +79,9 @@ export const toggleLike = async (postId, req) => {
       };
     }
 
-    let userId = null;
+    const user = await getOptionalUser(req);
+    const userId = user ? user._id : null;
     let anonymousId = null;
-
-    if (req.headers.authorization) {
-      try {
-        const user = await getUserByJWT(req.headers.authorization);
-        if (user && typeof user === 'object' && user._id) {
-          userId = user._id;
-        }
-      } catch (error) {
-        // Continue as anonymous
-      }
-    }
 
     if (!userId) {
       anonymousId = getAnonymousId(req);
@@ -121,27 +103,21 @@ export const toggleLike = async (postId, req) => {
       query.anonymousId = anonymousId;
     }
 
-    const existingLike = await Like.findOne(query);
+    const deleted = await Like.findOneAndDelete(query);
 
-    if (existingLike) {
-      await Like.deleteOne({ _id: existingLike._id });
+    if (deleted) {
       const count = await Like.countDocuments({ postId: new mongoose.Types.ObjectId(postId) });
-
       return {
         ...RESPONSE_CODES.SUCCESS,
-        data: {
-          liked: false,
-          count,
-        },
+        data: { liked: false, count },
       };
     }
 
-    const like = new Like();
-    like.postId = new mongoose.Types.ObjectId(postId);
-    like.userId = userId;
-    like.anonymousId = anonymousId;
-
-    await like.save();
+    await Like.create({
+      postId: new mongoose.Types.ObjectId(postId),
+      userId,
+      anonymousId,
+    });
     const count = await Like.countDocuments({ postId: new mongoose.Types.ObjectId(postId) });
 
     return {

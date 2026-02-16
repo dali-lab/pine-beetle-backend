@@ -196,17 +196,18 @@ export const getUserByJWT = async (authorization) => {
 };
 
 /**
- * @description gets authenticated user from JWT token, throws error if not authenticated
- * @param {String} authorization authorization header from request
- * @returns {Promise<User>} promise that resolves to user object
- * @throws {Error} if user is not authenticated or token is invalid
+ * @description attempts to get user from Authorization header; returns null if absent or invalid
+ * @param {Object} req express request object
+ * @returns {Promise<Object|null>} user document or null
  */
-export const requireAuthenticatedUser = async (authorization) => {
-  const user = await getUserByJWT(authorization);
-  if (!user || user === RESPONSE_CODES.NOT_FOUND) {
-    throw new Error('Invalid token');
+export const getOptionalUser = async (req) => {
+  if (!req.headers.authorization) return null;
+  try {
+    const user = await getUserByJWT(req.headers.authorization);
+    return (user && typeof user === 'object' && user._id) ? user : null;
+  } catch (error) {
+    return null;
   }
-  return user;
 };
 
 export const userWithEmailExists = async (email) => {

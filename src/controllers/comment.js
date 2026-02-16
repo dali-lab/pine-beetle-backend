@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { RESPONSE_CODES } from '../constants';
 import { Blog, Comment } from '../models';
 import { sanitizeToText } from '../utils';
-import { getUserByJWT } from './user';
+import { getOptionalUser } from './user';
 
 const MAX_COMMENT_LENGTH = 1000;
 
@@ -16,7 +16,6 @@ export const getComments = async (postId, options = {}) => {
   try {
     const { limit, offset, sort = 'date_created' } = options;
 
-    // Verify blog post exists
     const blogPost = await Blog.findById(postId);
     if (!blogPost) {
       return {
@@ -76,7 +75,6 @@ export const createComment = async (postId, body, req) => {
       };
     }
 
-    // Verify blog post exists
     const blogPost = await Blog.findById(postId);
     if (!blogPost) {
       return {
@@ -85,18 +83,8 @@ export const createComment = async (postId, body, req) => {
       };
     }
 
-    // Try to get user from JWT if available (optional for non-logged-in users)
-    let userId = null;
-    if (req.headers.authorization) {
-      try {
-        const user = await getUserByJWT(req.headers.authorization);
-        if (user && typeof user === 'object' && user._id) {
-          userId = user._id;
-        }
-      } catch (error) {
-        // User not authenticated, continue as anonymous
-      }
-    }
+    const user = await getOptionalUser(req);
+    const userId = user ? user._id : null;
 
     const comment = new Comment();
     comment.postId = new mongoose.Types.ObjectId(postId);
