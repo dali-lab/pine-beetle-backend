@@ -1,9 +1,9 @@
-import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
-import morgan from 'morgan';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import express from 'express';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
 import path from 'path';
 import routers from './routers';
 
@@ -36,8 +36,14 @@ mongoose
 // initialize
 const app = express();
 
-// enable cross origin resource sharing
-app.use(cors());
+app.set('trust proxy', true);
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: false,
+}));
 
 // use gzip compression
 app.use(compression());
@@ -63,6 +69,24 @@ app.use(
   '/v3/uploads',
   express.static(path.join(__dirname, '../public/uploads')),
 );
+
+// Middleware to check database connection (skip for healthcheck)
+app.use('/v3', (req, res, next) => {
+  if (req.path === '/healthcheck') {
+    return next();
+  }
+
+  if (!global.connection || global.connection.readyState !== 1) {
+    return res.status(503).send(
+      generateResponse(
+        RESPONSE_TYPES.INTERNAL_ERROR,
+        'Database connection not ready. Please try again in a moment.',
+      ),
+    );
+  }
+
+  return next();
+});
 
 // ROUTES
 Object.entries(routers).forEach(([prefix, router]) => {

@@ -195,6 +195,21 @@ export const getUserByJWT = async (authorization) => {
   return user;
 };
 
+/**
+ * @description attempts to get user from Authorization header; returns null if absent or invalid
+ * @param {Object} req express request object
+ * @returns {Promise<Object|null>} user document or null
+ */
+export const getOptionalUser = async (req) => {
+  if (!req.headers.authorization) return null;
+  try {
+    const user = await getUserByJWT(req.headers.authorization);
+    return (user && typeof user === 'object' && user._id) ? user : null;
+  } catch (error) {
+    return null;
+  }
+};
+
 export const userWithEmailExists = async (email) => {
   try {
     const user = await getUserByEmail(email);

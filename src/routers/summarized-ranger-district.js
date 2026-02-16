@@ -1,25 +1,25 @@
 import { Router } from 'express';
 
 import {
-  generateResponse,
   COLLECTION_NAMES,
+  generateResponse,
   RESPONSE_CODES,
   RESPONSE_TYPES,
 } from '../constants';
 
 import {
   aggregate,
+  generateLocationListPipeline,
   generateLocationPipeline,
   generateSparsePipeline,
-  generateStatePipeline,
-  generateYearPipeline,
-  generateYearListPipeline,
   generateStateListPipeline,
-  generateLocationListPipeline,
-  specifiedQueryFetch,
-  queryFetch,
-  getResults,
+  generateStatePipeline,
+  generateYearListPipeline,
+  generateYearPipeline,
   getChartData,
+  getResults,
+  queryFetch,
+  specifiedQueryFetch,
 } from '../utils';
 
 import {

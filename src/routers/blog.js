@@ -1,25 +1,136 @@
 import { Router } from 'express';
 import {
-  COLLECTION_NAMES,
   RESPONSE_CODES,
   RESPONSE_TYPES,
   generateResponse,
 } from '../constants';
-import { queryFetch, uploadFile } from '../utils';
-import { Blog, User } from '../controllers';
+import {
+  Blog, Comment, Like, User,
+} from '../controllers';
 import { requireAuth } from '../middleware';
+import { uploadFile } from '../utils';
 
 const blogRouter = Router();
 
 // get all blog posts
 blogRouter.route('/').get(async (_req, res) => {
   try {
-    const blogPosts = await queryFetch(COLLECTION_NAMES.blogPost);
-    res.send(generateResponse(RESPONSE_TYPES.SUCCESS, blogPosts));
+    const result = await Blog.getAllBlogPosts();
+
+    if (result && result.status === 200) {
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, result.data));
+    } else {
+      res.status(result.status || 500).send(generateResponse(result.type));
+    }
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res
+      .status(RESPONSE_CODES.INTERNAL_ERROR.status)
+      .send(generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error));
   }
 });
+
+blogRouter.route('/:postId/likes')
+  .get(async (req, res) => {
+    try {
+      const result = await Like.getLikes(req.params.postId, req);
+
+      if (result && result.status === 200) {
+        res.status(200).send({
+          success: true,
+          data: result.data,
+        });
+      } else {
+        res.status(result.status || 404).send({
+          success: false,
+          error: result.error,
+        });
+      }
+    } catch (error) {
+      console.error('Error getting likes:', error);
+      res.status(500).send({
+        success: false,
+        error: { message: 'Server error', code: 'SERVER_ERROR' },
+      });
+    }
+  })
+  .post(async (req, res) => {
+    try {
+      const result = await Like.toggleLike(req.params.postId, req);
+
+      if (result && result.status === 200) {
+        res.status(200).send({
+          success: true,
+          data: result.data,
+        });
+      } else {
+        res.status(result.status || 404).send({
+          success: false,
+          error: result.error,
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      res.status(500).send({
+        success: false,
+        error: { message: 'Server error', code: 'SERVER_ERROR' },
+      });
+    }
+  });
+
+blogRouter.route('/:postId/comments')
+  .get(async (req, res) => {
+    try {
+      const { limit, offset, sort } = req.query;
+      const result = await Comment.getComments(req.params.postId, { limit, offset, sort });
+
+      if (result && result.status === 200) {
+        res.status(200).send({
+          success: true,
+          data: result.data,
+        });
+      } else {
+        res.status(result.status || 404).send({
+          success: false,
+          error: result.error,
+        });
+      }
+    } catch (error) {
+      console.error('Error getting comments:', error);
+      res.status(500).send({
+        success: false,
+        error: { message: 'Server error', code: 'SERVER_ERROR' },
+      });
+    }
+  })
+  .post(async (req, res) => {
+    try {
+      const result = await Comment.createComment(req.params.postId, req.body, req);
+
+      if (result && result.status === 201) {
+        res.status(201).send({
+          success: true,
+          data: result.data,
+          message: result.message,
+        });
+      } else if (result.status === 400) {
+        res.status(400).send({
+          success: false,
+          error: result.error,
+        });
+      } else {
+        res.status(result.status || 404).send({
+          success: false,
+          error: result.error,
+        });
+      }
+    } catch (error) {
+      console.error('Error creating comment:', error);
+      res
+        .status(RESPONSE_CODES.INTERNAL_ERROR.status)
+        .send(generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error));
+    }
+  });
 
 blogRouter
   .route('/:id')

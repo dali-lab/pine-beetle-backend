@@ -4,6 +4,49 @@ import { Blog } from '../models';
 import { uploadFileToFirebase } from '../utils';
 
 /**
+ * @description retrieves all blog posts with likes and comments counts
+ * @returns {Promise<Object>} promise that resolves to blog posts array or error
+ */
+export const getAllBlogPosts = async () => {
+  try {
+    const blogPosts = await Blog.aggregate([
+      {
+        $lookup: {
+          from: 'likes',
+          localField: '_id',
+          foreignField: 'postId',
+          as: '_likes',
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'postId',
+          as: '_comments',
+        },
+      },
+      {
+        $addFields: {
+          likesCount: { $size: '$_likes' },
+          commentsCount: { $size: '$_comments' },
+        },
+      },
+      { $project: { _likes: 0, _comments: 0 } },
+      { $sort: { date_created: -1 } },
+    ]);
+
+    return {
+      ...RESPONSE_CODES.SUCCESS,
+      data: blogPosts,
+    };
+  } catch (error) {
+    console.error('Error getting all blog posts:', error);
+    return RESPONSE_CODES.INTERNAL_ERROR;
+  }
+};
+
+/**
  * @description retrieves blog post object
  * @param {String} id blog post id
  * @returns {Promise<Blog>} promise that resolves to blog post object or error

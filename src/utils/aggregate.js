@@ -372,6 +372,11 @@ export function generateLocationListPipeline(location, filters = {}) {
    */
 export function aggregate(collectionName, pipeline = []) {
   return new Promise((resolve, reject) => {
+    if (!global.connection) {
+      reject(new Error('Database connection not established'));
+      return;
+    }
+
     const cursor = global.connection
       .collection(collectionName)
       .aggregate(pipeline);
