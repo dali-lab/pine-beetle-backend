@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import {
-  COLLECTION_NAMES,
   RESPONSE_CODES,
   RESPONSE_TYPES,
   generateResponse,
@@ -9,17 +8,25 @@ import {
   Blog, Comment, Like, User,
 } from '../controllers';
 import { requireAuth } from '../middleware';
-import { queryFetch, uploadFile } from '../utils';
+import { uploadFile } from '../utils';
 
 const blogRouter = Router();
 
 // get all blog posts
 blogRouter.route('/').get(async (_req, res) => {
   try {
-    const blogPosts = await queryFetch(COLLECTION_NAMES.blogPost);
-    res.send(generateResponse(RESPONSE_TYPES.SUCCESS, blogPosts));
+    const result = await Blog.getAllBlogPosts();
+
+    if (result && result.status === 200) {
+      res.send(generateResponse(RESPONSE_TYPES.SUCCESS, result.data));
+    } else {
+      res.status(result.status || 500).send(generateResponse(result.type));
+    }
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res
+      .status(RESPONSE_CODES.INTERNAL_ERROR.status)
+      .send(generateResponse(RESPONSE_TYPES.INTERNAL_ERROR, error));
   }
 });
 

@@ -57,7 +57,7 @@ export const getComments = async (postId, options = {}) => {
  */
 export const createComment = async (postId, body, req) => {
   try {
-    const { content } = body;
+    const { content, author } = body;
 
     const cleaned = sanitizeToText(content);
 
@@ -86,9 +86,15 @@ export const createComment = async (postId, body, req) => {
     const user = await getOptionalUser(req);
     const userId = user ? user._id : null;
 
+    let authorName = sanitizeToText(author);
+    if (!authorName && user) {
+      authorName = `${user.first_name} ${user.last_name}`.trim();
+    }
+
     const comment = new Comment();
     comment.postId = new mongoose.Types.ObjectId(postId);
     comment.userId = userId;
+    comment.author = authorName || null;
     comment.content = cleaned;
 
     const savedComment = await comment.save();

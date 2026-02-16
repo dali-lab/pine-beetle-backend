@@ -12,6 +12,10 @@ const CommentSchema = new Schema(
       ref: 'User',
       required: false,
     },
+    author: {
+      type: String,
+      maxlength: [100, 'Author name must be under 100 characters'],
+    },
     content: {
       type: String,
       required: [true, 'A comment must have content'],
